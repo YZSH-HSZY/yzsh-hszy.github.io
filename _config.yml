@@ -1,0 +1,10 @@
+lsi: false  # 生成相关帖子的索引
+safe: true  # 禁用未白名单插件，磁盘缓存，并忽略符号链接
+# source: [your repo's top level directory]  # Jekyll 读取文件的目录
+incremental: false  # 启用实验性的增量构建功能。仅重新构建已更改的界面
+highlighter: rouge
+gist:
+  noscript: false  # 禁用Jekyll Gist的javascript脚本请求(github pages站点必须)
+kramdown:  # Jekyll 默认的 Markdown 渲染器
+  math_engine: mathjax
+  syntax_highlighter: rouge
