@@ -1,0 +1,55 @@
+name: test_sync_warehouse
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天同步一次，可以根据需要调整
+  workflow_dispatch:  # 允许手动触发工作流
+
+permissions:
+  contents: write  # 允许写入内容,使用 GitHub Actions 提供的默认 `GITHUB_TOKEN`
+
+jobs:
+  pull_mblog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Current Repository
+        uses: actions/checkout@main
+        with:
+          repository: YZSH-HSZY/yzsh-hszy.github.io
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: yzsh-repo
+
+      - name: Clone Github Repository Mblog
+        run: |
+          git clone https://github.com/YZSH-HSZY/mblog.git mblog-repo
+      
+      - name: Convert Ipynb To Markdown
+        run: cd mblog-repo && find ./ -iname "*.ipynb" | xargs jupyter nbconvert --to markdown
+
+      - name: Copy MD Files To Current Repository
+        run: |
+          cp -r mblog-repo/* yzsh-repo/content/ && cd yzsh-repo/content && find ./ -type f | grep -E -v "*\.md$" | xargs rm -rf
+
+      # - name: Commit and Push Changes
+      #   run: |
+      #     cd github-repo
+      #     git config user.name "YZSH-HSZY"
+      #     git config user.email "yzsh_hszy@outlook.com"
+      #     git add .
+      #     git commit -m "Sync from Gitee" || echo "No changes to commit"
+      #     git push origin main  # 根据你的主分支名称调整
+# on:
+#   # push: # push 时触发, 主要是为了测试配置有没有问题
+#   schedule:
+#     - cron: '* */3 * * *' # 每3小时触发, 对于一些更新不那么频繁的项目可以设置为每天一次, 低碳一点
+# jobs:
+#   repo-sync:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: TG908/fork-sync@v1.6.3
+#         with:
+#           github_token: ${{ secrets.GITHUB_TOKEN }}
+#           owner: ZhaoUncle # fork 的上游仓库 user
+#           head: main # fork 的上游仓库 branch
+#           base: main # 本地仓库 branch

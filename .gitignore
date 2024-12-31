@@ -164,7 +164,7 @@ cython_debug/
 
 test
 .vscode
-content
+output
 
 Makefile
 pelicanconf.py
