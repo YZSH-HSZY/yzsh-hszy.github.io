@@ -13,6 +13,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@main
+      - name: Set up Python
+        # This is the version of the action for setting up Python, not the Python version.
+        uses: actions/setup-python@v5
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.12.3'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
+      # You can test your matrix by printing the current Python version
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+      
+      - name: Install Pip Package
+        run: pip install jupyter nbconvert pandas
+      
+      - name: Show Pip List Package
+        run: pip list
+
       - name: Clone Current Repository
         uses: actions/checkout@main
         with:
@@ -29,7 +48,10 @@ jobs:
 
       - name: Copy MD Files To Current Repository
         run: |
-          cp -r mblog-repo/* yzsh-repo/content/ && cd yzsh-repo/content && find ./ -type f | grep -E -v "*\.md$" | xargs rm -rf
+          cd ..
+          cp -r mblog-repo/* yzsh-repo/content/ 
+          cd yzsh-repo/content 
+          find ./ -type f | grep -E -v "*\.md$" | xargs rm -rf
 
       # - name: Commit and Push Changes
       #   run: |
