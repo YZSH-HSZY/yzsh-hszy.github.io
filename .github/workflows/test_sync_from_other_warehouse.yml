@@ -48,19 +48,21 @@ jobs:
 
       - name: Copy MD Files To Current Repository
         run: |
-          echo $(pwd) && ls
+          echo $(pwd) && ls -R
           cp -r mblog-repo/* yzsh-repo/content/ 
           cd yzsh-repo/content 
           find ./ -type f | grep -E -v "*\.md$" | xargs rm -rf
+          echo "the yzsh-repo content"
+          ls -R ./
 
-      # - name: Commit and Push Changes
-      #   run: |
-      #     cd github-repo
-      #     git config user.name "YZSH-HSZY"
-      #     git config user.email "yzsh_hszy@outlook.com"
-      #     git add .
-      #     git commit -m "Sync from Gitee" || echo "No changes to commit"
-      #     git push origin main  # 根据你的主分支名称调整
+      - name: Commit and Push Content Changes
+        run: |
+          cd yzsh-repo
+          git config user.name "YZSH-HSZY"
+          git config user.email "yzsh_hszy@outlook.com"
+          git add content
+          git commit -m "Sync from other warehouse" || echo "No content changes to commit"
+          git push origin main  # 根据你的主分支名称调整
 # on:
 #   # push: # push 时触发, 主要是为了测试配置有没有问题
 #   schedule:
