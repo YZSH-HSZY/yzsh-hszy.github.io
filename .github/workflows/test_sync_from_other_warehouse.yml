@@ -27,7 +27,7 @@ jobs:
         run: python -c "import sys; print(sys.version)"
       
       - name: Install Pip Package
-        run: pip install jupyter nbconvert pandas
+        run: pip install jupyter nbconvert pandas pelican
       
       - name: Show Pip List Package
         run: pip list
