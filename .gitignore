@@ -170,3 +170,4 @@ Makefile
 pelicanconf.py
 publishconf.py
 tasks.py
+!_scripts/publishconf.py
