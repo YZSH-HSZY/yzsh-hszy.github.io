@@ -1,3 +1,10 @@
+---
+Title: Cpython Learen Notes.
+Date: 2024-07-18 12:00
+Lang: zh-cn
+Category: Cpython
+---
+
 # cpython
 一个python的c语言解释器，同样的python解释器实现还有jython、pypy等
 

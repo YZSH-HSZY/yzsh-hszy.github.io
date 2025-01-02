@@ -1,3 +1,11 @@
+---
+Title: Python Unicode And Utf-8 Different Notes.
+Date: 2024-07-18 12:00
+Lang: zh-cn
+Category: Cpython
+---
+
+
 ```python
 with open('all_unicode_char.txt', 'wb') as f:
     err_nums = 0

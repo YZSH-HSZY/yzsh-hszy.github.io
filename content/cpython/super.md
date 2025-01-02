@@ -1,3 +1,10 @@
+---
+Title: Python Super Class Example Notes.
+Date: 2024-07-18 12:00
+Lang: zh-cn
+Category: Cpython
+---
+
 ## super笔记
 在oop编程中，我们经常需要使用super来调用父类的方法，各个编程语言均有对应的super实现。在python中提供超类super的类定义，有以下几种调用方式。
 1. 在类定义代码段中，使用无参数的 `super()` 调用

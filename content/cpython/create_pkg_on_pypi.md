@@ -1,3 +1,10 @@
+---
+Title: Cpython Package Publish Notes.
+Date: 2024-07-18 12:00
+Lang: zh-cn
+Category: Cpython
+---
+
 ## 如何在 pypi(即python package index，python包索引)上发布自己新建的工具包？
 
 

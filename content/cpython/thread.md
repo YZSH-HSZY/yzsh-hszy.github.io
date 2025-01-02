@@ -1,3 +1,11 @@
+---
+Title: Python Thread Package Example Notes.
+Date: 2024-07-18 12:00
+Lang: zh-cn
+Category: Cpython
+---
+
+
 ```python
 import atexit
 from datetime import datetime
