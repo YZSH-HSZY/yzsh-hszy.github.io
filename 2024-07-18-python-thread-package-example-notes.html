@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Python Thread Package Example Notes.</title>
+                        <link rel="stylesheet" href="https://yzsh-hszy.github.io/theme/css/main.css" />
+                                <link href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Welcome to YZSH-HSZY blog. Atom Feed" />
+    <meta name="description" content="import atexit from datetime import datetime import threading from time import sleep def test_p(): print('this is test',..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="https://yzsh-hszy.github.io/">Welcome to YZSH-HSZY blog.</a></h1>
+                        <nav><ul>
+                                                <li class="active"><a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/misc.html">misc</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/review.html">Review</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/test.html">Test</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="https://yzsh-hszy.github.io/2024-07-18-python-thread-package-example-notes.html" rel="bookmark"
+             title="Permalink to Python Thread Package Example Notes.">Python Thread Package Example Notes.</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-07-18T12:00:00+08:00">
+                Published: Thu 18 July 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
+                </address>
+        <p>In <a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a>.</p>
+        
+</footer><!-- /.post-info -->        <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">atexit</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="k">def</span> <span class="nf">test_p</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;this is test&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y, %H:%M:%S&quot;</span><span class="p">)))</span>
+    <span class="k">assert</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="c1"># atexit.register(test_p)</span>
+
+<span class="k">def</span> <span class="nf">thread_print</span><span class="p">():</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mf">1e3</span><span class="p">:</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mf">.001</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;threading end print&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">end_print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;atexiting print&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">is_alive</span><span class="p">(),</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
+    <span class="n">target</span><span class="o">=</span><span class="n">thread_print</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="p">[]</span>
+<span class="p">)</span>
+<span class="c1"># 1. 对应主进程来说，并不是主线程退出了，主进程就会退出</span>
+<span class="c1">#   &gt; 而是主进程会等待所有在前景的线程结束才会退出</span>
+<span class="c1"># 2. 如果线程设置了守护标志，是一个背景线程daemon,那么主进程不会等待其执行完成才退出</span>
+<span class="c1">#   &gt; 一般无限循环检测标志或为其他线程提供服务的线程被设置为守护线程</span>
+<span class="c1"># </span>
+<span class="n">p</span><span class="o">.</span><span class="n">setDaemon</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">end_print</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="blogroll">
+                                        <h2>links</h2>
+                                        <ul>
+                                                        <li><a href="https://getpelican.com/">Pelican</a></li>
+                                                        <li><a href="https://www.python.org/">Python.org</a></li>
+                                                        <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                                                        <li><a href="#">You can modify those links in your config file</a></li>
+                                        </ul>
+                                </div><!-- /.blogroll -->
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="#">You can add links in your config file</a></li>
+                                                        <li><a href="#">Another social link</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Cpython Learen Notes.</title>
+                        <link rel="stylesheet" href="https://yzsh-hszy.github.io/theme/css/main.css" />
+                                <link href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Welcome to YZSH-HSZY blog. Atom Feed" />
+    <meta name="description" content="cpython 一个python的c语言解释器，同样的python解释器实现还有jython、pypy等 github官网 准备 在学习python的过程中，我对python的一些工作细节感到困惑，因此有了本文。在这里我将学习cpython源码的一些细节记录在下面: 环境 cpython..." />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="https://yzsh-hszy.github.io/">Welcome to YZSH-HSZY blog.</a></h1>
+                        <nav><ul>
+                                                <li class="active"><a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/misc.html">misc</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/review.html">Review</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/test.html">Test</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="https://yzsh-hszy.github.io/2024-07-18-cpython-learen-notes.html" rel="bookmark"
+             title="Permalink to Cpython Learen Notes.">Cpython Learen Notes.</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-07-18T12:00:00+08:00">
+                Published: Thu 18 July 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
+                </address>
+        <p>In <a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a>.</p>
+        
+</footer><!-- /.post-info -->        <h1>cpython</h1>
+<p>一个python的c语言解释器，同样的python解释器实现还有jython、pypy等</p>
+<p><a href="https://github.com/python/cpython">github官网</a></p>
+<h2>准备</h2>
+<p>在学习python的过程中，我对python的一些工作细节感到困惑，因此有了本文。在这里我将学习cpython源码的一些细节记录在下面:</p>
+<p><strong>环境</strong> cpython 3.12.3,ubuntu 20.04 in wsl2,gun/gcc系列编译器
+<strong>注意</strong> cpython在编译安装时，需要已有pyhton环境</p>
+<h2>cpython编译</h2>
+<p>(python官方开发构建文档)[https://devguide.python.org/getting-started/setup-building/#build-dependencies]</p>
+<p>在进行cpython的编译时，需要注意可能缺少相应的依赖项，可以使用<code>apt search</code>和<code>apt-file</code>命令找到包在机器上的安装名和文件存在与那些包中。</p>
+<p>这里列出一些需要的安装包
+- build-essential 包含一系列的C/C++开发工具，主要为GNU系列编译器
+- python3-pip python的pip包管理器
+- manpages-dev 适用于开发环境的man手册(包含系统调用和库调用的介绍信息)
+- pkg-config 管理库的编译和链接标志的工具，在项目包含依赖库时有用
+- cmake 一个简易的、生成makefile文件的项目构建工具
+- gdb GNU系列的调试器，进行源码调试的工具</p>
+<p><strong>注意</strong> 模块n/a(not available)有以下几种情况:
+1. 模块不支持当前 Python 版本：某些模块可能只支持特定的 Python 版本，如果你使用的 Python 版本不在支持范围内，模块可能无法编译。
+2. 缺少依赖库：某些模块可能依赖于特定的库或框架，如果这些库或框架未安装或不可用，模块可能无法编译。
+3. 编译错误：模块的源代码可能存在错误，导致编译失败。
+4. 不支持当前操作系统：某些模块可能只支持特定的操作系统，如果你使用的操作系统不在支持范围内，模块可能无法编译。</p>
+<h3>编译过程</h3>
+<div class="highlight"><pre><span></span><code>./configure<span class="w"> </span>--help<span class="w">  </span><span class="c1"># 查看帮助信息</span>
+<span class="c1"># 调试构建</span>
+mkdir<span class="w"> </span>debug
+<span class="nb">cd</span><span class="w"> </span>debug
+../configure<span class="w"> </span>--with-pydebug
+make
+make<span class="w"> </span><span class="nb">test</span>
+</code></pre></div>
+
+<h4>configure文件生成</h4>
+<p>CPython 的 <code>configure</code> 脚本是使用 <code>GNU Autoconf</code> 从 <code>configure.ac</code> 生成
+你可以在更改 <code>configure.ac</code> 后，运行 <code>make regen-configure</code> 生成 <code>configure</code>/<code>pyconfig.h.in</code>/<code>aclocal.m4</code></p>
+<p><strong>注意</strong> 不同cpython版本使用的autoconf版本不同
+- 对于 Python 3.12 及更新版本，需要 <code>GNU Autoconf v2.71</code>
+- 对于 Python 3.11 及更早版本，需要 <code>GNU Autoconf v2.69</code></p>
+<h3>编译过程中报缺少模块的错误</h3>
+<p>一般是由于缺少头文件造成的，可以通过<code>find</code>查看有无对应头文件，无则需要安装开发库，可通过<code>apt-file</code>搜索可安装包，以下是一些模块对应缺少的依赖库</p>
+<ul>
+<li>no module _ssl
+    安装tk-itk4-dev tcl-itcl4-dev libssl-dev</li>
+<li>ctype
+    libffi-dev</li>
+<li>readline
+    [libreadline-dev | lib32readline-dev]</li>
+<li>_bz2
+    libbz2-dev
+     介绍:
+      high-quality block-sorting file compressor library- development(高质量的块排序文件压缩程序库-开发)</li>
+<li>_lzma
+    liblzma-dev
+     介绍:
+      XZ-format compression library(xz格式的压缩算法库)
+      注意: 5.6.0,5.6.1版本中存在xz安全漏洞,请安装低版本</li>
+<li>_gdbm _dbm
+    libgdbm-dev libgdbm-compat-dev
+     介绍:
+      dbm: kv型数据库<br>
+      libgdbm-dev: GNU dbm database routines(GNU数据库例程)
+      libgdbm-compat-dev: legacy support development files(遗留支持开发文件)。解决无dbm.h文件问题    </li>
+</ul>
+<p><strong>注意</strong> <code>apt-file</code>需要使用<code>apt install apt-file</code>安装，并且使用<code>apt-file update</code>更新数据库之后，才能使用。</p>
+<h2>cpython目录结构</h2>
+<ul>
+<li><code>Doc</code>                 文档</li>
+<li><code>Grammar</code>             包含 Python 的 EBNF 语法文件</li>
+<li><code>Include</code>             cpython解释器头文件</li>
+<li><code>Lib</code>                 纯 Python 实现的标准库</li>
+<li><code>Misc</code>                独立目录，包含文档等</li>
+<li><code>Modules</code>             用 C 实现的标准库</li>
+<li><code>Objects</code>             所有内置类型的代码</li>
+<li><code>Mac</code>                 Mac 特定代码</li>
+<li><code>PC</code>                  Windows 特定代码</li>
+<li><code>PCbuild</code>             MSVC 构建文件</li>
+<li><code>Parser</code>              解析器相关的代码。包含 AST 节点定义</li>
+<li><code>Programs</code>            C 可执行文件的源代码，包括 CPython 解释器的 main 函数</li>
+<li><code>Python</code>              CPython core runtime。包括编译器、评估循环和各种内置模块</li>
+<li><code>Tools</code>               维护 Python 的工具</li>
+</ul>
+<h2>cpython源码分析</h2>
+<h2>分析实例</h2>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="blogroll">
+                                        <h2>links</h2>
+                                        <ul>
+                                                        <li><a href="https://getpelican.com/">Pelican</a></li>
+                                                        <li><a href="https://www.python.org/">Python.org</a></li>
+                                                        <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                                                        <li><a href="#">You can modify those links in your config file</a></li>
+                                        </ul>
+                                </div><!-- /.blogroll -->
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="#">You can add links in your config file</a></li>
+                                                        <li><a href="#">Another social link</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
