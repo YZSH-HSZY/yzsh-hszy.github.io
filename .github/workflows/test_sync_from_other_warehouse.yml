@@ -55,15 +55,15 @@ jobs:
           echo "the yzsh-repo content"
           ls -R ./
       
-      - name: Convert MD Files To Static Html Files
-        run: |
-          cd yzsh-repo
-          pelican content -D -s ./_scripts/publishconf.py -o .
-
       - name: Remove Last Step Generate Files
         run: |
           cd yzsh-repo
           python ./_scripts/clear.py --path .
+
+      - name: Convert MD Files To Static Html Files
+        run: |
+          cd yzsh-repo
+          pelican content -D -s ./_scripts/publishconf.py -o .
 
       - name: Commit and Push Content Changes
         run: |
