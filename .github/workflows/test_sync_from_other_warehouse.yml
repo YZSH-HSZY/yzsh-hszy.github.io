@@ -60,12 +60,17 @@ jobs:
           cd yzsh-repo
           pelican content -D -s ./_scripts/publishconf.py -o .
 
+      - name: Remove Last Step Generate Files
+        run: |
+          cd yzsh-repo
+          python ./_scripts/clear.py --path .
+
       - name: Commit and Push Content Changes
         run: |
           cd yzsh-repo
           git config user.name "YZSH-HSZY"
           git config user.email "yzsh_hszy@outlook.com"
-          git add content
+          git add .
           git commit -m "Sync from other warehouse and auto deploy" || echo "No content changes to commit"
           git push origin main  # 根据你的主分支名称调整
 # on:
