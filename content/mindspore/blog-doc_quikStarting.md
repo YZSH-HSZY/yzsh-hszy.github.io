@@ -1,3 +1,11 @@
+---
+Title: MindSpore Learen Notes -- QuikStart.
+Date: 2024-07-18 12:00
+Lang: zh-cn
+Category: MindSpore
+---
+
+
 # mindspore介绍
 昇思MindSpore是一个全场景深度学习框架，旨在实现易开发、高效执行、全场景统一部署三大目标。
 昇思提供一系列配套设施能够为简化深度学习过程，并提供一些工具用于辅助开发AI项目。
@@ -220,7 +228,7 @@ visualize(train_dataset)
 
 
     
-![png](blog-doc_quikStarting_files/blog-doc_quikStarting_4_1.png)
+![png](blog-doc_quikStarting_files/blog-doc_quikStarting_5_1.png)
     
 
 
@@ -317,8 +325,3 @@ print(datetime.now(pytz.timezone('Asia/Shanghai')))
 
     2024-06-28 21:12:18.029531+08:00
 
-
-
-```python
-
-```

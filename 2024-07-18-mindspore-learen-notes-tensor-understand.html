@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Mindspore Learen Notes -- Tensor Understand.</title>
+                        <link rel="stylesheet" href="https://yzsh-hszy.github.io/theme/css/main.css" />
+                                <link href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Welcome to YZSH-HSZY blog. Atom Feed" />
+    <meta name="description" content="张量介绍 张量（Tensor）是一个可用来表示在一些矢量、标量和其他张量之间的线性关系的多线性函数，这些线性关系的基本例 …" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="https://yzsh-hszy.github.io/">Welcome to YZSH-HSZY blog.</a></h1>
+                        <nav><ul>
+                                                <li><a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a></li>
+                                                <li class="active"><a href="https://yzsh-hszy.github.io/category/mindspore.html">Mindspore</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/test.html">Test</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="https://yzsh-hszy.github.io/2024-07-18-mindspore-learen-notes-tensor-understand.html" rel="bookmark"
+             title="Permalink to Mindspore Learen Notes -- Tensor Understand.">Mindspore Learen Notes -- Tensor Understand.</a></h1>
+      </header>
+
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-07-18T12:00:00+08:00">
+                Published: Thu 18 July 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
+                </address>
+        <p>In <a href="https://yzsh-hszy.github.io/category/mindspore.html">Mindspore</a>.</p>
+        
+</footer><!-- /.post-info -->        <h2>张量介绍</h2>
+<p>张量（Tensor）是一个可用来表示在一些矢量、标量和其他张量之间的线性关系的多线性函数，这些线性关系的基本例子有内积、外积、线性映射以及笛卡儿积。其坐标在 𝑛 维空间内，有 $n^r$ 个分量的一种量，其中每个分量都是坐标的函数，而在坐标变换时，这些分量也依照某些规则作线性变换。 𝑟 称为该张量的秩或阶（与矩阵的秩和阶均无关系）。</p>
+<p><strong>注意</strong> 张量是一种特殊的数据结构，与数组和矩阵非常相似。张量（Tensor）是MindSpore网络运算中的基本数据结构，本教程主要介绍张量和稀疏张量的属性及用法。</p>
+<h2>张量与矩阵与数组与向量的区别</h2>
+<p>在numpy中，数据的结构有数组、矩阵、向量这几种描述方式，而在深度学习中通常使用张量来描述所有数据和相应的变换关系。在参与运算时他们之间的差距通常非常小，但却是不同角度下的描述，因此正确的理解并区分他们是必要的。</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># mindspore base moudel import</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">mindspore</span>
+<span class="kn">from</span> <span class="nn">mindspore</span> <span class="kn">import</span> <span class="n">ops</span>
+<span class="kn">from</span> <span class="nn">mindspore</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">CSRTensor</span><span class="p">,</span> <span class="n">COOTensor</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;moudel import success&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">moudel</span><span class="w"> </span><span class="kn">import</span><span class="w"> </span><span class="nn">success</span>
+</code></pre></div>
+
+<h3>a base tensor create</h3>
+<p>构造张量时，支持传入Tensor、float、int、bool、tuple、list、complex和numpy.ndarray类型。
+1. 根据数据直接生成
+可以根据数据创建张量，数据类型可以设置或者通过框架自动推断。</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># python原生类型</span>
+<span class="n">int_tensor</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">float_tensor</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+<span class="n">bool_tensor</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">tuple_tensor</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">list_tensor</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">complex_tensor</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">(</span><span class="nb">complex</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">9</span><span class="p">))</span>
+<span class="n">temp_dict</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">temp_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;tensor&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="n">k</span><span class="p">,</span> 
+            <span class="s1">&#39;;value is :&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span>
+            <span class="s1">&#39;;shape is :&#39;</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+            <span class="s1">&#39;;dtype is :&#39;</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="p">)</span>
+<span class="c1"># Tensor、numpy.ndarray类型</span>
+<span class="n">nd_tensor</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;nd_tensor&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="p">(</span><span class="n">nd_tensor</span><span class="p">),</span> <span class="n">nd_tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">nd_tensor</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+<span class="n">cp_tensor</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">(</span><span class="n">nd_tensor</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;cp_tensor&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="p">(</span><span class="n">cp_tensor</span><span class="p">),</span> <span class="n">cp_tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">cp_tensor</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="nx">int_tensor</span><span class="w"> </span><span class="p">;</span><span class="nx">value</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">;</span><span class="nx">shape</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">;</span><span class="nx">dtype</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nx">Int64</span>
+<span class="nx">float_tensor</span><span class="w"> </span><span class="p">;</span><span class="nx">value</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="m m-Double">1.0</span><span class="w"> </span><span class="p">;</span><span class="nx">shape</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">;</span><span class="nx">dtype</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nx">Float32</span>
+<span class="nx">bool_tensor</span><span class="w"> </span><span class="p">;</span><span class="nx">value</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nx">True</span><span class="w"> </span><span class="p">;</span><span class="nx">shape</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">;</span><span class="nx">dtype</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nx">Bool</span>
+<span class="nx">tuple_tensor</span><span class="w"> </span><span class="p">;</span><span class="nx">value</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="w"> </span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="p">;</span><span class="nx">shape</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">,)</span><span class="w"> </span><span class="p">;</span><span class="nx">dtype</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nx">Int64</span>
+<span class="nx">list_tensor</span><span class="w"> </span><span class="p">;</span><span class="nx">value</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="w"> </span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="p">;</span><span class="nx">shape</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">,)</span><span class="w"> </span><span class="p">;</span><span class="nx">dtype</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nx">Int64</span>
+<span class="nx">complex_tensor</span><span class="w"> </span><span class="p">;</span><span class="nx">value</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">9</span><span class="nx">j</span><span class="p">)</span><span class="w"> </span><span class="p">;</span><span class="nx">shape</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">;</span><span class="nx">dtype</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nx">Complex128</span>
+<span class="nx">nd_tensor</span><span class="w"> </span><span class="mi">281468910652768</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="nx">Float32</span>
+<span class="nx">cp_tensor</span><span class="w"> </span><span class="mi">281468910653168</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="nx">Float32</span>
+</code></pre></div>
+
+<ol>
+<li>使用init初始化器构造张量</li>
+</ol>
+<p>当使用init初始化器对张量进行初始化时，支持传入的参数有init、shape、dtype。</p>
+<ul>
+<li>
+<p>init: 支持传入initializer的子类。如：下方示例中的 One() 和 Normal()。</p>
+</li>
+<li>
+<p>shape: 支持传入 list、tuple、 int。</p>
+</li>
+<li>
+<p>dtype: 支持传入mindspore.dtype。</p>
+</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">mindspore.common.initializer</span> <span class="kn">import</span> <span class="n">One</span><span class="p">,</span> <span class="n">Normal</span>
+
+<span class="c1"># Initialize a tensor with ones</span>
+<span class="n">tensor1</span> <span class="o">=</span> <span class="n">mindspore</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">mindspore</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="n">One</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;tensor1:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">tensor1</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>tensor1:
+ [[1. 1.]
+ [1. 1.]]
+</code></pre></div>
+
+<p>Normal初始化器会将数据进行正太分布处理，公式如下:
+$f(x) =  \frac{1} {\sqrt{2<em sigma>π} * sigma}exp(-\frac{(x - mean)^2} {2</em>)$
+参数默认值 sigma=0.01, mean=0.0，生成的x元素为随机值}^2</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Initialize a tensor from normal distribution</span>
+<span class="n">tensor2</span> <span class="o">=</span> <span class="n">mindspore</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">mindspore</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="n">Normal</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;tensor2:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">tensor2</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>tensor2:
+ [[ 0.01408593  0.00398565  0.01824992]
+ [-0.00208053  0.01520424  0.01576259]]
+</code></pre></div>
+
+<blockquote>
+<p>在我探究Normal()作用时，注意到另一个和 <code>mindspore.Tensor</code> 类似的类 <code>mindspore._c_expression.Tensor</code>,那么他们有什么区别呢？</p>
+<p>为了解决这个问题，我编写了以下python代码验证：</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">mindspore._c_expression</span> <span class="kn">import</span> <span class="n">Tensor</span> <span class="k">as</span> <span class="n">Tensor_</span>
+<span class="kn">import</span> <span class="nn">mindspore._c_expression</span> <span class="k">as</span> <span class="nn">_c</span>
+<span class="c1"># 这个_c_expression是一个so库文件，可以通过__file__属性查看其所在位置</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;the _c_expression so library file path is :&#39;</span><span class="p">,</span> <span class="n">_c</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
+<span class="n">some_list</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># 记载Tensor_和Tensor自身属性地址相同部分</span>
+<span class="n">diff_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">Tensor_</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span> <span class="k">continue</span>
+    <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Tensor_</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Tensor</span><span class="p">,</span><span class="n">k</span><span class="p">)):</span>
+        <span class="n">some_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">diff_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">20</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mindspore.Tensor and mindspore._c_expression.Tensor has some attrs is :&#39;</span><span class="p">,</span>
+      <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">some_list</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;all some attrs nums is :&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">some_list</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">20</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mindspore.Tensor and mindspore._c_expression.Tensor has diff attrs is :&#39;</span><span class="p">,</span>
+       <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">diff_list</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;all diff attrs nums is :&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">diff_list</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">the</span><span class="w"> </span><span class="n">_c_expression</span><span class="w"> </span><span class="n">so</span><span class="w"> </span><span class="n">library</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">miniconda</span><span class="o">/</span><span class="n">envs</span><span class="o">/</span><span class="n">jupyter</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">9</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">mindspore</span><span class="o">/</span><span class="n">_c_expression</span><span class="o">.</span><span class="n">cpython</span><span class="o">-</span><span class="mi">39</span><span class="o">-</span><span class="n">aarch64</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span><span class="n">gnu</span><span class="o">.</span><span class="n">so</span>
+<span class="o">--------------------</span>
+<span class="n">mindspore</span><span class="o">.</span><span class="n">Tensor</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">mindspore</span><span class="o">.</span><span class="n">_c_expression</span><span class="o">.</span><span class="n">Tensor</span><span class="w"> </span><span class="n">has</span><span class="w"> </span><span class="n">some</span><span class="w"> </span><span class="n">attrs</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">_dtype</span><span class="w"> </span><span class="n">_flatten_tensors</span><span class="w"> </span><span class="n">_flush_from_cache</span><span class="w"> </span><span class="n">_get_flattened_tensors</span><span class="w"> </span><span class="n">_get_fusion_size</span><span class="w"> </span><span class="n">_is_flattened</span><span class="w"> </span><span class="n">_is_test_stub</span><span class="w"> </span><span class="n">_itemsize</span><span class="w"> </span><span class="n">_nbytes</span><span class="w"> </span><span class="n">_shape</span><span class="w"> </span><span class="n">_size</span><span class="w"> </span><span class="n">_strides</span><span class="w"> </span><span class="n">adapter_flag</span><span class="w"> </span><span class="n">assign_value_cpp</span><span class="w"> </span><span class="n">data_sync</span><span class="w"> </span><span class="n">dim</span><span class="w"> </span><span class="n">getitem_index_info</span><span class="w"> </span><span class="n">init_flag</span><span class="w"> </span><span class="n">is_init</span><span class="w"> </span><span class="n">offload</span><span class="w"> </span><span class="n">offload_file_path</span><span class="w"> </span><span class="n">param_info</span><span class="w"> </span><span class="n">persistent_data_from_numpy</span><span class="w"> </span><span class="n">set_cast_dtype</span><span class="w"> </span><span class="n">set_dtype</span><span class="w"> </span><span class="n">set_init_flag</span><span class="w"> </span><span class="n">setitem_index_info</span>
+<span class="n">all</span><span class="w"> </span><span class="n">some</span><span class="w"> </span><span class="n">attrs</span><span class="w"> </span><span class="n">nums</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">27</span>
+<span class="o">--------------------</span>
+<span class="n">mindspore</span><span class="o">.</span><span class="n">Tensor</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">mindspore</span><span class="o">.</span><span class="n">_c_expression</span><span class="o">.</span><span class="n">Tensor</span><span class="w"> </span><span class="n">has</span><span class="w"> </span><span class="n">diff</span><span class="w"> </span><span class="n">attrs</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">_offload</span><span class="w"> </span><span class="n">asnumpy</span><span class="w"> </span><span class="n">asnumpy_of_slice_persistent_data</span><span class="w"> </span><span class="n">contiguous</span><span class="w"> </span><span class="n">dtype</span><span class="w"> </span><span class="n">from_numpy</span><span class="w"> </span><span class="n">get_bytes</span><span class="w"> </span><span class="n">is_contiguous</span><span class="w"> </span><span class="n">is_persistent_data</span><span class="w"> </span><span class="n">shape</span>
+<span class="n">all</span><span class="w"> </span><span class="n">diff</span><span class="w"> </span><span class="n">attrs</span><span class="w"> </span><span class="n">nums</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">10</span>
+</code></pre></div>
+
+<p>可以看到Tensor_和Tensor大部分属性的均指向同一地址，因为_c_expression是一个库扩展模块，要想更加详细的了解他们之间区别，需要去查看对应的c++源码实现。
+这里只列出部分我探究的内容，更详细的解析请自行查看源码。</p>
+<!-- TODO 未完成，仅列出部分以记录 -->
+<ol>
+<li>python类Tensor的init方法在<code>mindspore\python\mindspore\common\tensor.py</code>;在其初始化方法中最终均会调用<code>Tensor_.__init__</code>方法</li>
+<li>mindspore编写python扩展<code>_c_expression</code>是通过<code>pybind11</code>进行的，在<code>mindspore\ccsrc\CMakeLists.txt</code>文件中存在调用<code>pybind11_add_module</code>的cmake宏进行py模块绑定，对应文件为<code>mindspore\ccsrc\pipeline\jit\ps\init.cc</code>，内有<code>PYBIND11_MODULE(_c_expression, m)</code> 进行<code>_c_expression</code>模块的具体代码绑定。</li>
+<li>第2步中，<code>_c_expression</code>模块缺少py::class Tensor的绑定，我只在<code>mindspore\ccsrc\pybind_api\ir\tensor_py.cc</code>中找到 <code>mindspore.Tensor</code> 的绑定代码。</li>
+<li>进一步研究发现，<code>tensor_py.cc</code>对应的<code>py::class Tensor</code>绑定代码在函数<code>RegMetaTensor</code>中，会被<code>RegModule</code>调用，最终在<code>PYBIND11_MODULE</code>中通过<code>mindspore::RegModuleHelper</code>调用绑定，而<code>mindspore.Tensor</code>继承自<code>_c_expression.Tensor</code>类，可以通过类的mro方法查看继承关系。</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">Tensor</span><span class="o">.</span><span class="n">mro</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Tensor_</span><span class="o">.</span><span class="n">mro</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="k">[&lt;class &#39;mindspore.common.tensor.Tensor&#39;&gt;, &lt;class &#39;mindspore._c_expression.Tensor&#39;&gt;, &lt;class &#39;mindspore._c_expression.MetaTensor&#39;&gt;, &lt;class &#39;pybind11_builtins.pybind11_object&#39;&gt;, &lt;class &#39;object&#39;&gt;]</span>
+<span class="k">[&lt;class &#39;mindspore._c_expression.Tensor&#39;&gt;, &lt;class &#39;mindspore._c_expression.MetaTensor&#39;&gt;, &lt;class &#39;pybind11_builtins.pybind11_object&#39;&gt;, &lt;class &#39;object&#39;&gt;]</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1"># 回到正题，张量Tensor的创建也可以根据另一个Tensor的属性进行</span>
+<span class="c1"># mindspore提供了一个ops模块可用于Cell的构造</span>
+<span class="n">a_ones</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">tensor1</span><span class="p">)</span>
+<span class="n">a_zeros</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">tensor1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ops create ones tensor is:&#39;</span><span class="p">,</span> <span class="n">a_ones</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ops create zeros tensor is:&#39;</span><span class="p">,</span> <span class="n">a_zeros</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>ops create ones tensor is: [[1. 1.]
+ [1. 1.]]
+ops create zeros tensor is: [[0. 0.]
+ [0. 0.]]
+</code></pre></div>
+
+<h3>张量的常用属性</h3>
+<ul>
+<li>
+<p>形状（shape）：<code>Tensor</code>的shape，是一个tuple。</p>
+</li>
+<li>
+<p>数据类型（dtype）：<code>Tensor</code>元素的dtype，是MindSpore的一个数据类型。</p>
+</li>
+<li>
+<p>单个元素大小（itemsize）： <code>Tensor</code>中每一个元素占用字节数，是一个整数。</p>
+</li>
+<li>
+<p>占用字节数量（nbytes）： <code>Tensor</code>占用的总字节数，是一个整数。</p>
+</li>
+<li>
+<p>维数（ndim）： <code>Tensor</code>的秩，也就是len(tensor.shape)，是一个整数。</p>
+</li>
+<li>
+<p>元素个数（size）： <code>Tensor</code>中所有元素的个数，是一个整数。</p>
+</li>
+<li>
+<p>每一维步长（strides）： <code>Tensor</code>每一维所需要的字节数，是一个tuple。</p>
+</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">t</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">9</span><span class="p">]])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;t_shape:&quot;</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;t_dtype:&quot;</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;t_itemsize:&quot;</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">itemsize</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;t_nbytes:&quot;</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">nbytes</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;t_ndim:&quot;</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;t_size:&quot;</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;t_strides:&quot;</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">strides</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="nx">t_shape</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span>
+<span class="nx">t_dtype</span><span class="p">:</span><span class="w"> </span><span class="nx">Int64</span>
+<span class="nx">t_itemsize</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span>
+<span class="nx">t_nbytes</span><span class="p">:</span><span class="w"> </span><span class="mi">48</span>
+<span class="nx">t_ndim</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<span class="nx">t_size</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span>
+<span class="nx">t_strides</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span>
+</code></pre></div>
+
+<p><span display=hidden>### 维度与维数区别
+Tensorflow描述张量的维度：阶，形状以及维数 </p>
+<p>TensorFlow用张量这种数据结构来表示所有的数据.你可以把一个张量想象成一个n维的数组或列表.一个张量有一个静态类型和动态类型的维数.张量可以在图中的节点之间流通。</p>
+<p>在TensorFlow系统中，张量的维数来被描述为阶。但是张量的阶和矩阵的阶并不是同一个概念。张量的阶（有时是关于如顺序或度数或者是n维）是张量维数的一个数量描述。</p>
+<p>比如，下面的张量（使用Python中list定义的）就是2阶。</p>
+<p>TensorFlow文档中使用了三种记号来方便地描述张量的维度：阶，形状以及维数.下表展示了他们之间的关系：
+</span></p>
+<h3>张量索引</h3>
+<p>Tensor索引与Numpy索引类似，索引从0开始编制，负索引表示按倒序编制，冒号:和 ...用于对数据进行切片。</p>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;the tensor is:&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First row: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;value of bottom right corner: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Last column: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First column: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>the tensor is: [[1 2 3]
+ [1 7 9]]
+First row: [1 2 3]
+value of bottom right corner: 7
+Last column: [3 9]
+First column: [1 1]
+</code></pre></div>
+
+<h3>张量运算</h3>
+<p>张量之间可以使用很多运算，包括算术、线性代数、矩阵处理（转置、标引、切片）、采样等，使用方法和numpy类似</p>
+<div class="highlight"><pre><span></span><code><span class="n">x</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">9</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]),</span> <span class="n">mindspore</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> <span class="n">mindspore</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="c1"># 1. 算术运算</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;add:&quot;</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sub:&quot;</span><span class="p">,</span> <span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;mul:&quot;</span><span class="p">,</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;div:&quot;</span><span class="p">,</span> <span class="n">x</span> <span class="o">/</span> <span class="n">y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;mod:&quot;</span><span class="p">,</span> <span class="n">x</span> <span class="o">%</span> <span class="n">y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;floordiv:&quot;</span><span class="p">,</span> <span class="n">x</span> <span class="o">//</span> <span class="n">y</span><span class="p">)</span>
+<span class="c1"># 2. 矩阵处理</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;转置:&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="c1"># 使用`ops.concat`连接张量</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;concat tensors:&quot;</span><span class="p">,</span> <span class="n">ops</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="c1"># 使用ops.stack从新维度合并张量</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;stack tensors:&quot;</span><span class="p">,</span> <span class="n">ops</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]))</span>
+<span class="c1"># 3. tensor与np.ndarray转换</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;x: </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">asnumpy</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>add: [13.  7.  9.  8.]
+sub: [ 5. -3. -3.  2.]
+mul: [36. 10. 18. 15.]
+div: [2.25      0.4       0.5       1.6666666]
+mod: [1. 2. 3. 2.]
+floordiv: [2. 0. 0. 1.]
+[[9. 3.]
+ [2. 5.]]
+concat tensors: [9. 2. 3. 5. 4. 5. 6. 3.]
+stack tensors: [[9. 2. 3. 5.]
+ [4. 5. 6. 3.]]
+x: [9. 2. 3. 5.] &lt;class &#39;mindspore.common.tensor.Tensor&#39;&gt;
+n: [9. 2. 3. 5.] &lt;class &#39;numpy.ndarray&#39;&gt;
+</code></pre></div>
+
+<h3>几种特殊tensor</h3>
+<h4>稀疏张量</h4>
+<p>稀疏张量中绝大部分元素的值为零。</p>
+<p>在某些应用场景中（比如推荐系统、分子动力学、图神经网络等），数据的特征是稀疏的，若使用普通张量表征这些数据会引入大量不必要的计算、存储和通讯开销。这时就可以使用稀疏张量来表征这些数据。</p>
+<p>MindSpore支持常用的<code>CSR</code>和<code>COO</code>两种稀疏数据格式，如<code>CSRTensor</code>、<code>COOTensor</code>和<code>RowTensor</code>等</p>
+<p>常用稀疏张量的表达形式是<code>&lt;indices:Tensor, values:Tensor, shape:Tensor&gt;</code>。其中，<code>indices</code>表示非零下标元素， <code>values</code>表示非零元素的值，shape表示的是被压缩的稀疏张量的形状。</p>
+<h5>CSRTensor</h5>
+<p><code>CSR</code>（Compressed Sparse Row，压缩稀疏行）稀疏张量格式有着高效的存储与计算的优势。其中，非零元素的值存储在<code>values</code>中，非零元素的位置存储在<code>indptr</code>（行）和<code>indices</code>（列）中。各参数含义如下：</p>
+<ul>
+<li>
+<p><code>indptr</code>: 一维整数张量, 表示稀疏数据每一行的非零元素在<code>values</code>中的起始位置和终止位置, 索引数据类型支持int16、int32、int64。</p>
+</li>
+<li>
+<p><code>indices</code>: 一维整数张量，表示稀疏张量非零元素在列中的位置, 与<code>values</code>长度相等，索引数据类型支持int16、int32、int64。</p>
+</li>
+<li>
+<p><code>values</code>: 一维张量，表示<code>CSRTensor</code>相对应的非零元素的值，与<code>indices</code>长度相等。</p>
+</li>
+<li>
+<p><code>shape</code>: 表示被压缩的稀疏张量的形状，数据类型为<code>Tuple</code>，目前仅支持二维<code>CSRTensor</code>。</p>
+</li>
+</ul>
+<p><strong>注意</strong> CSRTensor有以下限制：</p>
+<ol>
+<li>CSR仅能表示二维张量</li>
+<li>行张量<code>indptr</code>的<code>size</code>为<code>csrtensor.shape[0]+1</code>，其索引i表示csr张量第i行，值为列张量<code>indices</code>索引，即指向该行第一个非0元素列位置</li>
+<li>列张量<code>indices</code>，存储每个非0元素的列位置，长度与值张量<code>values</code>相等，<code>indices[i]</code> 表示第i个非0元素所在列位置</li>
+<li>值张量<code>values</code> 存储csr所有非0值，按先行后列排序</li>
+</ol>
+<p><strong>注意</strong> 在Ascend平台，CSRTensor很多运算不可用</p>
+<div class="highlight"><pre><span></span><code><span class="n">indptr</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">mindspore</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+<span class="n">indices</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">mindspore</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+<span class="n">values</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">mindspore</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+<span class="c1"># Make a CSRTensor</span>
+<span class="n">csr_tensor</span> <span class="o">=</span> <span class="n">CSRTensor</span><span class="p">(</span><span class="n">indptr</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">csr_tensor</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">mindspore</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">csr_tensor</span><span class="p">)</span>
+<span class="c1"># 第一行元素indptr[0]首个非零元素在indices[indptr[0]]列出现，值为values[indptr[0]]</span>
+<span class="c1"># 第二行元素indptr[1]首个非零元素在indices[indptr[1]]列出现，值为values[indptr[1]]</span>
+<span class="c1"># values[indptr[0],indptr[1]]为第一行所有非零元素，列位置在indices中</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="nx">Float64</span>
+<span class="nx">CSRTensor</span><span class="p">(</span><span class="nx">shape</span><span class="p">=[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="nx">dtype</span><span class="p">=</span><span class="nx">Float32</span><span class="p">,</span><span class="w"> </span><span class="nx">indptr</span><span class="p">=</span><span class="nx">Tensor</span><span class="p">(</span><span class="nx">shape</span><span class="p">=[</span><span class="mi">3</span><span class="p">],</span><span class="w"> </span><span class="nx">dtype</span><span class="p">=</span><span class="nx">Int32</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">=[</span><span class="mi">0</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="mi">2</span><span class="p">]),</span><span class="w"> </span><span class="nx">indices</span><span class="p">=</span><span class="nx">Tensor</span><span class="p">(</span><span class="nx">shape</span><span class="p">=[</span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="nx">dtype</span><span class="p">=</span><span class="nx">Int32</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">=[</span><span class="mi">0</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="mi">3</span><span class="p">]),</span><span class="w"> </span><span class="nx">values</span><span class="p">=</span><span class="nx">Tensor</span><span class="p">(</span><span class="nx">shape</span><span class="p">=[</span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="nx">dtype</span><span class="p">=</span><span class="nx">Float32</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">=[</span><span class="w"> </span><span class="m m-Double">1.00000000</span><span class="nx">e</span><span class="o">+</span><span class="mi">00</span><span class="w">  </span><span class="m m-Double">5.00000000</span><span class="nx">e</span><span class="o">+</span><span class="mi">00</span><span class="w">  </span><span class="m m-Double">2.00000000</span><span class="nx">e</span><span class="o">+</span><span class="mi">00</span><span class="w">  </span><span class="m m-Double">9.00000000</span><span class="nx">e</span><span class="o">+</span><span class="mi">00</span><span class="p">]))</span>
+</code></pre></div>
+
+<p>上述代码表示如下所示的<code>CSRTensor</code>:</p>
+<p>$$
+ \left[
+ \begin{matrix}
+   1 &amp; 0 &amp; 5 &amp; 0 \
+   0 &amp; 2 &amp; 0 &amp; 9
+  \end{matrix}
+  \right]
+$$</p>
+<h5>COOTensor</h5>
+<p><code>COO</code>（Coordinate Format）稀疏张量格式用来表示某一张量在给定索引上非零元素的集合，若非零元素的个数为<code>N</code>，被压缩的张量的维数为<code>ndims</code>。各参数含义如下：</p>
+<ul>
+<li>
+<p><code>indices</code>: 二维整数张量，每行代表非零元素下标。形状：<code>[N, ndims]</code>， 索引数据类型支持int16、int32、int64。</p>
+</li>
+<li>
+<p><code>values</code>: 一维张量，表示相对应的非零元素的值。形状：<code>[N]</code>。</p>
+</li>
+<li>
+<p><code>shape</code>: 表示被压缩的稀疏张量的形状，目前仅支持二维<code>COOTensor</code>。</p>
+</li>
+</ul>
+<p><strong>注意</strong> values中每个非零元素values[i]在COOTensor中的坐标为indices[i]，因此可支持多维Tensor</p>
+<p>下面给出一些COOTensor的使用示例：</p>
+<div class="highlight"><pre><span></span><code><span class="n">indices</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">mindspore</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+<span class="n">values</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">mindspore</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+<span class="c1"># Make a COOTensor</span>
+<span class="n">COOTensor</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="nx">COOTensor</span><span class="p">(</span><span class="nx">shape</span><span class="p">=[</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="nx">dtype</span><span class="p">=</span><span class="nx">Float32</span><span class="p">,</span><span class="w"> </span><span class="nx">indices</span><span class="p">=</span><span class="nx">Tensor</span><span class="p">(</span><span class="nx">shape</span><span class="p">=[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="nx">dtype</span><span class="p">=</span><span class="nx">Int32</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">=</span>
+<span class="p">[[</span><span class="mi">0</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span>
+<span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="w"> </span><span class="mi">2</span><span class="p">]]),</span><span class="w"> </span><span class="nx">values</span><span class="p">=</span><span class="nx">Tensor</span><span class="p">(</span><span class="nx">shape</span><span class="p">=[</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="nx">dtype</span><span class="p">=</span><span class="nx">Float32</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">=[</span><span class="w"> </span><span class="m m-Double">1.00000000</span><span class="nx">e</span><span class="o">+</span><span class="mi">00</span><span class="w">  </span><span class="m m-Double">2.00000000</span><span class="nx">e</span><span class="o">+</span><span class="mi">00</span><span class="p">]))</span>
+</code></pre></div>
+
+<p>上述代码表示如下所示的<code>COOTensor</code>:</p>
+<p>$$
+ \left[
+ \begin{matrix}
+   0 &amp; 1 &amp; 0 &amp; 0 \
+   0 &amp; 0 &amp; 2 &amp; 0 \
+   0 &amp; 0 &amp; 0 &amp; 0
+  \end{matrix}
+  \right]
+$$</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">pytz</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="s1">&#39;Asia/Shanghai&#39;</span><span class="p">)),</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">user:YZSH-HSZY&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="mf">2024</span><span class="o">-</span><span class="mf">07</span><span class="o">-</span><span class="mf">04</span><span class="w"> </span><span class="mf">16</span><span class="p">:</span><span class="mf">08</span><span class="p">:</span><span class="mf">16.273507</span><span class="o">+</span><span class="mf">08</span><span class="p">:</span><span class="mf">00</span><span class="w"> </span>
+<span class="n">user</span><span class="p">:</span><span class="n">YZSH</span><span class="o">-</span><span class="n">HSZY</span>
+</code></pre></div>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
+                <section id="extras" class="body">
+                                <div class="blogroll">
+                                        <h2>links</h2>
+                                        <ul>
+                                                        <li><a href="https://getpelican.com/">Pelican</a></li>
+                                                        <li><a href="https://www.python.org/">Python.org</a></li>
+                                                        <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                                                        <li><a href="#">You can modify those links in your config file</a></li>
+                                        </ul>
+                                </div><!-- /.blogroll -->
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="#">You can add links in your config file</a></li>
+                                                        <li><a href="#">Another social link</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>

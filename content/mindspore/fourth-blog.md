@@ -1,3 +1,10 @@
+---
+Title: Mindspore Learen Notes -- Data Transfroms Operation Learen.
+Date: 2024-07-18 12:00
+Lang: zh-cn
+Category: Mindspore
+---
+
 # 数据变换 Transforms
 
 通常情况下，直接加载的原始数据并不能直接送入神经网络进行训练，我们需要对其进行数据预处理。MindSpore提供不同种类的数据变换（Transforms），配合数据处理Pipeline来实现数据预处理。所有的Transforms均可通过`map`方法传入，实现对指定数据列的处理。
@@ -457,7 +464,7 @@ plot_waveform(waveform, sample_rate, title="Original waveform")
 
 
     
-![png](fourth-blog_files/fourth-blog_24_0.png)
+![png](fourth-blog_files/fourth-blog_25_0.png)
     
 
 
@@ -484,7 +491,7 @@ plot_spectrogram(spec, title="audio")
 
 
     
-![png](fourth-blog_files/fourth-blog_25_0.png)
+![png](fourth-blog_files/fourth-blog_26_0.png)
     
 
 

@@ -1,3 +1,10 @@
+---
+Title: Mindspore Learen Notes -- Construct Dataset.
+Date: 2024-07-18 12:00
+Lang: zh-cn
+Category: Mindspore
+---
+
 ## 数据集 Dataset
 数据是深度学习的基础，高质量的数据输入将在整个深度神经网络中起到积极作用。MindSpore提供基于Pipeline的数据引擎，通过数据集（Dataset）和数据变换（Transforms）实现高效的数据预处理。其中Dataset是Pipeline的起始，用于加载原始数据。mindspore.dataset提供了内置的文本、图像、音频等数据集加载接口，并提供了自定义数据集加载接口。
 
@@ -97,7 +104,7 @@ visualize(train_dataset)
 
 
     
-![png](third-blog_files/third-blog_8_0.png)
+![png](third-blog_files/third-blog_9_0.png)
     
 
 
@@ -122,7 +129,7 @@ visualize(train_dataset)
 
 
     
-![png](third-blog_files/third-blog_11_0.png)
+![png](third-blog_files/third-blog_12_0.png)
     
 
 
