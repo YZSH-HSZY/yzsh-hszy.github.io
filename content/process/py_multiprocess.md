@@ -1,3 +1,8 @@
+---
+Title: mblog python multiprocess Survey Research md.
+Status: skip
+---
+
 # 介绍
 这部分是接触高性能计算时笔记，主语言为python
 

@@ -1,6 +1,6 @@
 ---
 Title: Mindspore Learen Notes -- Data Transfroms Operation Learen.
-Date: 2024-07-18 12:00
+Date: 2024-07-04 12:00
 Lang: zh-cn
 Category: Mindspore
 ---

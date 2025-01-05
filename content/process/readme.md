@@ -1,3 +1,8 @@
+---
+Title: mblog process Survey Research readme md.
+Status: skip
+---
+
 # 进程process
 在我们编写代码时，几乎经常遇到需要杀进程和资源冲突的情况，通常我们会借助`kill`或`window-kill`这些工具来终结这些冲突进程。那么他们具体的工作是如何进行的呢？
 

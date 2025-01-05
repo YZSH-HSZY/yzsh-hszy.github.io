@@ -1,6 +1,6 @@
 ---
 Title: MindSpore Learen Notes -- QuikStart.
-Date: 2024-07-18 12:00
+Date: 2024-07-01 12:00
 Lang: zh-cn
 Category: MindSpore
 ---

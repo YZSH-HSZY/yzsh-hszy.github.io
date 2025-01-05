@@ -1,6 +1,6 @@
 ---
 Title: Mindspore Learen Notes -- Construct Dataset.
-Date: 2024-07-18 12:00
+Date: 2024-07-03 12:00
 Lang: zh-cn
 Category: Mindspore
 ---
