@@ -114,18 +114,18 @@ make&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;test&lt;/span&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot; &lt;/span&gt;
 &lt;span class="sd"&gt;    演示super(type, obj)和super(type,type2)调用&lt;/span&gt;
 &lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Father&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;father_obj_method&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;Father&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;father_obj_method&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
         &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;this is obj of Father&amp;#39;&lt;/span&gt;
     &lt;span class="nd"&gt;@classmethod&lt;/span&gt;
-    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;father_classmethod&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;cls&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;father_classmethod&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;cls&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
         &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;this is method of Father method&amp;#39;&lt;/span&gt;
 
-&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Child&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Father&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;father_obj_method&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;Child&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Father&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;father_obj_method&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
         &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;overwrite obj method&amp;#39;&lt;/span&gt;
     &lt;span class="nd"&gt;@classmethod&lt;/span&gt;
-    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;father_classmethod&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;cls&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;father_classmethod&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;cls&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
         &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;overwrite classmethod&amp;#39;&lt;/span&gt;
 
 &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="vm"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
@@ -183,37 +183,37 @@ object.mro
 &lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;the type of the instance invoking super(); may be None&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
 &lt;span class="p"&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Cpython"></category></entry><entry><title>Python Thread Package Example Notes.</title><link href="https://yzsh-hszy.github.io/2024-07-18-python-thread-package-example-notes.html" rel="alternate"></link><published>2024-07-18T12:00:00+08:00</published><updated>2024-07-18T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2024-07-18:/2024-07-18-python-thread-package-example-notes.html</id><summary type="html">&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;atexit&lt;/span&gt;
-&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;datetime&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;datetime&lt;/span&gt;
-&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;threading&lt;/span&gt;
-&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;time&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;sleep&lt;/span&gt;
-&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;test_p&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Cpython"></category></entry><entry><title>Python Thread Package Example Notes.</title><link href="https://yzsh-hszy.github.io/2024-07-18-python-thread-package-example-notes.html" rel="alternate"></link><published>2024-07-18T12:00:00+08:00</published><updated>2024-07-18T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2024-07-18:/2024-07-18-python-thread-package-example-notes.html</id><summary type="html">&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;atexit&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;datetime&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;datetime&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;threading&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;time&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;sleep&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;test_p&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
     &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;this is test&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;datetime&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;now&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;strftime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s2"&gt;/%m/%Y, %H:%M:%S&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
     &lt;span class="k"&gt;assert&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
 &lt;span class="c1"&gt;# atexit.register(test_p)&lt;/span&gt;
 
-&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;thread_print&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;thread_print&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
     &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
     &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mf"&gt;1e3&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
         &lt;span class="n"&gt;sleep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;.001&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
         &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
     &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;threading end print&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="k"&gt;def …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;atexit&lt;/span&gt;
-&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;datetime&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;datetime&lt;/span&gt;
-&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;threading&lt;/span&gt;
-&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;time&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;sleep&lt;/span&gt;
-&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;test_p&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+&lt;span class="k"&gt;def …&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;atexit&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;datetime&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;datetime&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;threading&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;time&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;sleep&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;test_p&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
     &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;this is test&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;datetime&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;now&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;strftime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s2"&gt;/%m/%Y, %H:%M:%S&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
     &lt;span class="k"&gt;assert&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
 &lt;span class="c1"&gt;# atexit.register(test_p)&lt;/span&gt;
 
-&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;thread_print&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;thread_print&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
     &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
     &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mf"&gt;1e3&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
         &lt;span class="n"&gt;sleep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;.001&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
         &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
     &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;threading end print&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;end_print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;end_print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
     &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;atexiting print&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
     &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
     &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;isinstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;threading&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Thread&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
@@ -265,7 +265,7 @@ object.mro
 
 &lt;p&gt;unicode中文范围
 U4e00-u9fa5 &lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;re&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;re&lt;/span&gt;
 &lt;span class="c1"&gt;# import jsonpath&lt;/span&gt;
 &lt;span class="c1"&gt;# jsonpath.jsonpath(&lt;/span&gt;
 &lt;span class="c1"&gt;#     {&amp;quot;l&amp;quot;:0,&amp;quot;tx&amp;quot;:{&amp;quot;b&amp;quot;:[8]},&amp;quot;b&amp;quot;:[1,2,9]},&lt;/span&gt;

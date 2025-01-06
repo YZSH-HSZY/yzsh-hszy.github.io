@@ -35,11 +35,11 @@
 </footer><!-- /.post-info --><h1>数据变换 Transforms</h1>
 <p>通常情况下，直接加载的原始数据并不能直接送入神经网络进行训练，我们需要对其进行数据预处理。MindSpore提供不同种类的数据变换（Transforms），配合数据处理Pipeline来实现数据预处理。所有的Transforms均可通过<code>map</code>方法传入，实现对指定数据列的处理。</p>
 <p><code>mindspore.dataset</code>提供了面向图像、文本、音频等不同数据类型的Transforms，同时也支持使用Lambda函数。</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">from</span> <span class="nn">download</span> <span class="kn">import</span> <span class="n">download</span>
-<span class="kn">from</span> <span class="nn">mindspore.dataset</span> <span class="kn">import</span> <span class="n">transforms</span><span class="p">,</span> <span class="n">vision</span><span class="p">,</span> <span class="n">text</span>
-<span class="kn">from</span> <span class="nn">mindspore.dataset</span> <span class="kn">import</span> <span class="n">GeneratorDataset</span><span class="p">,</span> <span class="n">MnistDataset</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">download</span><span class="w"> </span><span class="kn">import</span> <span class="n">download</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mindspore.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">transforms</span><span class="p">,</span> <span class="n">vision</span><span class="p">,</span> <span class="n">text</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mindspore.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">GeneratorDataset</span><span class="p">,</span> <span class="n">MnistDataset</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;base moudel import&#39;</span><span class="p">)</span>
 </code></pre></div>
 
@@ -201,18 +201,18 @@ rescale img data is:
 <h2>Audio Transforms(音频变换)</h2>
 <p><code>mindspore.dataset.audio</code>模块提供一系列针对音频数据的Transforms。<a href="https://www.mindspore.cn/docs/zh-CN/r2.3.0/api_python/samples/dataset/audio_gallery.html">参audio文档</a></p>
 <div class="highlight"><pre><span></span><code><span class="c1"># 安装librosa库</span>
-<span class="kn">import</span> <span class="nn">pip</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pip</span>
 <span class="n">pip</span><span class="o">.</span><span class="n">main</span><span class="p">([</span><span class="s1">&#39;install&#39;</span><span class="p">,</span> <span class="s1">&#39;librosa&#39;</span><span class="p">])</span>
 
-<span class="kn">import</span> <span class="nn">librosa</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">scipy.io.wavfile</span> <span class="k">as</span> <span class="nn">wavfile</span>
-<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Audio</span>
-<span class="kn">from</span> <span class="nn">download</span> <span class="kn">import</span> <span class="n">download</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">librosa</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.io.wavfile</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">wavfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Audio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">download</span><span class="w"> </span><span class="kn">import</span> <span class="n">download</span>
 
-<span class="kn">import</span> <span class="nn">mindspore.dataset</span> <span class="k">as</span> <span class="nn">ds</span>
-<span class="kn">import</span> <span class="nn">mindspore.dataset.audio</span> <span class="k">as</span> <span class="nn">audio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mindspore.dataset</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ds</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mindspore.dataset.audio</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">audio</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Audio环境准备&#39;</span><span class="p">)</span>
 </code></pre></div>
 
@@ -324,7 +324,7 @@ rescale img data is:
 <div class="highlight"><pre><span></span><code><span class="c1"># 读取音频文件</span>
 <span class="n">sample_rate</span><span class="p">,</span> <span class="n">waveform</span> <span class="o">=</span> <span class="n">wavfile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">wav_file</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">plot_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sr</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Waveform&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sr</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Waveform&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; 绘制音频波形图 &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
@@ -337,7 +337,7 @@ rescale img data is:
     <span class="n">figure</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">plot_spectrogram</span><span class="p">(</span><span class="n">specgram</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;freq_bin&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_spectrogram</span><span class="p">(</span><span class="n">specgram</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;freq_bin&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; 绘制音频光谱图 &quot;&quot;&quot;</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">axs</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span> <span class="ow">or</span> <span class="s2">&quot;Spectrogram (db)&quot;</span><span class="p">)</span>
@@ -375,8 +375,8 @@ rescale img data is:
 <p>从线性幅度频谱图恢复信号波形</p>
 <h3>Mel Filter Bank</h3>
 <p>mindspore.dataset.audio.melscale_fbanks 可以创建频率变换矩阵。</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">import</span> <span class="nn">pytz</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytz</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="s1">&#39;Asia/Shanghai&#39;</span><span class="p">)),</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">user:YZSH-HSZY&#39;</span><span class="p">)</span>
 </code></pre></div>
 
