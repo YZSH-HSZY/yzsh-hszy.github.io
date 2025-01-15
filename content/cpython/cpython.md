@@ -17,7 +17,7 @@ Category: Cpython
 **注意** cpython在编译安装时，需要已有pyhton环境
 
 ## cpython编译
-(python官方开发构建文档)[https://devguide.python.org/getting-started/setup-building/#build-dependencies]
+[python官方开发构建文档](https://devguide.python.org/getting-started/setup-building/#build-dependencies)
 
 在进行cpython的编译时，需要注意可能缺少相应的依赖项，可以使用`apt search`和`apt-file`命令找到包在机器上的安装名和文件存在与那些包中。
 
@@ -83,10 +83,16 @@ CPython 的 `configure` 脚本是使用 `GNU Autoconf` 从 `configure.ac` 生成
 
 **注意** `apt-file`需要使用`apt install apt-file`安装，并且使用`apt-file update`更新数据库之后，才能使用。
 
+### 使用 `dev container` 进行 `cpython` 的学习开发
+
+[参vscode开发容器创建教程](https://code.visualstudio.com/docs/devcontainers/create-dev-container#_dockerfile)
+
+> 其中 `devcontainer.json` 可在cpython官方仓库中获取
+
 ## cpython目录结构
 
 - `Doc`                 文档
-- `Grammar`             包含 Python 的 EBNF 语法文件
+- `Grammar`             包含 Python 的 EBNF(Extended Backus-Naur Form) 语法文件
 - `Include`             cpython解释器头文件
 - `Lib`                 纯 Python 实现的标准库
 - `Misc`                独立目录，包含文档等
@@ -99,6 +105,22 @@ CPython 的 `configure` 脚本是使用 `GNU Autoconf` 从 `configure.ac` 生成
 - `Programs`            C 可执行文件的源代码，包括 CPython 解释器的 main 函数
 - `Python`              CPython core runtime。包括编译器、评估循环和各种内置模块
 - `Tools`               维护 Python 的工具
+
+## 相关术语解释
+
+### EBNF(Extended Backus-Naur Form, 扩展巴科斯范式)
+
+巴科斯范式（Backus Normal Form简称为BNF），又称为巴科斯-诺尔范式，是一种上下文无关的语言，广泛地使用于程序设计语言、指令集、通信协议的语法表示中。
+
+> 上下文无关语言的典型代表: 正则语言 -- 一种通过有限状态机或正则表达式表达的语言，这种语言是上下文无关语言的子集。
+> 一个表示数字相加的BNF示例如下:
+```
+<addition> ::= <number>+<number>
+<number> ::= <sign><integer>|<integer>
+<integer> ::= <digit>|<digit><integer>
+<digit>::=0|1|2|3|4|5|6|7|8|9
+<sign> ::= +|-
+```
 
 ## cpython源码分析
 

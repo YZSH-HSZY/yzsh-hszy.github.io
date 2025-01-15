@@ -40,7 +40,7 @@
 <p><strong>环境</strong> cpython 3.12.3,ubuntu 20.04 in wsl2,gun/gcc系列编译器
 <strong>注意</strong> cpython在编译安装时，需要已有pyhton环境</p>
 <h2>cpython编译</h2>
-<p>(python官方开发构建文档)[https://devguide.python.org/getting-started/setup-building/#build-dependencies]</p>
+<p><a href="https://devguide.python.org/getting-started/setup-building/#build-dependencies">python官方开发构建文档</a></p>
 <p>在进行cpython的编译时，需要注意可能缺少相应的依赖项，可以使用<code>apt search</code>和<code>apt-file</code>命令找到包在机器上的安装名和文件存在与那些包中。</p>
 <p>这里列出一些需要的安装包
 - build-essential 包含一系列的C/C++开发工具，主要为GNU系列编译器
@@ -96,10 +96,15 @@ make<span class="w"> </span><span class="nb">test</span>
       libgdbm-compat-dev: legacy support development files(遗留支持开发文件)。解决无dbm.h文件问题    </li>
 </ul>
 <p><strong>注意</strong> <code>apt-file</code>需要使用<code>apt install apt-file</code>安装，并且使用<code>apt-file update</code>更新数据库之后，才能使用。</p>
+<h3>使用 <code>dev container</code> 进行 <code>cpython</code> 的学习开发</h3>
+<p><a href="https://code.visualstudio.com/docs/devcontainers/create-dev-container#_dockerfile">参vscode开发容器创建教程</a></p>
+<blockquote>
+<p>其中 <code>devcontainer.json</code> 可在cpython官方仓库中获取</p>
+</blockquote>
 <h2>cpython目录结构</h2>
 <ul>
 <li><code>Doc</code>                 文档</li>
-<li><code>Grammar</code>             包含 Python 的 EBNF 语法文件</li>
+<li><code>Grammar</code>             包含 Python 的 EBNF(Extended Backus-Naur Form) 语法文件</li>
 <li><code>Include</code>             cpython解释器头文件</li>
 <li><code>Lib</code>                 纯 Python 实现的标准库</li>
 <li><code>Misc</code>                独立目录，包含文档等</li>
@@ -113,6 +118,20 @@ make<span class="w"> </span><span class="nb">test</span>
 <li><code>Python</code>              CPython core runtime。包括编译器、评估循环和各种内置模块</li>
 <li><code>Tools</code>               维护 Python 的工具</li>
 </ul>
+<h2>相关术语解释</h2>
+<h3>EBNF(Extended Backus-Naur Form, 扩展巴科斯范式)</h3>
+<p>巴科斯范式（Backus Normal Form简称为BNF），又称为巴科斯-诺尔范式，是一种上下文无关的语言，广泛地使用于程序设计语言、指令集、通信协议的语法表示中。</p>
+<blockquote>
+<p>上下文无关语言的典型代表: 正则语言 -- 一种通过有限状态机或正则表达式表达的语言，这种语言是上下文无关语言的子集。
+一个表示数字相加的BNF示例如下:</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="o">&lt;</span><span class="n">addition</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">number</span><span class="o">&gt;+&lt;</span><span class="n">number</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">number</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">&lt;</span><span class="nb">sign</span><span class="o">&gt;&lt;</span><span class="n">integer</span><span class="o">&gt;</span><span class="p">|</span><span class="o">&lt;</span><span class="n">integer</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">integer</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">digit</span><span class="o">&gt;</span><span class="p">|</span><span class="o">&lt;</span><span class="n">digit</span><span class="o">&gt;&lt;</span><span class="n">integer</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">digit</span><span class="o">&gt;::=</span><span class="mi">0</span><span class="p">|</span><span class="mi">1</span><span class="p">|</span><span class="mi">2</span><span class="p">|</span><span class="mi">3</span><span class="p">|</span><span class="mi">4</span><span class="p">|</span><span class="mi">5</span><span class="p">|</span><span class="mi">6</span><span class="p">|</span><span class="mi">7</span><span class="p">|</span><span class="mi">8</span><span class="p">|</span><span class="mi">9</span>
+<span class="o">&lt;</span><span class="nb">sign</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">+</span><span class="p">|</span><span class="o">-</span>
+</code></pre></div>
+
 <h2>cpython源码分析</h2>
 <h2>分析实例</h2>                    </article>
                 </aside><!-- /#featured -->
