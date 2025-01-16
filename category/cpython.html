@@ -125,14 +125,26 @@ make<span class="w"> </span><span class="nb">test</span>
 <p>上下文无关语言的典型代表: 正则语言 -- 一种通过有限状态机或正则表达式表达的语言，这种语言是上下文无关语言的子集。
 一个表示数字相加的BNF示例如下:</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code><span class="o">&lt;</span><span class="n">addition</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">number</span><span class="o">&gt;+&lt;</span><span class="n">number</span><span class="o">&gt;</span>
-<span class="o">&lt;</span><span class="n">number</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">&lt;</span><span class="nb">sign</span><span class="o">&gt;&lt;</span><span class="n">integer</span><span class="o">&gt;</span><span class="p">|</span><span class="o">&lt;</span><span class="n">integer</span><span class="o">&gt;</span>
-<span class="o">&lt;</span><span class="n">integer</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">digit</span><span class="o">&gt;</span><span class="p">|</span><span class="o">&lt;</span><span class="n">digit</span><span class="o">&gt;&lt;</span><span class="n">integer</span><span class="o">&gt;</span>
-<span class="o">&lt;</span><span class="n">digit</span><span class="o">&gt;::=</span><span class="mi">0</span><span class="p">|</span><span class="mi">1</span><span class="p">|</span><span class="mi">2</span><span class="p">|</span><span class="mi">3</span><span class="p">|</span><span class="mi">4</span><span class="p">|</span><span class="mi">5</span><span class="p">|</span><span class="mi">6</span><span class="p">|</span><span class="mi">7</span><span class="p">|</span><span class="mi">8</span><span class="p">|</span><span class="mi">9</span>
-<span class="o">&lt;</span><span class="nb">sign</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">+</span><span class="p">|</span><span class="o">-</span>
+<div class="highlight"><pre><span></span><code><span class="o">&lt;</span><span class="nv">addition</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">&lt;</span><span class="nv">number</span><span class="o">&gt;+&lt;</span><span class="nv">number</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nv">number</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">&lt;</span><span class="nv">sign</span><span class="o">&gt;&lt;</span><span class="nv">integer</span><span class="o">&gt;|&lt;</span><span class="nv">integer</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nv">integer</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">&lt;</span><span class="nv">digit</span><span class="o">&gt;|&lt;</span><span class="nv">digit</span><span class="o">&gt;&lt;</span><span class="nv">integer</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nv">digit</span><span class="o">&gt;::=</span><span class="mi">0</span><span class="o">|</span><span class="mi">1</span><span class="o">|</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span><span class="o">|</span><span class="mi">4</span><span class="o">|</span><span class="mi">5</span><span class="o">|</span><span class="mi">6</span><span class="o">|</span><span class="mi">7</span><span class="o">|</span><span class="mi">8</span><span class="o">|</span><span class="mi">9</span>
+<span class="o">&lt;</span><span class="nv">sign</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">+|-</span>
 </code></pre></div>
 
 <h2>cpython源码分析</h2>
+<p>由上述目录描述可知, Programs中存放的是 <code>CPython</code> 解释器相关的实现部分, 其中 <code>python.c</code> 定义了程序的入口</p>
+<div class="highlight"><pre><span></span><code>Enable<span class="w"> </span>debuginfod<span class="w"> </span><span class="k">for</span><span class="w"> </span>this<span class="w"> </span>session?<span class="w"> </span><span class="o">(</span>y<span class="w"> </span>or<span class="w"> </span><span class="o">[</span>n<span class="o">])</span><span class="w"> </span>y
+Debuginfod<span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>enabled.
+To<span class="w"> </span>make<span class="w"> </span>this<span class="w"> </span>setting<span class="w"> </span>permanent,<span class="w"> </span>add<span class="w"> </span><span class="s1">&#39;set debuginfod enabled on&#39;</span><span class="w"> </span>to<span class="w"> </span>.gdbinit.
+Downloading<span class="w"> </span>separate<span class="w"> </span>debug<span class="w"> </span>info<span class="w"> </span><span class="k">for</span><span class="w"> </span>system-supplied<span class="w"> </span>DSO<span class="w"> </span>at<span class="w"> </span>0x7ffd481b7000
+Downloading<span class="w"> </span>separate<span class="w"> </span>debug<span class="w"> </span>info<span class="w"> </span><span class="k">for</span><span class="w"> </span>/lib64/libm.so.6<span class="w">                                                                          </span>
+Downloading<span class="w"> </span>separate<span class="w"> </span>debug<span class="w"> </span>info<span class="w"> </span><span class="k">for</span><span class="w"> </span>/lib64/libc.so.6<span class="w">                                                                          </span>
+<span class="o">[</span>Thread<span class="w"> </span>debugging<span class="w"> </span>using<span class="w"> </span>libthread_db<span class="w"> </span>enabled<span class="o">]</span><span class="w">                                                                                 </span>
+Using<span class="w"> </span>host<span class="w"> </span>libthread_db<span class="w"> </span>library<span class="w"> </span><span class="s2">&quot;/lib64/libthread_db.so.1&quot;</span>.
+</code></pre></div>
+
+<p><a href="https://wiki.archlinux.org/title/Debugging/Getting_traces">参gdb获取调试栈信息</a></p>
 <h2>分析实例</h2>                    </article>
                 </aside><!-- /#featured -->
                     <section id="content" class="body">
@@ -206,16 +218,16 @@ make<span class="w"> </span><span class="nb">test</span>
                 </address>
         <p>In <a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a>.</p>
         
-</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">atexit</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">sleep</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_p</span><span class="p">():</span>
+</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">atexit</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="k">def</span> <span class="nf">test_p</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;this is test&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y, %H:%M:%S&quot;</span><span class="p">)))</span>
     <span class="k">assert</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">1</span>
 <span class="c1"># atexit.register(test_p)</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">thread_print</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">thread_print</span><span class="p">():</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mf">1e3</span><span class="p">:</span>
         <span class="n">sleep</span><span class="p">(</span><span class="mf">.001</span><span class="p">)</span>

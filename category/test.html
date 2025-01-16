@@ -39,9 +39,9 @@
 <p>python内部提供一个multiprocessing模块, 其支持使用与 threading 模块类似的 API 来操作进程。可用其来绕过GIL</p>
 </blockquote>
 <h2>环境准备</h2>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">splitext</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">abspath</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">splitext</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">abspath</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;current ipynb path is: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mkdir cache dir in order to run py in shell&quot;</span><span class="p">)</span>
@@ -67,11 +67,11 @@ create dir /home/smartwork/work/mblog/process/.cache success.
 <p>其中,在window上默认使用 <code>spawn</code> 方式启动</p>
 <h2>spawn探讨</h2>
 <div class="highlight"><pre><span></span><code><span class="o">%%</span><span class="n">writefile</span> <span class="o">.</span><span class="n">cache</span><span class="o">/</span><span class="n">test_spwan</span><span class="o">.</span><span class="n">py</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;import running output.&quot;</span><span class="p">)</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">spawn_example</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">spawn_example</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="mi">8</span><span class="o">**</span><span class="mi">9</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
@@ -89,51 +89,51 @@ create dir /home/smartwork/work/mblog/process/.cache success.
 <div class="highlight"><pre><span></span><code><span class="err">!</span><span class="n">python</span> <span class="o">.</span><span class="n">cache</span><span class="o">/</span><span class="n">test_spwan</span><span class="o">.</span><span class="n">py</span>
 </code></pre></div>
 
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">running</span> <span class="n">output</span><span class="o">.</span>
-<span class="n">current</span> <span class="n">mp</span> <span class="n">start</span> <span class="n">method</span> <span class="ow">is</span><span class="p">:</span>  <span class="n">spawn</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">running</span> <span class="n">output</span><span class="o">.</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">running</span><span class="w"> </span><span class="n">output</span><span class="o">.</span>
+<span class="n">current</span><span class="w"> </span><span class="n">mp</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="n">method</span><span class="w"> </span><span class="ow">is</span><span class="p">:</span><span class="w">  </span><span class="n">spawn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">running</span><span class="w"> </span><span class="n">output</span><span class="o">.</span>
 <span class="mi">134217728</span>
 </code></pre></div>
 
 <p>从上述执行结果中可以看到, <code>import running output.</code> 输出了两次. 一次为python运行时解析执行的print语句,</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing.context</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing.pool</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing.shared_memory</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing.synchronize</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">random</span><span class="w"> </span><span class="kn">import</span> <span class="n">randint</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Thread</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">tqdm</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">join</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">splitext</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">isfile</span><span class="p">,</span> <span class="n">isdir</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">glob</span><span class="w"> </span><span class="kn">import</span> <span class="n">glob</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">multiprocessing.context</span>
+<span class="kn">import</span> <span class="nn">multiprocessing.pool</span>
+<span class="kn">import</span> <span class="nn">multiprocessing.shared_memory</span>
+<span class="kn">import</span> <span class="nn">multiprocessing.synchronize</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">splitext</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">isfile</span><span class="p">,</span> <span class="n">isdir</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">pi</span> <span class="k">as</span> <span class="n">PI</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">tan</span><span class="p">,</span> <span class="n">atan</span><span class="p">,</span> <span class="n">exp</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">pi</span> <span class="k">as</span> <span class="n">PI</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">tan</span><span class="p">,</span> <span class="n">atan</span><span class="p">,</span> <span class="n">exp</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mp</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">multiprocessing.sharedctypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">Value</span><span class="p">,</span> <span class="n">Array</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">Lock</span><span class="p">,</span> <span class="n">Queue</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">queue</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">from</span> <span class="nn">multiprocessing.sharedctypes</span> <span class="kn">import</span> <span class="n">Value</span><span class="p">,</span> <span class="n">Array</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">Lock</span><span class="p">,</span> <span class="n">Queue</span>
+<span class="kn">import</span> <span class="nn">queue</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">QVariant</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">qgis.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">QgsFeature</span><span class="p">,</span> <span class="n">QgsGeometry</span><span class="p">,</span> <span class="n">QgsPointXY</span><span class="p">,</span> <span class="n">QgsProject</span><span class="p">,</span> <span class="n">QgsApplication</span><span class="p">,</span> <span class="n">QgsVectorLayer</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">qgis.gui</span><span class="w"> </span><span class="kn">import</span> <span class="n">QgisInterface</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">qgis.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">iface</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">qgis._core</span><span class="w"> </span><span class="kn">import</span> <span class="n">QgsCoordinateReferenceSystem</span><span class="p">,</span> <span class="n">QgsFields</span><span class="p">,</span> <span class="n">QgsField</span><span class="p">,</span> <span class="n">QgsVectorFileWriter</span><span class="p">,</span> <span class="n">QgsWkbTypes</span><span class="p">,</span> <span class="n">QgsProject</span><span class="p">,</span> <span class="n">QgsVectorLayer</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">qgis._core</span><span class="w"> </span><span class="kn">import</span> <span class="n">QgsApplication</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">QVariant</span>
+<span class="kn">from</span> <span class="nn">qgis.core</span> <span class="kn">import</span> <span class="n">QgsFeature</span><span class="p">,</span> <span class="n">QgsGeometry</span><span class="p">,</span> <span class="n">QgsPointXY</span><span class="p">,</span> <span class="n">QgsProject</span><span class="p">,</span> <span class="n">QgsApplication</span><span class="p">,</span> <span class="n">QgsVectorLayer</span>
+<span class="kn">from</span> <span class="nn">qgis.gui</span> <span class="kn">import</span> <span class="n">QgisInterface</span>
+<span class="kn">from</span> <span class="nn">qgis.utils</span> <span class="kn">import</span> <span class="n">iface</span>
+<span class="kn">from</span> <span class="nn">qgis._core</span> <span class="kn">import</span> <span class="n">QgsCoordinateReferenceSystem</span><span class="p">,</span> <span class="n">QgsFields</span><span class="p">,</span> <span class="n">QgsField</span><span class="p">,</span> <span class="n">QgsVectorFileWriter</span><span class="p">,</span> <span class="n">QgsWkbTypes</span><span class="p">,</span> <span class="n">QgsProject</span><span class="p">,</span> <span class="n">QgsVectorLayer</span>
+<span class="kn">from</span> <span class="nn">qgis._core</span> <span class="kn">import</span> <span class="n">QgsApplication</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">LonLat2WebMercator</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">LonLat2WebMercator</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    lonLat is from GPS&#39;s WGS84</span>
 <span class="sd">    webMercator is the fromat in baidumap, googlemap</span>
@@ -144,7 +144,7 @@ create dir /home/smartwork/work/mblog/process/.cache success.
   <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">*</span><span class="mf">20037508.34</span><span class="o">/</span><span class="mi">180</span>
   <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">WebMercator2LonLat</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="p">):</span>
+<span class="k">def</span> <span class="nf">WebMercator2LonLat</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="p">):</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    web Mercator to longitude and latitude</span>
 <span class="sd">  &quot;&quot;&quot;</span>
@@ -154,29 +154,29 @@ create dir /home/smartwork/work/mblog/process/.cache success.
   <span class="k">return</span> <span class="p">[</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">]</span>
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">A</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
     <span class="n">i</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">l</span><span class="p">:</span> <span class="nb">list</span>
     <span class="n">d</span><span class="p">:</span> <span class="nb">dict</span>
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Point</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Point</span><span class="p">:</span>
     <span class="n">x</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">y</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_qgs_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QgsGeometry</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">to_qgs_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QgsGeometry</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromPointXY</span><span class="p">(</span><span class="n">QgsPointXY</span><span class="p">(</span><span class="o">*</span><span class="n">WebMercator2LonLat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)))</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">handle_convert_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="nf">handle_convert_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
             <span class="n">attrs</span><span class="p">:</span> <span class="n">QgsFields</span><span class="p">,</span> <span class="n">val_dicts</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">layer</span><span class="p">:</span> <span class="n">QgsVectorLayer</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QgsGeometry</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_qgs_geometry</span><span class="p">()</span>
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Point25D</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Point25D</span><span class="p">:</span>
     <span class="n">x</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">y</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">depth</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_qgs_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QgsGeometry</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">to_qgs_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QgsGeometry</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromPointXY</span><span class="p">(</span><span class="n">QgsPointXY</span><span class="p">(</span><span class="o">*</span><span class="n">WebMercator2LonLat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)))</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">handle_convert_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="nf">handle_convert_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
             <span class="n">attrs</span><span class="p">:</span> <span class="n">QgsFields</span><span class="p">,</span> <span class="n">val_dicts</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">layer</span><span class="p">:</span> <span class="n">QgsVectorLayer</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QgsGeometry</span><span class="p">:</span>
         <span class="c1"># if layer is not None: </span>
         <span class="c1">#     layer.addAttribute(QgsField(&quot;depth&quot;, QVariant.String, None, 254))</span>
@@ -193,14 +193,14 @@ create dir /home/smartwork/work/mblog/process/.cache success.
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_qgs_geometry</span><span class="p">()</span>
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Pline</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Pline</span><span class="p">:</span>
     <span class="n">minx</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">miny</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">maxx</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">maxy</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">points_number</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">repeat_points</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Point</span><span class="p">]</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_qgs_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QgsGeometry</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">to_qgs_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QgsGeometry</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">points_number</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repeat_points</span><span class="p">):</span>
             <span class="n">warn</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;points_number is not equal to repeat_points, &quot;</span>
@@ -208,21 +208,21 @@ create dir /home/smartwork/work/mblog/process/.cache success.
         <span class="k">return</span> <span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromPolylineXY</span><span class="p">(</span>
             <span class="p">[</span><span class="n">QgsPointXY</span><span class="p">(</span><span class="o">*</span><span class="n">WebMercator2LonLat</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">y</span><span class="p">))</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeat_points</span><span class="p">]</span>
         <span class="p">)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">handle_convert_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="nf">handle_convert_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
             <span class="n">attrs</span><span class="p">:</span> <span class="n">QgsFields</span><span class="p">,</span> <span class="n">val_dicts</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">layer</span><span class="p">:</span> <span class="n">QgsVectorLayer</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QgsGeometry</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_qgs_geometry</span><span class="p">()</span>
 
 <span class="n">MULT_POLYGON_COUNT</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># 多部分多边形计数</span>
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Polygon</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Polygon</span><span class="p">:</span>
     <span class="n">minx</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">miny</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">maxx</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">maxy</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">polygon_num</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">repeat_plines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Pline</span><span class="p">]</span>  <span class="c1"># 不包含mixx/y,maxx/y</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_qgs_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">QgsGeometry</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">to_qgs_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">QgsGeometry</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">polygon_num</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repeat_plines</span><span class="p">):</span>
             <span class="n">warn</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;polygon_num is not equal to repeat_plines, &quot;</span>
@@ -237,7 +237,7 @@ create dir /home/smartwork/work/mblog/process/.cache success.
                 <span class="p">[[</span><span class="n">QgsPointXY</span><span class="p">(</span><span class="o">*</span><span class="n">WebMercator2LonLat</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">k</span><span class="o">.</span><span class="n">y</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">repeat_points</span><span class="p">]]</span>
             <span class="p">))</span>
         <span class="k">return</span> <span class="n">res</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">handle_convert_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="nf">handle_convert_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
             <span class="n">attrs</span><span class="p">:</span> <span class="n">QgsFields</span><span class="p">,</span> <span class="n">val_dicts</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">layer</span><span class="p">:</span> <span class="n">QgsVectorLayer</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QgsGeometry</span><span class="p">:</span>
         <span class="k">global</span> <span class="n">MULT_POLYGON_COUNT</span>
         <span class="n">the_geoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_qgs_geometry</span><span class="p">()</span>
@@ -247,7 +247,7 @@ create dir /home/smartwork/work/mblog/process/.cache success.
         <span class="k">return</span> <span class="n">the_geoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">mp_handle_func</span><span class="p">(</span><span class="n">mp_queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">mp_handle_func</span><span class="p">(</span><span class="n">mp_queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">{})</span>
         <span class="n">tt</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span> 
@@ -285,7 +285,7 @@ create dir /home/smartwork/work/mblog/process/.cache success.
 
 <p>输出如下:</p>
 <div class="highlight"><pre><span></span><code><span class="p">[</span><span class="mi">18952</span><span class="p">,</span> <span class="mi">5852</span><span class="p">]</span>
-<span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="err">&#39;</span><span class="nc">__main__</span><span class="o">.</span><span class="n">A</span><span class="s1">&#39;&gt;</span>
+<span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">__main__</span><span class="o">.</span><span class="n">A</span><span class="s1">&#39;&gt;</span>
 <span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">d</span><span class="o">=</span><span class="p">{})</span>
 <span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">d</span><span class="o">=</span><span class="p">{})</span>
 <span class="n">Polygon</span><span class="p">(</span><span class="n">minx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">miny</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxx</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">maxy</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">polygon_num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">repeat_plines</span><span class="o">=</span><span class="p">[</span><span class="n">Pline</span><span class="p">(</span><span class="n">minx</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">miny</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">maxx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">maxy</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">points_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">repeat_points</span><span class="o">=</span><span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">9</span><span class="p">)])])</span>

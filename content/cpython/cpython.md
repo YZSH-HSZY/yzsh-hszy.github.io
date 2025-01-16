@@ -124,4 +124,18 @@ CPython 的 `configure` 脚本是使用 `GNU Autoconf` 从 `configure.ac` 生成
 
 ## cpython源码分析
 
+由上述目录描述可知, Programs中存放的是 `CPython` 解释器相关的实现部分, 其中 `python.c` 定义了程序的入口
+
+```sh
+Enable debuginfod for this session? (y or [n]) y
+Debuginfod has been enabled.
+To make this setting permanent, add 'set debuginfod enabled on' to .gdbinit.
+Downloading separate debug info for system-supplied DSO at 0x7ffd481b7000
+Downloading separate debug info for /lib64/libm.so.6                                                                          
+Downloading separate debug info for /lib64/libc.so.6                                                                          
+[Thread debugging using libthread_db enabled]                                                                                 
+Using host libthread_db library "/lib64/libthread_db.so.1".
+```
+[参gdb获取调试栈信息](https://wiki.archlinux.org/title/Debugging/Getting_traces)
+
 ## 分析实例

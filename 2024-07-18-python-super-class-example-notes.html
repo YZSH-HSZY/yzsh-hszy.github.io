@@ -50,18 +50,18 @@
 <div class="highlight"><pre><span></span><code><span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">    演示super(type, obj)和super(type,type2)调用</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Father</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">father_obj_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Father</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">father_obj_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;this is obj of Father&#39;</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">father_classmethod</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">father_classmethod</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;this is method of Father method&#39;</span>
 
-<span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Father</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">father_obj_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Father</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">father_obj_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;overwrite obj method&#39;</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">father_classmethod</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">father_classmethod</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;overwrite classmethod&#39;</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>

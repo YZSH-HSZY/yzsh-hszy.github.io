@@ -92,10 +92,10 @@ CHW格式是指按照通道数、高度和宽度的顺序排列图像尺寸的�
 </li>
 </ul>
 <h2>实战</h2>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">mindspore</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">mindspore</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">mindspore.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">vision</span><span class="p">,</span> <span class="n">transforms</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">mindspore.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">MnistDataset</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">mindspore</span>
+<span class="kn">from</span> <span class="nn">mindspore</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">mindspore.dataset</span> <span class="kn">import</span> <span class="n">vision</span><span class="p">,</span> <span class="n">transforms</span>
+<span class="kn">from</span> <span class="nn">mindspore.dataset</span> <span class="kn">import</span> <span class="n">MnistDataset</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mindspore base moudle import&#39;</span><span class="p">)</span>
 
 <span class="c1"># mindspore.dataset 模块提供api来加载和处理各种常用数据集，如MNIST、CIFAR-10, CIFAR-100, VOC, COCO, ImageNet, CelebA, CLUE等</span>
@@ -107,7 +107,7 @@ CHW格式是指按照通道数、高度和宽度的顺序排列图像尺寸的�
 
 <div class="highlight"><pre><span></span><code><span class="c1"># MNIST_Data数据集下载</span>
 <span class="c1"># mnist数据集是由美国国家标准与技术研究所提供的手写数字图片数据集</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">download</span><span class="w"> </span><span class="kn">import</span> <span class="n">download</span>
+<span class="kn">from</span> <span class="nn">download</span> <span class="kn">import</span> <span class="n">download</span>
 
 <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/&quot;</span> \
       <span class="s2">&quot;notebook/datasets/MNIST_Data.zip&quot;</span>
@@ -221,14 +221,14 @@ CHW格式是指按照通道数、高度和宽度的顺序排列图像尺寸的�
 
 <div class="highlight"><pre><span></span><code><span class="c1"># 查看MNIST_Data数据集内容</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="c1"># 加载数据集，包含图像和标签两部分</span>
 <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">MnistDataset</span><span class="p">(</span><span class="s2">&quot;MNIST_Data/train&quot;</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dataset:&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dataset`s cloumns is: &#39;</span><span class="p">,</span> <span class="n">train_dataset</span><span class="o">.</span><span class="n">get_col_names</span><span class="p">())</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">visualize</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">visualize</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    查看数据集中部分内容，这里是图片</span>
 <span class="sd">    Args:</span>
@@ -259,7 +259,7 @@ dataset`s cloumns is:  [&#39;image&#39;, &#39;label&#39;]
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;the img chw is : &#39;</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c1"># mnist数据中每张图像是一个25*25的灰度图</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;the label is : &#39;</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">datapipe</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">MnistDataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">datapipe</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">MnistDataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="n">image_transforms</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">vision</span><span class="o">.</span><span class="n">Rescale</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">255.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="c1"># 将图像进行缩放处理</span>
         <span class="n">vision</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1307</span><span class="p">,),</span> <span class="n">std</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3081</span><span class="p">,)),</span> <span class="c1"># 将图像进行归一化处理</span>
@@ -294,8 +294,8 @@ the label is :  5
 当我们定义神经网络时，可以继承 nn.Cell 类，在__init__方法中进行子Cell的实例化和状态管理，在construct(构造)方法中实现Tensor操作。</li>
 </ol>
 <p><strong>construct意为神经网络（或计算图）构建，相关内容详见使用静态图加速。construct()方法不可直接调用</strong></p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Net</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Cell</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Cell</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Flatten</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dense_relu_sequential</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">SequentialCell</span><span class="p">(</span>
@@ -306,7 +306,7 @@ the label is :  5
             <span class="n">nn</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dense_relu_sequential</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">logits</span>
@@ -327,8 +327,8 @@ the label is :  5
 <span class="ge">  &gt;</span>
 </code></pre></div>
 
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pytz</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">pytz</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="s1">&#39;Asia/Shanghai&#39;</span><span class="p">)))</span>
 </code></pre></div>
 
