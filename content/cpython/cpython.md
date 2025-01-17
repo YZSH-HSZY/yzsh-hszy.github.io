@@ -124,7 +124,17 @@ CPython 的 `configure` 脚本是使用 `GNU Autoconf` 从 `configure.ac` 生成
 
 ## cpython源码分析
 
+> 环境: Fedora Linux 40 ,clang version 18.1.8, Python 3.14.0a3+, git commit id: b00e1254fc, vscode devcontainer
+
 由上述目录描述可知, Programs中存放的是 `CPython` 解释器相关的实现部分, 其中 `python.c` 定义了程序的入口
+
+当我们使用python执行脚本时, 从命令行中获取的参数会被 Modules/main.c 的 `Py_BytesMain` 处理, 它会构建一个 `_PyArgv` 类型的py参数封装, 并提供指针传递给 `pymain_main` 调用, 在 `pymain_main` 中py进行以下步骤:
+1. 初始化py进程状态 `pymain_init` 
+    - `_PyRuntime_Initialize()`
+
+**注意** POSIX和WINDOWS的cpython的main入口的区别在于window上使用 `wchar_t*` 来引用unicode参数
+
+[参使用gdb观察py对象的构建](https://hackmd.io/@klouielu/ByMHBMjFe?type=view)
 
 ```sh
 Enable debuginfod for this session? (y or [n]) y

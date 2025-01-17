@@ -133,7 +133,15 @@ make<span class="w"> </span><span class="nb">test</span>
 </code></pre></div>
 
 <h2>cpython源码分析</h2>
+<blockquote>
+<p>环境: Fedora Linux 40 ,clang version 18.1.8, Python 3.14.0a3+, git commit id: b00e1254fc, vscode devcontainer</p>
+</blockquote>
 <p>由上述目录描述可知, Programs中存放的是 <code>CPython</code> 解释器相关的实现部分, 其中 <code>python.c</code> 定义了程序的入口</p>
+<p>当我们使用python执行脚本时, 从命令行中获取的参数会被 Modules/main.c 的 <code>Py_BytesMain</code> 处理, 它会构建一个 <code>_PyArgv</code> 类型的py参数封装, 并提供指针传递给 <code>pymain_main</code> 调用, 在 <code>pymain_main</code> 中py进行以下步骤:
+1. 初始化py进程状态 <code>pymain_init</code> 
+    - <code>_PyRuntime_Initialize()</code></p>
+<p><strong>注意</strong> POSIX和WINDOWS的cpython的main入口的区别在于window上使用 <code>wchar_t*</code> 来引用unicode参数</p>
+<p><a href="https://hackmd.io/@klouielu/ByMHBMjFe?type=view">参使用gdb观察py对象的构建</a></p>
 <div class="highlight"><pre><span></span><code>Enable<span class="w"> </span>debuginfod<span class="w"> </span><span class="k">for</span><span class="w"> </span>this<span class="w"> </span>session?<span class="w"> </span><span class="o">(</span>y<span class="w"> </span>or<span class="w"> </span><span class="o">[</span>n<span class="o">])</span><span class="w"> </span>y
 Debuginfod<span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>enabled.
 To<span class="w"> </span>make<span class="w"> </span>this<span class="w"> </span>setting<span class="w"> </span>permanent,<span class="w"> </span>add<span class="w"> </span><span class="s1">&#39;set debuginfod enabled on&#39;</span><span class="w"> </span>to<span class="w"> </span>.gdbinit.
