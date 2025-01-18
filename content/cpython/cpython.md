@@ -130,7 +130,10 @@ CPython 的 `configure` 脚本是使用 `GNU Autoconf` 从 `configure.ac` 生成
 
 当我们使用python执行脚本时, 从命令行中获取的参数会被 Modules/main.c 的 `Py_BytesMain` 处理, 它会构建一个 `_PyArgv` 类型的py参数封装, 并提供指针传递给 `pymain_main` 调用, 在 `pymain_main` 中py进行以下步骤:
 1. 初始化py进程状态 `pymain_init` 
-    - `_PyRuntime_Initialize()`
+    - `_PyRuntime_Initialize(&_PyRuntime)` 做一些运行初始化设置
+    - `PyPreConfig_InitPythonConfig(&preconfig);` 预处理py的配置信息,主要是编码方式、调试开关以及一些其他的命令选项
+    - `PyConfig_SetBytesArgv(&config, args->argc, args->bytes_argv);` 设置py配置信息
+    - `Py_InitializeFromConfig(&config);` 根据配置信息初始化py解释器
 
 **注意** POSIX和WINDOWS的cpython的main入口的区别在于window上使用 `wchar_t*` 来引用unicode参数
 

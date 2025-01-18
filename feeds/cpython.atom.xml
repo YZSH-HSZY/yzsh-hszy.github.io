@@ -112,7 +112,10 @@ make&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;test&lt;/span&gt;
 &lt;p&gt;由上述目录描述可知, Programs中存放的是 &lt;code&gt;CPython&lt;/code&gt; 解释器相关的实现部分, 其中 &lt;code&gt;python.c&lt;/code&gt; 定义了程序的入口&lt;/p&gt;
 &lt;p&gt;当我们使用python执行脚本时, 从命令行中获取的参数会被 Modules/main.c 的 &lt;code&gt;Py_BytesMain&lt;/code&gt; 处理, 它会构建一个 &lt;code&gt;_PyArgv&lt;/code&gt; 类型的py参数封装, 并提供指针传递给 &lt;code&gt;pymain_main&lt;/code&gt; 调用, 在 &lt;code&gt;pymain_main&lt;/code&gt; 中py进行以下步骤:
 1. 初始化py进程状态 &lt;code&gt;pymain_init&lt;/code&gt; 
-    - &lt;code&gt;_PyRuntime_Initialize()&lt;/code&gt;&lt;/p&gt;
+    - &lt;code&gt;_PyRuntime_Initialize(&amp;amp;_PyRuntime)&lt;/code&gt; 做一些运行初始化设置
+    - &lt;code&gt;PyPreConfig_InitPythonConfig(&amp;amp;preconfig);&lt;/code&gt; 预处理py的配置信息,主要是编码方式、调试开关以及一些其他的命令选项
+    - &lt;code&gt;PyConfig_SetBytesArgv(&amp;amp;config, args-&amp;gt;argc, args-&amp;gt;bytes_argv);&lt;/code&gt; 设置py配置信息
+    - &lt;code&gt;Py_InitializeFromConfig(&amp;amp;config);&lt;/code&gt; 根据配置信息初始化py解释器&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; POSIX和WINDOWS的cpython的main入口的区别在于window上使用 &lt;code&gt;wchar_t*&lt;/code&gt; 来引用unicode参数&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://hackmd.io/@klouielu/ByMHBMjFe?type=view"&gt;参使用gdb观察py对象的构建&lt;/a&gt;&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Enable&lt;span class="w"&gt; &lt;/span&gt;debuginfod&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;this&lt;span class="w"&gt; &lt;/span&gt;session?&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;y&lt;span class="w"&gt; &lt;/span&gt;or&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;n&lt;span class="o"&gt;])&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;y
