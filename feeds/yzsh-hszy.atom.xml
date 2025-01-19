@@ -377,7 +377,9 @@ make&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;test&lt;/span&gt;
     - &lt;code&gt;_PyRuntime_Initialize(&amp;amp;_PyRuntime)&lt;/code&gt; 做一些运行初始化设置
     - &lt;code&gt;PyPreConfig_InitPythonConfig(&amp;amp;preconfig);&lt;/code&gt; 预处理py的配置信息,主要是编码方式、调试开关以及一些其他的命令选项
     - &lt;code&gt;PyConfig_SetBytesArgv(&amp;amp;config, args-&amp;gt;argc, args-&amp;gt;bytes_argv);&lt;/code&gt; 设置py配置信息
-    - &lt;code&gt;Py_InitializeFromConfig(&amp;amp;config);&lt;/code&gt; 根据配置信息初始化py解释器&lt;/p&gt;
+    - &lt;code&gt;Py_InitializeFromConfig(&amp;amp;config);&lt;/code&gt; 根据配置信息初始化py全局设置
+    - &lt;code&gt;PyConfig_Clear&lt;/code&gt; 清理局部解析的config对象
+2. 如果上一步的初始化正常，则调用 &lt;code&gt;Py_RunMain&lt;/code&gt; 会转动 &lt;code&gt;pymain_run_python&lt;/code&gt; 处理，其中会根据 &lt;code&gt;PyConfig *config&lt;/code&gt; 选择py的执行方式，有 &lt;code&gt;pymain_run_command/pymain_run_module/pymain_run_file/pymain_run_stdin&lt;/code&gt; 几种执行方式&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; POSIX和WINDOWS的cpython的main入口的区别在于window上使用 &lt;code&gt;wchar_t*&lt;/code&gt; 来引用unicode参数&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://hackmd.io/@klouielu/ByMHBMjFe?type=view"&gt;参使用gdb观察py对象的构建&lt;/a&gt;&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Enable&lt;span class="w"&gt; &lt;/span&gt;debuginfod&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;this&lt;span class="w"&gt; &lt;/span&gt;session?&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;y&lt;span class="w"&gt; &lt;/span&gt;or&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;n&lt;span class="o"&gt;])&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;y
