@@ -136,6 +136,7 @@ CPython 的 `configure` 脚本是使用 `GNU Autoconf` 从 `configure.ac` 生成
     - `Py_InitializeFromConfig(&config);` 根据配置信息初始化py全局设置
     - `PyConfig_Clear` 清理局部解析的config对象
 2. 如果上一步的初始化正常，则调用 `Py_RunMain` 会转动 `pymain_run_python` 处理，其中会根据 `PyConfig *config` 选择py的执行方式，有 `pymain_run_command/pymain_run_module/pymain_run_file/pymain_run_stdin` 几种执行方式
+    - `pymain_run_command` 在使用 `python -c {COMMAND}` 解释作为字符串传入的程序时执行
 
 **注意** POSIX和WINDOWS的cpython的main入口的区别在于window上使用 `wchar_t*` 来引用unicode参数
 

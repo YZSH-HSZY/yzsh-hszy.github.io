@@ -150,7 +150,8 @@ make<span class="w"> </span><span class="nb">test</span>
     - <code>PyConfig_SetBytesArgv(&amp;config, args-&gt;argc, args-&gt;bytes_argv);</code> 设置py配置信息
     - <code>Py_InitializeFromConfig(&amp;config);</code> 根据配置信息初始化py全局设置
     - <code>PyConfig_Clear</code> 清理局部解析的config对象
-2. 如果上一步的初始化正常，则调用 <code>Py_RunMain</code> 会转动 <code>pymain_run_python</code> 处理，其中会根据 <code>PyConfig *config</code> 选择py的执行方式，有 <code>pymain_run_command/pymain_run_module/pymain_run_file/pymain_run_stdin</code> 几种执行方式</p>
+2. 如果上一步的初始化正常，则调用 <code>Py_RunMain</code> 会转动 <code>pymain_run_python</code> 处理，其中会根据 <code>PyConfig *config</code> 选择py的执行方式，有 <code>pymain_run_command/pymain_run_module/pymain_run_file/pymain_run_stdin</code> 几种执行方式
+    - <code>pymain_run_command</code> 在使用 <code>python -c {COMMAND}</code> 解释作为字符串传入的程序时执行</p>
 <p><strong>注意</strong> POSIX和WINDOWS的cpython的main入口的区别在于window上使用 <code>wchar_t*</code> 来引用unicode参数</p>
 <p><a href="https://hackmd.io/@klouielu/ByMHBMjFe?type=view">参使用gdb观察py对象的构建</a></p>
 <div class="highlight"><pre><span></span><code>Enable<span class="w"> </span>debuginfod<span class="w"> </span><span class="k">for</span><span class="w"> </span>this<span class="w"> </span>session?<span class="w"> </span><span class="o">(</span>y<span class="w"> </span>or<span class="w"> </span><span class="o">[</span>n<span class="o">])</span><span class="w"> </span>y
