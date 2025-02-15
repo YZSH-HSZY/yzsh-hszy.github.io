@@ -1,5 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Welcome to YZSH-HSZY blog. - YZSH-HSZY</title><link href="https://yzsh-hszy.github.io/" rel="alternate"></link><link href="https://yzsh-hszy.github.io/feeds/yzsh-hszy.atom.xml" rel="self"></link><id>https://yzsh-hszy.github.io/</id><updated>2024-12-30T19:00:00+08:00</updated><entry><title>multiprocess blog.</title><link href="https://yzsh-hszy.github.io/2024-12-30-multiprocess-blog.html" rel="alternate"></link><published>2024-12-30T19:00:00+08:00</published><updated>2024-12-30T19:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2024-12-30:/2024-12-30-multiprocess-blog.html</id><summary type="html">&lt;h1&gt;笔记介绍&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Welcome to YZSH-HSZY blog. - YZSH-HSZY</title><link href="https://yzsh-hszy.github.io/" rel="alternate"></link><link href="https://yzsh-hszy.github.io/feeds/yzsh-hszy.atom.xml" rel="self"></link><id>https://yzsh-hszy.github.io/</id><updated>2025-02-10T12:00:00+08:00</updated><entry><title>Build Mini Linux Distro And Use Qemu Running.</title><link href="https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html" rel="alternate"></link><published>2025-02-10T12:00:00+08:00</published><updated>2025-02-10T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-02-10:/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html</id><summary type="html">&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;这是使用qemu的使用教程, 以构建最小linux发行版为例.
+&lt;a href="https://github.com/nir9/welcome/tree/master"&gt;参nir9博客&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;从构建linux内核开始&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;env&lt;/strong&gt;
+    - linux内核源码 &lt;code&gt;git clone --depth 1 https://git.kernel.org/
+pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
+    - 依赖包 &lt;code&gt;apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev …&lt;/code&gt;&lt;/p&gt;&lt;/blockquote&gt;</summary><content type="html">&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;这是使用qemu的使用教程, 以构建最小linux发行版为例.
+&lt;a href="https://github.com/nir9/welcome/tree/master"&gt;参nir9博客&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;从构建linux内核开始&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;env&lt;/strong&gt;
+    - linux内核源码 &lt;code&gt;git clone --depth 1 https://git.kernel.org/
+pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
+    - 依赖包 &lt;code&gt;apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev syslinux dosfstools&lt;/code&gt;
+    - 使用qemu启动编译后的内核 &lt;code&gt;apt install qemu-system-x86&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; 在linux目录下使用 &lt;code&gt;make help&lt;/code&gt; 查看帮助, 这里我们使用 &lt;code&gt;make tinyconfig&lt;/code&gt; 配置尽可能小的内核&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;使用 &lt;code&gt;make menuconfig&lt;/code&gt; 配置编译make选项, 配置如下:&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;64&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;bit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;kernel&lt;/span&gt;
+&lt;span class="n"&gt;General&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;---&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;Initial&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;RAM&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;filesystem&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ow"&gt;and&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;RAM&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;disk&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;initramfs&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;initrd&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="n"&gt;General&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;---&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;Configure&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;standard&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;kernel&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;features&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;exp&lt;/span&gt;&lt;span class="n"&gt;ert&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;users&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;---&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;Enable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kr"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kr"&gt;print&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="n"&gt;Executable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kr"&gt;for&lt;/span&gt;&lt;span class="n"&gt;mats&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;---&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;Kernel&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kr"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ELF&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;binaries&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="n"&gt;Device&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Drivers&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;---&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;Character&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;devices&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;---&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;Enable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;TTY&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;使用 &lt;code&gt;make -j $(nproc)&lt;/code&gt; 构建, 默认生成的内核镜像在 &lt;code&gt;arch/x86/boot/bzImage&lt;/code&gt;,为压缩的kernel镜像
+查看内核镜像的运行 &lt;code&gt;qemu-system-x86_64 --kernel arch/x86/boot/bzImage&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;## &lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Qemu"></category></entry><entry><title>multiprocess blog.</title><link href="https://yzsh-hszy.github.io/2024-12-30-multiprocess-blog.html" rel="alternate"></link><published>2024-12-30T19:00:00+08:00</published><updated>2024-12-30T19:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2024-12-30:/2024-12-30-multiprocess-blog.html</id><summary type="html">&lt;h1&gt;笔记介绍&lt;/h1&gt;
 &lt;p&gt;该笔记用于记录工作中多进程相关问题和学习笔记.主要为python语言.
 &lt;a href="https://docs.python.org/zh-cn/3/library/multiprocessing.html"&gt;参阅官方多进程文档获取详细说明&lt;/a&gt;&lt;/p&gt;
 &lt;blockquote&gt;

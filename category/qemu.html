@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+        <head>
+                        <meta charset="utf-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <meta name="generator" content="Pelican" />
+                        <title>Welcome to YZSH-HSZY blog. - Qemu</title>
+                        <link rel="stylesheet" href="https://yzsh-hszy.github.io/theme/css/main.css" />
+                                <link href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Welcome to YZSH-HSZY blog. Atom Feed" />
+        </head>
+
+        <body id="index" class="home">
+                <header id="banner" class="body">
+                        <h1><a href="https://yzsh-hszy.github.io/">Welcome to YZSH-HSZY blog.</a></h1>
+                        <nav><ul>
+                                                <li><a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/mindspore.html">Mindspore</a></li>
+                                                <li class="active"><a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/test.html">Test</a></li>
+                        </ul></nav>
+                </header><!-- /#banner -->
+
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html">Build Mini Linux Distro And Use Qemu Running.</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2025-02-10T12:00:00+08:00">
+                Published: Mon 10 February 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
+                </address>
+        <p>In <a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a>.</p>
+        
+</footer><!-- /.post-info --><h1>介绍</h1>
+<p>这是使用qemu的使用教程, 以构建最小linux发行版为例.
+<a href="https://github.com/nir9/welcome/tree/master">参nir9博客</a></p>
+<h2>从构建linux内核开始</h2>
+<blockquote>
+<p><strong>env</strong>
+    - linux内核源码 <code>git clone --depth 1 https://git.kernel.org/
+pub/scm/linux/kernel/git/torvalds/linux.git</code>
+    - 依赖包 <code>apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev syslinux dosfstools</code>
+    - 使用qemu启动编译后的内核 <code>apt install qemu-system-x86</code></p>
+</blockquote>
+<p><strong>注意</strong> 在linux目录下使用 <code>make help</code> 查看帮助, 这里我们使用 <code>make tinyconfig</code> 配置尽可能小的内核</p>
+<blockquote>
+<p>使用 <code>make menuconfig</code> 配置编译make选项, 配置如下:</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="mf">64</span><span class="o">-</span><span class="n">bit</span><span class="w"> </span><span class="n">kernel</span>
+<span class="n">General</span><span class="w"> </span><span class="n">setup</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Initial</span><span class="w"> </span><span class="n">RAM</span><span class="w"> </span><span class="n">filesystem</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">RAM</span><span class="w"> </span><span class="n">disk</span><span class="w"> </span><span class="p">(</span><span class="n">initramfs</span><span class="o">/</span><span class="n">initrd</span><span class="p">)</span><span class="w"> </span><span class="n">support</span><span class="w"> </span>
+<span class="n">General</span><span class="w"> </span><span class="n">setup</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Configure</span><span class="w"> </span><span class="n">standard</span><span class="w"> </span><span class="n">kernel</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="p">(</span><span class="nb">exp</span><span class="n">ert</span><span class="w"> </span><span class="n">users</span><span class="p">)</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Enable</span><span class="w"> </span><span class="n">support</span><span class="w"> </span><span class="kr">for</span><span class="w"> </span><span class="kr">print</span><span class="n">k</span><span class="w"> </span>
+<span class="n">Executable</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="kr">for</span><span class="n">mats</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Kernel</span><span class="w"> </span><span class="n">support</span><span class="w"> </span><span class="kr">for</span><span class="w"> </span><span class="n">ELF</span><span class="w"> </span><span class="n">binaries</span><span class="w"> </span>
+<span class="n">Device</span><span class="w"> </span><span class="n">Drivers</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Character</span><span class="w"> </span><span class="n">devices</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Enable</span><span class="w"> </span><span class="n">TTY</span>
+</code></pre></div>
+
+<blockquote>
+<p>使用 <code>make -j $(nproc)</code> 构建, 默认生成的内核镜像在 <code>arch/x86/boot/bzImage</code>,为压缩的kernel镜像
+查看内核镜像的运行 <code>qemu-system-x86_64 --kernel arch/x86/boot/bzImage</code></p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="c1">## </span>
+</code></pre></div>                    </article>
+                </aside><!-- /#featured -->
+                <section id="extras" class="body">
+                                <div class="blogroll">
+                                        <h2>links</h2>
+                                        <ul>
+                                                        <li><a href="https://getpelican.com/">Pelican</a></li>
+                                                        <li><a href="https://www.python.org/">Python.org</a></li>
+                                                        <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                                                        <li><a href="#">You can modify those links in your config file</a></li>
+                                        </ul>
+                                </div><!-- /.blogroll -->
+                                <div class="social">
+                                        <h2>social</h2>
+                                        <ul>
+                                                        <li><a href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                                                        <li><a href="#">You can add links in your config file</a></li>
+                                                        <li><a href="#">Another social link</a></li>
+                                        </ul>
+                                </div><!-- /.social -->
+                </section><!-- /#extras -->
+
+                <footer id="contentinfo" class="body">
+                        <address id="about" class="vcard body">
+                                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                        </address><!-- /#about -->
+
+                        <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+                </footer><!-- /#contentinfo -->
+
+        </body>
+</html>
