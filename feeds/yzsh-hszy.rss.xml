@@ -3,11 +3,10 @@
 &lt;p&gt;这是使用qemu的使用教程, 以构建最小linux发行版为例.
 &lt;a href="https://github.com/nir9/welcome/tree/master"&gt;参nir9博客&lt;/a&gt;&lt;/p&gt;
 &lt;h2&gt;从构建linux内核开始&lt;/h2&gt;
-&lt;blockquote&gt;
 &lt;p&gt;&lt;strong&gt;env&lt;/strong&gt;
-    - linux内核源码 &lt;code&gt;git clone --depth 1 https://git.kernel.org/
+- linux内核源码 &lt;code&gt;git clone --depth 1 https://git.kernel.org/
 pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
-    - 依赖包 &lt;code&gt;apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev …&lt;/code&gt;&lt;/p&gt;&lt;/blockquote&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">YZSH-HSZY</dc:creator><pubDate>Mon, 10 Feb 2025 12:00:00 +0800</pubDate><guid isPermaLink="false">tag:yzsh-hszy.github.io,2025-02-10:/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html</guid><category>Qemu</category></item><item><title>multiprocess blog.</title><link>https://yzsh-hszy.github.io/2024-12-30-multiprocess-blog.html</link><description>&lt;h1&gt;笔记介绍&lt;/h1&gt;
+- 依赖包 &lt;code&gt;apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev …&lt;/code&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">YZSH-HSZY</dc:creator><pubDate>Mon, 10 Feb 2025 12:00:00 +0800</pubDate><guid isPermaLink="false">tag:yzsh-hszy.github.io,2025-02-10:/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html</guid><category>Qemu</category></item><item><title>multiprocess blog.</title><link>https://yzsh-hszy.github.io/2024-12-30-multiprocess-blog.html</link><description>&lt;h1&gt;笔记介绍&lt;/h1&gt;
 &lt;p&gt;该笔记用于记录工作中多进程相关问题和学习笔记.主要为python语言.
 &lt;a href="https://docs.python.org/zh-cn/3/library/multiprocessing.html"&gt;参阅官方多进程文档获取详细说明&lt;/a&gt;&lt;/p&gt;
 &lt;blockquote&gt;

@@ -3,21 +3,18 @@
 &lt;p&gt;这是使用qemu的使用教程, 以构建最小linux发行版为例.
 &lt;a href="https://github.com/nir9/welcome/tree/master"&gt;参nir9博客&lt;/a&gt;&lt;/p&gt;
 &lt;h2&gt;从构建linux内核开始&lt;/h2&gt;
-&lt;blockquote&gt;
 &lt;p&gt;&lt;strong&gt;env&lt;/strong&gt;
-    - linux内核源码 &lt;code&gt;git clone --depth 1 https://git.kernel.org/
+- linux内核源码 &lt;code&gt;git clone --depth 1 https://git.kernel.org/
 pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
-    - 依赖包 &lt;code&gt;apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev …&lt;/code&gt;&lt;/p&gt;&lt;/blockquote&gt;</summary><content type="html">&lt;h1&gt;介绍&lt;/h1&gt;
+- 依赖包 &lt;code&gt;apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev …&lt;/code&gt;&lt;/p&gt;</summary><content type="html">&lt;h1&gt;介绍&lt;/h1&gt;
 &lt;p&gt;这是使用qemu的使用教程, 以构建最小linux发行版为例.
 &lt;a href="https://github.com/nir9/welcome/tree/master"&gt;参nir9博客&lt;/a&gt;&lt;/p&gt;
 &lt;h2&gt;从构建linux内核开始&lt;/h2&gt;
-&lt;blockquote&gt;
 &lt;p&gt;&lt;strong&gt;env&lt;/strong&gt;
-    - linux内核源码 &lt;code&gt;git clone --depth 1 https://git.kernel.org/
+- linux内核源码 &lt;code&gt;git clone --depth 1 https://git.kernel.org/
 pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
-    - 依赖包 &lt;code&gt;apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev syslinux dosfstools&lt;/code&gt;
-    - 使用qemu启动编译后的内核 &lt;code&gt;apt install qemu-system-x86&lt;/code&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
+- 依赖包 &lt;code&gt;apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev syslinux dosfstools&lt;/code&gt;
+- 使用qemu启动编译后的内核 &lt;code&gt;apt install qemu-system-x86&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; 在linux目录下使用 &lt;code&gt;make help&lt;/code&gt; 查看帮助, 这里我们使用 &lt;code&gt;make tinyconfig&lt;/code&gt; 配置尽可能小的内核&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;使用 &lt;code&gt;make menuconfig&lt;/code&gt; 配置编译make选项, 配置如下:&lt;/p&gt;
@@ -30,8 +27,83 @@ pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;使用 &lt;code&gt;make -j $(nproc)&lt;/code&gt; 构建, 默认生成的内核镜像在 &lt;code&gt;arch/x86/boot/bzImage&lt;/code&gt;,为压缩的kernel镜像
+&lt;p&gt;使用 &lt;code&gt;make -j $(nproc)&lt;/code&gt; 构建, 默认生成的内核镜像在 &lt;code&gt;arch/x86/boot/bzImage&lt;/code&gt;,为压缩的kernel镜像,约780K
 查看内核镜像的运行 &lt;code&gt;qemu-system-x86_64 --kernel arch/x86/boot/bzImage&lt;/code&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; 此时qemu启动kernel会报 &lt;code&gt;not working init found&lt;/code&gt;, 应为没有准备启动初始程序&lt;/p&gt;
+&lt;h2&gt;构建一个mini-shell&lt;/h2&gt;
+&lt;p&gt;上述步骤中, 我们完成了一个轻量式的linux-kernel构建,接下来准备构建一个轻量的shell来作为init程序&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// shell.c&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;sys/wait.h&amp;gt;&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;real_waitid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;idtype_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;idtype&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;id_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;siginfo_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;infop&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;options&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kt"&gt;char&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;255&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(;;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;# &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;count&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;255&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// /bin/ls\n -&amp;gt; /bin/ls\0&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;count&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kt"&gt;pid_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;fork_result&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;fork&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fork_result&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="n"&gt;execve&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="c1"&gt;// wait&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="c1"&gt;// &lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="kt"&gt;siginfo_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="n"&gt;real_waitid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;P_ALL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;WEXITED&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;_exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;sys.S&lt;/span&gt;
+&lt;span class="na"&gt;.intel_syntax&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;noprefix&lt;/span&gt;
+
+&lt;span class="na"&gt;.global&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;write&lt;/span&gt;
+&lt;span class="na"&gt;.global&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;read&lt;/span&gt;
+&lt;span class="na"&gt;.global&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;fork&lt;/span&gt;
+&lt;span class="na"&gt;.global&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;execve&lt;/span&gt;
+&lt;span class="na"&gt;.global&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;real_waitid&lt;/span&gt;
+&lt;span class="na"&gt;.global&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;_exit&lt;/span&gt;
+
+&lt;span class="nl"&gt;write:&lt;/span&gt;
+&lt;span class="nf"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;span class="nf"&gt;syscall&lt;/span&gt;
+&lt;span class="nf"&gt;ret&lt;/span&gt;
+
+&lt;span class="nl"&gt;read:&lt;/span&gt;
+&lt;span class="nf"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;
+&lt;span class="nf"&gt;syscall&lt;/span&gt;
+&lt;span class="nf"&gt;ret&lt;/span&gt;
+
+&lt;span class="nl"&gt;execve:&lt;/span&gt;
+&lt;span class="nf"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;59&lt;/span&gt;
+&lt;span class="nf"&gt;syscall&lt;/span&gt;
+&lt;span class="nf"&gt;ret&lt;/span&gt;
+
+
+&lt;span class="nl"&gt;fork:&lt;/span&gt;
+&lt;span class="nf"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;57&lt;/span&gt;
+&lt;span class="nf"&gt;syscall&lt;/span&gt;
+&lt;span class="nf"&gt;ret&lt;/span&gt;
+
+&lt;span class="nl"&gt;real_waitid:&lt;/span&gt;
+&lt;span class="nf"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;247&lt;/span&gt;
+&lt;span class="nf"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;r10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;rcx&lt;/span&gt;
+&lt;span class="nf"&gt;syscall&lt;/span&gt;
+&lt;span class="nf"&gt;ret&lt;/span&gt;
+
+&lt;span class="nl"&gt;_exit:&lt;/span&gt;
+&lt;span class="nf"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;60&lt;/span&gt;
+&lt;span class="nf"&gt;syscall&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;## &lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Qemu"></category></entry></feed>

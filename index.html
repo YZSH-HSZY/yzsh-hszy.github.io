@@ -37,13 +37,11 @@
 <p>这是使用qemu的使用教程, 以构建最小linux发行版为例.
 <a href="https://github.com/nir9/welcome/tree/master">参nir9博客</a></p>
 <h2>从构建linux内核开始</h2>
-<blockquote>
 <p><strong>env</strong>
-    - linux内核源码 <code>git clone --depth 1 https://git.kernel.org/
+- linux内核源码 <code>git clone --depth 1 https://git.kernel.org/
 pub/scm/linux/kernel/git/torvalds/linux.git</code>
-    - 依赖包 <code>apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev syslinux dosfstools</code>
-    - 使用qemu启动编译后的内核 <code>apt install qemu-system-x86</code></p>
-</blockquote>
+- 依赖包 <code>apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev syslinux dosfstools</code>
+- 使用qemu启动编译后的内核 <code>apt install qemu-system-x86</code></p>
 <p><strong>注意</strong> 在linux目录下使用 <code>make help</code> 查看帮助, 这里我们使用 <code>make tinyconfig</code> 配置尽可能小的内核</p>
 <blockquote>
 <p>使用 <code>make menuconfig</code> 配置编译make选项, 配置如下:</p>
@@ -56,9 +54,84 @@ pub/scm/linux/kernel/git/torvalds/linux.git</code>
 </code></pre></div>
 
 <blockquote>
-<p>使用 <code>make -j $(nproc)</code> 构建, 默认生成的内核镜像在 <code>arch/x86/boot/bzImage</code>,为压缩的kernel镜像
+<p>使用 <code>make -j $(nproc)</code> 构建, 默认生成的内核镜像在 <code>arch/x86/boot/bzImage</code>,为压缩的kernel镜像,约780K
 查看内核镜像的运行 <code>qemu-system-x86_64 --kernel arch/x86/boot/bzImage</code></p>
 </blockquote>
+<p><strong>注意</strong> 此时qemu启动kernel会报 <code>not working init found</code>, 应为没有准备启动初始程序</p>
+<h2>构建一个mini-shell</h2>
+<p>上述步骤中, 我们完成了一个轻量式的linux-kernel构建,接下来准备构建一个轻量的shell来作为init程序</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// shell.c</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/wait.h&gt;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">real_waitid</span><span class="p">(</span><span class="n">idtype_t</span><span class="w"> </span><span class="n">idtype</span><span class="p">,</span><span class="w"> </span><span class="kt">id_t</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="kt">siginfo_t</span><span class="w"> </span><span class="o">*</span><span class="n">infop</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">options</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="p">);</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">command</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(;;)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;# &quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">command</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">// /bin/ls\n -&gt; /bin/ls\0</span>
+<span class="w">        </span><span class="n">command</span><span class="p">[</span><span class="n">count</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">pid_t</span><span class="w"> </span><span class="n">fork_result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fork</span><span class="p">();</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fork_result</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">execve</span><span class="p">(</span><span class="n">command</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// wait</span>
+<span class="w">            </span><span class="c1">// </span>
+<span class="w">            </span><span class="kt">siginfo_t</span><span class="w"> </span><span class="n">info</span><span class="p">;</span>
+<span class="w">            </span><span class="n">real_waitid</span><span class="p">(</span><span class="n">P_ALL</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">info</span><span class="p">,</span><span class="w"> </span><span class="n">WEXITED</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="nf">sys.S</span>
+<span class="na">.intel_syntax</span><span class="w"> </span><span class="no">noprefix</span>
+
+<span class="na">.global</span><span class="w"> </span><span class="no">write</span>
+<span class="na">.global</span><span class="w"> </span><span class="no">read</span>
+<span class="na">.global</span><span class="w"> </span><span class="no">fork</span>
+<span class="na">.global</span><span class="w"> </span><span class="no">execve</span>
+<span class="na">.global</span><span class="w"> </span><span class="no">real_waitid</span>
+<span class="na">.global</span><span class="w"> </span><span class="no">_exit</span>
+
+<span class="nl">write:</span>
+<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span>
+<span class="nf">syscall</span>
+<span class="nf">ret</span>
+
+<span class="nl">read:</span>
+<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span>
+<span class="nf">syscall</span>
+<span class="nf">ret</span>
+
+<span class="nl">execve:</span>
+<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">59</span>
+<span class="nf">syscall</span>
+<span class="nf">ret</span>
+
+
+<span class="nl">fork:</span>
+<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">57</span>
+<span class="nf">syscall</span>
+<span class="nf">ret</span>
+
+<span class="nl">real_waitid:</span>
+<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">247</span>
+<span class="nf">mov</span><span class="w"> </span><span class="no">r10</span><span class="p">,</span><span class="w"> </span><span class="no">rcx</span>
+<span class="nf">syscall</span>
+<span class="nf">ret</span>
+
+<span class="nl">_exit:</span>
+<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span>
+<span class="nf">syscall</span>
+</code></pre></div>
+
 <div class="highlight"><pre><span></span><code><span class="c1">## </span>
 </code></pre></div>                    </article>
                 </aside><!-- /#featured -->
