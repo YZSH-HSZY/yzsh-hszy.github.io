@@ -108,6 +108,12 @@ mov rax, 60
 syscall
 ```
 
+在linux源码目录下参考系统调用的寄存器编号 `linux/arch/x86/include/generated/asm/syscalls_64.h`
+
+echo init | cpio -H newc -o > init.cpio
+make isoimage FDARGS="initrd=/init.cpio" FDINITRD=`pwd`/init.cpio
+qemu-system-x86_64 -cdram arch/x86/boot/image.iso
+
 
 ```python
 ## 

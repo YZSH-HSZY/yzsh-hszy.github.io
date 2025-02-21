@@ -105,6 +105,10 @@ pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
 &lt;span class="nf"&gt;syscall&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
+&lt;p&gt;在linux源码目录下参考系统调用的寄存器编号 &lt;code&gt;linux/arch/x86/include/generated/asm/syscalls_64.h&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;echo init | cpio -H newc -o &amp;gt; init.cpio
+make isoimage FDARGS="initrd=/init.cpio" FDINITRD=&lt;code&gt;pwd&lt;/code&gt;/init.cpio
+qemu-system-x86_64 -cdram arch/x86/boot/image.iso&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;## &lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Qemu"></category></entry><entry><title>multiprocess blog.</title><link href="https://yzsh-hszy.github.io/2024-12-30-multiprocess-blog.html" rel="alternate"></link><published>2024-12-30T19:00:00+08:00</published><updated>2024-12-30T19:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2024-12-30:/2024-12-30-multiprocess-blog.html</id><summary type="html">&lt;h1&gt;笔记介绍&lt;/h1&gt;
 &lt;p&gt;该笔记用于记录工作中多进程相关问题和学习笔记.主要为python语言.

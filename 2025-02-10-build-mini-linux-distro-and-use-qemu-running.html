@@ -138,6 +138,10 @@ pub/scm/linux/kernel/git/torvalds/linux.git</code>
 <span class="nf">syscall</span>
 </code></pre></div>
 
+<p>在linux源码目录下参考系统调用的寄存器编号 <code>linux/arch/x86/include/generated/asm/syscalls_64.h</code></p>
+<p>echo init | cpio -H newc -o &gt; init.cpio
+make isoimage FDARGS="initrd=/init.cpio" FDINITRD=<code>pwd</code>/init.cpio
+qemu-system-x86_64 -cdram arch/x86/boot/image.iso</p>
 <div class="highlight"><pre><span></span><code><span class="c1">## </span>
 </code></pre></div>
       </div><!-- /.entry-content -->
