@@ -7,7 +7,7 @@
                         <title>Build Mini Linux Distro And Use Qemu Running.</title>
                         <link rel="stylesheet" href="https://yzsh-hszy.github.io/theme/css/main.css" />
                                 <link href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Welcome to YZSH-HSZY blog. Atom Feed" />
-    <meta name="description" content="介绍 这是使用qemu的使用教程, 以构建最小linux发行版为例. 参nir9博客 从构建linux内核开始 env - linux内核源码 git clone --depth 1 https://git.kernel.org/..." />
+    <meta name="description" content="介绍 这是使用qemu的使用教程, 以构建最小linux发行版为例. 参nir9博客 术语参考 initrd: 初始化RAM磁盘, 是在实际根文件系统之前装载的初始根文件系统. initrd绑定到内核时会被内核引导过程加载,然后挂载 …" />
         </head>
 
         <body id="index" class="home">
@@ -42,12 +42,18 @@
 </footer><!-- /.post-info -->        <h1>介绍</h1>
 <p>这是使用qemu的使用教程, 以构建最小linux发行版为例.
 <a href="https://github.com/nir9/welcome/tree/master">参nir9博客</a></p>
+<h2>术语参考</h2>
+<ul>
+<li><code>initrd</code>: 初始化RAM磁盘, 是在实际根文件系统之前装载的初始根文件系统. initrd绑定到内核时会被内核引导过程加载,然后挂载initrd以加载模块使真正的文件系统可用</li>
+<li><code>cpio</code>: cpio是一个将文件复制到 cpio 或 tar 存档文件或从中复制文件的程序,存档可以是磁盘上的另一个文件/磁带/管道</li>
+</ul>
 <h2>从构建linux内核开始</h2>
 <p><strong>env</strong>
 - linux内核源码 <code>git clone --depth 1 https://git.kernel.org/
 pub/scm/linux/kernel/git/torvalds/linux.git</code>
 - 依赖包 <code>apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev syslinux dosfstools</code>
-- 使用qemu启动编译后的内核 <code>apt install qemu-system-x86</code></p>
+- 使用qemu启动编译后的内核 <code>apt install qemu-system-x86</code>
+- 如果需要制作iso镜像文件 <code>apt install isolinux genisoimage</code></p>
 <p><strong>注意</strong> 在linux目录下使用 <code>make help</code> 查看帮助, 这里我们使用 <code>make tinyconfig</code> 配置尽可能小的内核</p>
 <blockquote>
 <p>使用 <code>make menuconfig</code> 配置编译make选项, 配置如下:</p>
@@ -60,12 +66,55 @@ pub/scm/linux/kernel/git/torvalds/linux.git</code>
 </code></pre></div>
 
 <blockquote>
-<p>使用 <code>make -j $(nproc)</code> 构建, 默认生成的内核镜像在 <code>arch/x86/boot/bzImage</code>,为压缩的kernel镜像,约780K
+<p>以上配置分别代表生成 <code>64位内核</code>;<code>启用RAM文件系统和初始化根文件系统</code>;<code>启用文本打印支持</code>;<code>支持ELF格式执行文件</code>;<code>启用tty字符设备</code>
+使用 <code>make -j $(nproc)</code> 构建, 默认生成的内核镜像在 <code>arch/x86/boot/bzImage</code>,为压缩的kernel镜像,约780K
 查看内核镜像的运行 <code>qemu-system-x86_64 --kernel arch/x86/boot/bzImage</code></p>
 </blockquote>
-<p><strong>注意</strong> 此时qemu启动kernel会报 <code>not working init found</code>, 应为没有准备启动初始程序</p>
+<p><strong>注意</strong> 此时qemu启动kernel会报 <code>not working init found</code>, 因为此时没有准备启动初始程序</p>
 <h2>构建一个mini-shell</h2>
 <p>上述步骤中, 我们完成了一个轻量式的linux-kernel构建,接下来准备构建一个轻量的shell来作为init程序</p>
+<ol>
+<li>编写一个简易的调用shell命令程序, 使用POISX接口<code>write/read/execve/waitid</code></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/wait.h&gt;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(){</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">cmd</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
+<span class="w">    </span><span class="k">for</span><span class="p">(;;){</span>
+<span class="w">        </span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;# &quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">cmd</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">// write(1, &quot;&quot;, );</span>
+<span class="w">        </span><span class="n">cmd</span><span class="p">[</span><span class="n">count</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">pid_t</span><span class="w"> </span><span class="n">child</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fork</span><span class="p">();</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">child</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">-1</span><span class="p">){</span>
+<span class="w">            </span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fork failed!</span><span class="se">\n</span><span class="s">exit!!!&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">21</span><span class="p">);</span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">child</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">){</span>
+<span class="w">            </span><span class="n">execve</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="kt">siginfo_t</span><span class="w"> </span><span class="n">infop</span><span class="p">;</span>
+<span class="w">        </span><span class="n">waitid</span><span class="p">(</span><span class="n">P_ALL</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">infop</span><span class="p">,</span><span class="w"> </span><span class="n">WEXITED</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<ol>
+<li><code>gcc -static shell.c -o init</code> 编译为静态可执行文件</li>
+<li><code>echo init | cpio -H newc -o &gt; init.cpio</code> 生成一个initrd</li>
+<li>重新编译为iso内核 <code>make isoimage FDARGS="initrd=/init.cpio" FDINITRD=$(pwd)/init.cpio</code> 生成的arch/x96/boot/image.iso 镜像大小为2.2M</li>
+<li>启动iso镜像 <code>qemu-system-x86_64 -cdrom image.iso</code></li>
+</ol>
+<h3>使用assembly进行系统调用,进一步精简init程序</h3>
+<ol>
+<li>在linux源码目录下参考系统调用的id号 <code>linux/arch/x86/include/generated/asm/syscalls_64.h</code></li>
+<li>查阅<a href="https://www.intel.cn/content/www/cn/zh/support/articles/000006715/processors.html">inter x86开发手册</a>了解各寄存器作用, 这里仅关注rax寄存器用于存储syscall的id</li>
+<li><a href="https://en.wikipedia.org/wiki/X86_calling_conventions">wiki x86 体系结构的调用约定</a></li>
+<li><code>ld -o init shell.o sys.o --entry main -z noexecstack</code></li>
+</ol>
 <div class="highlight"><pre><span></span><code><span class="c1">// shell.c</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/wait.h&gt;</span>
@@ -138,7 +187,6 @@ pub/scm/linux/kernel/git/torvalds/linux.git</code>
 <span class="nf">syscall</span>
 </code></pre></div>
 
-<p>在linux源码目录下参考系统调用的寄存器编号 <code>linux/arch/x86/include/generated/asm/syscalls_64.h</code></p>
 <p>echo init | cpio -H newc -o &gt; init.cpio
 make isoimage FDARGS="initrd=/init.cpio" FDINITRD=<code>pwd</code>/init.cpio
 qemu-system-x86_64 -cdram arch/x86/boot/image.iso</p>

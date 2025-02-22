@@ -2,19 +2,23 @@
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Welcome to YZSH-HSZY blog. - Qemu</title><link href="https://yzsh-hszy.github.io/" rel="alternate"></link><link href="https://yzsh-hszy.github.io/feeds/qemu.atom.xml" rel="self"></link><id>https://yzsh-hszy.github.io/</id><updated>2025-02-10T12:00:00+08:00</updated><entry><title>Build Mini Linux Distro And Use Qemu Running.</title><link href="https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html" rel="alternate"></link><published>2025-02-10T12:00:00+08:00</published><updated>2025-02-10T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-02-10:/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html</id><summary type="html">&lt;h1&gt;介绍&lt;/h1&gt;
 &lt;p&gt;这是使用qemu的使用教程, 以构建最小linux发行版为例.
 &lt;a href="https://github.com/nir9/welcome/tree/master"&gt;参nir9博客&lt;/a&gt;&lt;/p&gt;
-&lt;h2&gt;从构建linux内核开始&lt;/h2&gt;
-&lt;p&gt;&lt;strong&gt;env&lt;/strong&gt;
-- linux内核源码 &lt;code&gt;git clone --depth 1 https://git.kernel.org/
-pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
-- 依赖包 &lt;code&gt;apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev …&lt;/code&gt;&lt;/p&gt;</summary><content type="html">&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;h2&gt;术语参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;initrd&lt;/code&gt;: 初始化RAM磁盘, 是在实际根文件系统之前装载的初始根文件系统. initrd绑定到内核时会被内核引导过程加载,然后挂载 …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;h1&gt;介绍&lt;/h1&gt;
 &lt;p&gt;这是使用qemu的使用教程, 以构建最小linux发行版为例.
 &lt;a href="https://github.com/nir9/welcome/tree/master"&gt;参nir9博客&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;术语参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;initrd&lt;/code&gt;: 初始化RAM磁盘, 是在实际根文件系统之前装载的初始根文件系统. initrd绑定到内核时会被内核引导过程加载,然后挂载initrd以加载模块使真正的文件系统可用&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cpio&lt;/code&gt;: cpio是一个将文件复制到 cpio 或 tar 存档文件或从中复制文件的程序,存档可以是磁盘上的另一个文件/磁带/管道&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h2&gt;从构建linux内核开始&lt;/h2&gt;
 &lt;p&gt;&lt;strong&gt;env&lt;/strong&gt;
 - linux内核源码 &lt;code&gt;git clone --depth 1 https://git.kernel.org/
 pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
 - 依赖包 &lt;code&gt;apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev syslinux dosfstools&lt;/code&gt;
-- 使用qemu启动编译后的内核 &lt;code&gt;apt install qemu-system-x86&lt;/code&gt;&lt;/p&gt;
+- 使用qemu启动编译后的内核 &lt;code&gt;apt install qemu-system-x86&lt;/code&gt;
+- 如果需要制作iso镜像文件 &lt;code&gt;apt install isolinux genisoimage&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; 在linux目录下使用 &lt;code&gt;make help&lt;/code&gt; 查看帮助, 这里我们使用 &lt;code&gt;make tinyconfig&lt;/code&gt; 配置尽可能小的内核&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;使用 &lt;code&gt;make menuconfig&lt;/code&gt; 配置编译make选项, 配置如下:&lt;/p&gt;
@@ -27,12 +31,55 @@ pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;使用 &lt;code&gt;make -j $(nproc)&lt;/code&gt; 构建, 默认生成的内核镜像在 &lt;code&gt;arch/x86/boot/bzImage&lt;/code&gt;,为压缩的kernel镜像,约780K
+&lt;p&gt;以上配置分别代表生成 &lt;code&gt;64位内核&lt;/code&gt;;&lt;code&gt;启用RAM文件系统和初始化根文件系统&lt;/code&gt;;&lt;code&gt;启用文本打印支持&lt;/code&gt;;&lt;code&gt;支持ELF格式执行文件&lt;/code&gt;;&lt;code&gt;启用tty字符设备&lt;/code&gt;
+使用 &lt;code&gt;make -j $(nproc)&lt;/code&gt; 构建, 默认生成的内核镜像在 &lt;code&gt;arch/x86/boot/bzImage&lt;/code&gt;,为压缩的kernel镜像,约780K
 查看内核镜像的运行 &lt;code&gt;qemu-system-x86_64 --kernel arch/x86/boot/bzImage&lt;/code&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; 此时qemu启动kernel会报 &lt;code&gt;not working init found&lt;/code&gt;, 应为没有准备启动初始程序&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; 此时qemu启动kernel会报 &lt;code&gt;not working init found&lt;/code&gt;, 因为此时没有准备启动初始程序&lt;/p&gt;
 &lt;h2&gt;构建一个mini-shell&lt;/h2&gt;
 &lt;p&gt;上述步骤中, 我们完成了一个轻量式的linux-kernel构建,接下来准备构建一个轻量的shell来作为init程序&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;编写一个简易的调用shell命令程序, 使用POISX接口&lt;code&gt;write/read/execve/waitid&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;sys/wait.h&amp;gt;&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(){&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kt"&gt;char&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;255&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="p"&gt;(;;){&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;# &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;count&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;255&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// write(1, &amp;quot;&amp;quot;, );&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;count&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kt"&gt;pid_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;child&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;fork&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;child&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;-1&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;fork failed!&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;exit!!!&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;21&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;child&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="n"&gt;execve&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kt"&gt;siginfo_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;infop&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;waitid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;P_ALL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;infop&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;WEXITED&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;gcc -static shell.c -o init&lt;/code&gt; 编译为静态可执行文件&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;echo init | cpio -H newc -o &amp;gt; init.cpio&lt;/code&gt; 生成一个initrd&lt;/li&gt;
+&lt;li&gt;重新编译为iso内核 &lt;code&gt;make isoimage FDARGS="initrd=/init.cpio" FDINITRD=$(pwd)/init.cpio&lt;/code&gt; 生成的arch/x96/boot/image.iso 镜像大小为2.2M&lt;/li&gt;
+&lt;li&gt;启动iso镜像 &lt;code&gt;qemu-system-x86_64 -cdrom image.iso&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;使用assembly进行系统调用,进一步精简init程序&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;在linux源码目录下参考系统调用的id号 &lt;code&gt;linux/arch/x86/include/generated/asm/syscalls_64.h&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;查阅&lt;a href="https://www.intel.cn/content/www/cn/zh/support/articles/000006715/processors.html"&gt;inter x86开发手册&lt;/a&gt;了解各寄存器作用, 这里仅关注rax寄存器用于存储syscall的id&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://en.wikipedia.org/wiki/X86_calling_conventions"&gt;wiki x86 体系结构的调用约定&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ld -o init shell.o sys.o --entry main -z noexecstack&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// shell.c&lt;/span&gt;
 &lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;
 &lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;sys/wait.h&amp;gt;&lt;/span&gt;
@@ -105,7 +152,6 @@ pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
 &lt;span class="nf"&gt;syscall&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;在linux源码目录下参考系统调用的寄存器编号 &lt;code&gt;linux/arch/x86/include/generated/asm/syscalls_64.h&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;echo init | cpio -H newc -o &amp;gt; init.cpio
 make isoimage FDARGS="initrd=/init.cpio" FDINITRD=&lt;code&gt;pwd&lt;/code&gt;/init.cpio
 qemu-system-x86_64 -cdram arch/x86/boot/image.iso&lt;/p&gt;
