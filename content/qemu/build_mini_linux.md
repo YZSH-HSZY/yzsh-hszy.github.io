@@ -36,7 +36,7 @@ Device Drivers  --->Character devices  --->Enable TTY
 > 使用 `make -j $(nproc)` 构建, 默认生成的内核镜像在 `arch/x86/boot/bzImage`,为压缩的kernel镜像,约780K
 > 查看内核镜像的运行 `qemu-system-x86_64 --kernel arch/x86/boot/bzImage`
 
-**注意** 此时qemu启动kernel会报 `not working init found`, 因为此时没有准备启动初始程序
+**注意** 此时qemu启动kernel会显示 `not working init found`, 因为此时没有准备启动初始程序
 
 ## 构建一个mini-shell
 上述步骤中, 我们完成了一个轻量式的linux-kernel构建,接下来准备构建一个轻量的shell来作为init程序
@@ -79,6 +79,7 @@ int main(){
 2. 查阅[inter x86开发手册](https://www.intel.cn/content/www/cn/zh/support/articles/000006715/processors.html)了解各寄存器作用, 这里仅关注rax寄存器用于存储syscall的id
 3. [wiki x86 体系结构的调用约定](https://en.wikipedia.org/wiki/X86_calling_conventions)
 4. `ld -o init shell.o sys.o --entry main -z noexecstack`
+
 ```c
 // shell.c
 #include <unistd.h>
@@ -152,6 +153,41 @@ _exit:
 mov rax, 60
 syscall
 ```
+
+> 上述步骤中生成的最小init,在我调用时报错 `Segmentation fault (core dumped)`, 在我进一步排查积累了以下经验
+1. 首先, 我想验证通过gcc和as链接obj生成程序是否可行, 而不是其他版本或库等的问题. 为此我编写了一个仅包含`write`的系统调用和对应的asm实现syscall id寄存器(此处是eax/rax)的装载
+示例代码如下:
+```
+// shell.c
+#include <unistd.h>
+
+int main(){
+    write(1, "# ", 2);
+}
+// sys.S
+.intel_syntax noprefix
+
+.global write
+
+write:
+mov rax, 1
+syscall
+ret
+```
+2. 但是我仍得到了 `Segmentation fault`,不同的是在此之前程序有期望的输出`# `, 此时想要继续探究下去, 我就需要探索汇编了, 但这方面我不太熟悉, 因此消耗了一些时间. 首先因为具有期望输出, 使用判断此时asm系统调用应该可用, 了解到 `objdump` 这一反汇编工具, 因此将生成的程序反汇编 `objdump -D minit > mm.S` , 主要关注syscall之后的部分
+```
+0000000000401000 <main>:
+  401019:	e8 07 00 00 00       	callq  401025 <write>
+  40101e:	b8 00 00 00 00       	mov    $0x0,%eax
+  401023:	5d                   	pop    %rbp
+  401024:	c3                   	retq   
+
+0000000000401025 <write>:
+  401025:	48 c7 c0 01 00 00 00 	mov    $0x1,%rax
+  40102c:	0f 05                	syscall 
+  40102e:	c3                   	retq   
+```
+可以看到在 `call write` 之后仅有有个常量mov和pop栈恢复, 判断应该是此处有问题, 让我们通过gdb调试一下  `gdb minit`; 在gdb命令界面中输入 `set disassemble-next-line on` 开启自动反汇编; `layout regs -tui` 以tui形式显示寄存器; `si`逐步汇编指令调试, 发现在执行 `retq` 时报 `cannot access memory at address 0x1`, 因此我们需要避免gcc为我们自动处理的退出, 这也是为什么需要使用`_exit` syscall退出程序
 
 echo init | cpio -H newc -o > init.cpio
 make isoimage FDARGS="initrd=/init.cpio" FDINITRD=`pwd`/init.cpio

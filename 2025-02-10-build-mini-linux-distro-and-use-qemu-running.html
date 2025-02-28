@@ -70,7 +70,7 @@ pub/scm/linux/kernel/git/torvalds/linux.git</code>
 使用 <code>make -j $(nproc)</code> 构建, 默认生成的内核镜像在 <code>arch/x86/boot/bzImage</code>,为压缩的kernel镜像,约780K
 查看内核镜像的运行 <code>qemu-system-x86_64 --kernel arch/x86/boot/bzImage</code></p>
 </blockquote>
-<p><strong>注意</strong> 此时qemu启动kernel会报 <code>not working init found</code>, 因为此时没有准备启动初始程序</p>
+<p><strong>注意</strong> 此时qemu启动kernel会显示 <code>not working init found</code>, 因为此时没有准备启动初始程序</p>
 <h2>构建一个mini-shell</h2>
 <p>上述步骤中, 我们完成了一个轻量式的linux-kernel构建,接下来准备构建一个轻量的shell来作为init程序</p>
 <ol>
@@ -187,6 +187,44 @@ pub/scm/linux/kernel/git/torvalds/linux.git</code>
 <span class="nf">syscall</span>
 </code></pre></div>
 
+<blockquote>
+<p>上述步骤中生成的最小init,在我调用时报错 <code>Segmentation fault (core dumped)</code>, 在我进一步排查积累了以下经验
+1. 首先, 我想验证通过gcc和as链接obj生成程序是否可行, 而不是其他版本或库等的问题. 为此我编写了一个仅包含<code>write</code>的系统调用和对应的asm实现syscall id寄存器(此处是eax/rax)的装载
+示例代码如下:</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="c1">// shell.c</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(){</span>
+<span class="w">    </span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;# &quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="c1">// sys.S</span>
+<span class="p">.</span><span class="n">intel_syntax</span><span class="w"> </span><span class="n">noprefix</span>
+
+<span class="p">.</span><span class="n">global</span><span class="w"> </span><span class="n">write</span>
+
+<span class="nl">write</span><span class="p">:</span>
+<span class="n">mov</span><span class="w"> </span><span class="n">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">syscall</span>
+<span class="n">ret</span>
+</code></pre></div>
+
+<ol>
+<li>但是我仍得到了 <code>Segmentation fault</code>,不同的是在此之前程序有期望的输出<code>#</code>, 此时想要继续探究下去, 我就需要探索汇编了, 但这方面我不太熟悉, 因此消耗了一些时间. 首先因为具有期望输出, 使用判断此时asm系统调用应该可用, 了解到 <code>objdump</code> 这一反汇编工具, 因此将生成的程序反汇编 <code>objdump -D minit &gt; mm.S</code> , 主要关注syscall之后的部分</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="mf">0000000000401000</span><span class="w"> </span><span class="o">&lt;</span><span class="n">main</span><span class="o">&gt;</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">401019</span><span class="p">:</span><span class="w">   </span><span class="n">e8</span><span class="w"> </span><span class="mf">07</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w">          </span><span class="n">callq</span><span class="w">  </span><span class="mf">401025</span><span class="w"> </span><span class="o">&lt;</span><span class="n">write</span><span class="o">&gt;</span>
+<span class="w">  </span><span class="mf">40101</span><span class="n">e</span><span class="p">:</span><span class="w">   </span><span class="n">b8</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w">          </span><span class="n">mov</span><span class="w">    </span><span class="err">$</span><span class="mf">0</span><span class="n">x0</span><span class="p">,</span><span class="err">%</span><span class="n">eax</span>
+<span class="w">  </span><span class="mf">401023</span><span class="p">:</span><span class="w">   </span><span class="mf">5</span><span class="n">d</span><span class="w">                      </span><span class="n">pop</span><span class="w">    </span><span class="err">%</span><span class="n">rbp</span>
+<span class="w">  </span><span class="mf">401024</span><span class="p">:</span><span class="w">   </span><span class="n">c3</span><span class="w">                      </span><span class="n">retq</span><span class="w">   </span>
+
+<span class="mf">0000000000401025</span><span class="w"> </span><span class="o">&lt;</span><span class="n">write</span><span class="o">&gt;</span><span class="p">:</span>
+<span class="w">  </span><span class="mf">401025</span><span class="p">:</span><span class="w">   </span><span class="mf">48</span><span class="w"> </span><span class="n">c7</span><span class="w"> </span><span class="n">c0</span><span class="w"> </span><span class="mf">01</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w">    </span><span class="n">mov</span><span class="w">    </span><span class="err">$</span><span class="mf">0</span><span class="n">x1</span><span class="p">,</span><span class="err">%</span><span class="n">rax</span>
+<span class="w">  </span><span class="mf">40102</span><span class="n">c</span><span class="p">:</span><span class="w">   </span><span class="mf">0</span><span class="n">f</span><span class="w"> </span><span class="mf">05</span><span class="w">                   </span><span class="kr">sys</span><span class="n">call</span><span class="w"> </span>
+<span class="w">  </span><span class="mf">40102</span><span class="n">e</span><span class="p">:</span><span class="w">   </span><span class="n">c3</span><span class="w">                      </span><span class="n">retq</span><span class="w">   </span>
+</code></pre></div>
+
+<p>可以看到在 <code>call write</code> 之后仅有有个常量mov和pop栈恢复, 判断应该是此处有问题, 让我们通过gdb调试一下  <code>gdb minit</code>; 在gdb命令界面中输入 <code>set disassemble-next-line on</code> 开启自动反汇编; <code>layout regs -tui</code> 以tui形式显示寄存器; <code>si</code>逐步汇编指令调试, 发现在执行 <code>retq</code> 时报 <code>cannot access memory at address 0x1</code>, 因此我们需要避免gcc为我们自动处理的退出, 这也是为什么需要使用<code>_exit</code> syscall退出程序</p>
 <p>echo init | cpio -H newc -o &gt; init.cpio
 make isoimage FDARGS="initrd=/init.cpio" FDINITRD=<code>pwd</code>/init.cpio
 qemu-system-x86_64 -cdram arch/x86/boot/image.iso</p>
