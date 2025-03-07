@@ -9,9 +9,13 @@ Category: Qemu
 这是使用qemu的使用教程, 以构建最小linux发行版为例.
 [参nir9博客](https://github.com/nir9/welcome/tree/master)
 
+
+
 ## 术语参考
 - `initrd`: 初始化RAM磁盘, 是在实际根文件系统之前装载的初始根文件系统. initrd绑定到内核时会被内核引导过程加载,然后挂载initrd以加载模块使真正的文件系统可用
 - `cpio`: cpio是一个将文件复制到 cpio 或 tar 存档文件或从中复制文件的程序,存档可以是磁盘上的另一个文件/磁带/管道
+
+
 
 ## 从构建linux内核开始
 
@@ -37,6 +41,8 @@ Device Drivers  --->Character devices  --->Enable TTY
 > 查看内核镜像的运行 `qemu-system-x86_64 --kernel arch/x86/boot/bzImage`
 
 **注意** 此时qemu启动kernel会显示 `not working init found`, 因为此时没有准备启动初始程序
+
+
 
 ## 构建一个mini-shell
 上述步骤中, 我们完成了一个轻量式的linux-kernel构建,接下来准备构建一个轻量的shell来作为init程序
@@ -73,13 +79,16 @@ int main(){
 4. 重新编译为iso内核 `make isoimage FDARGS="initrd=/init.cpio" FDINITRD=$(pwd)/init.cpio` 生成的arch/x96/boot/image.iso 镜像大小为2.2M
 5. 启动iso镜像 `qemu-system-x86_64 -cdrom image.iso`
 
+
+
 ### 使用assembly进行系统调用,进一步精简init程序
 
+> 此过程需要的参考文档资源如下:
 1. 在linux源码目录下参考系统调用的id号 `linux/arch/x86/include/generated/asm/syscalls_64.h`
 2. 查阅[inter x86开发手册](https://www.intel.cn/content/www/cn/zh/support/articles/000006715/processors.html)了解各寄存器作用, 这里仅关注rax寄存器用于存储syscall的id
 3. [wiki x86 体系结构的调用约定](https://en.wikipedia.org/wiki/X86_calling_conventions)
-4. `ld -o init shell.o sys.o --entry main -z noexecstack`
 
+> 准备待链接的.c和.s源文件
 ```c
 // shell.c
 #include <unistd.h>
@@ -153,8 +162,17 @@ _exit:
 mov rax, 60
 syscall
 ```
+> 依次执行编译链接命令
+- `gcc -c shell.c -o shell.o`
+- `as sys.S -o sys.o`
+- `ld -o init shell.o sys.o --entry main -z noexecstack`
 
-> 上述步骤中生成的最小init,在我调用时报错 `Segmentation fault (core dumped)`, 在我进一步排查积累了以下经验
+
+
+#### `Segmentation fault` 问题排查
+
+上述步骤中生成的最小init,在我调用时报错 `Segmentation fault (core dumped)`, 在我进一步排查积累了以下经验
+
 1. 首先, 我想验证通过gcc和as链接obj生成程序是否可行, 而不是其他版本或库等的问题. 为此我编写了一个仅包含`write`的系统调用和对应的asm实现syscall id寄存器(此处是eax/rax)的装载
 示例代码如下:
 ```
@@ -187,11 +205,17 @@ ret
   40102c:	0f 05                	syscall 
   40102e:	c3                   	retq   
 ```
-可以看到在 `call write` 之后仅有有个常量mov和pop栈恢复, 判断应该是此处有问题, 让我们通过gdb调试一下  `gdb minit`; 在gdb命令界面中输入 `set disassemble-next-line on` 开启自动反汇编; `layout regs -tui` 以tui形式显示寄存器; `si`逐步汇编指令调试, 发现在执行 `retq` 时报 `cannot access memory at address 0x1`, 因此我们需要避免gcc为我们自动处理的退出, 这也是为什么需要使用`_exit` syscall退出程序
+可以看到在 `call write` 之后仅有指令:常量mov和pop栈恢复, 判断应该是此处有问题, 让我们通过gdb调试一下  `gdb minit`; 在gdb命令界面中输入 `set disassemble-next-line on` 开启自动反汇编; `layout regs -tui` 以tui形式显示寄存器; `si`逐步汇编指令调试, 发现在执行 `retq` 时报 `cannot access memory at address 0x1`, 因此我们需要避免gcc为我们自动处理的退出, 这也是为什么需要使用`_exit` syscall来退出程序, 在`sys.S`中添加_exit定义后,此部分工作正常
+3. 现在，让我们用上述步骤调试 `init` 程序中的 `Segmentation fault`, 问题发生在 `mov %fs:0x28, %rax`, 查阅资料得知, 此部分用于栈溢出保护,一般和指令 `mov %rax, -0x8(%rsp)` 配套出现, 其作用为:从线程局部空间随机读取一个值, 在函数返回时, 检查此值是否被修改, 以防止栈溢出攻击. 在64bit模式下 %fs 的实际基址由 %fs_base 决定, 此值为0, 因此出现了非法地址范围
+4. 我推断这部分应该时gcc自动完成的部分, 在上述进行仅包含 `write` syscall 的init程序时调试时, 并没有这部分. 经过步步裁剪, 栈溢出保护由语句 `siginfo_t info;` 引入, siginfo_t在进行临时变量拷贝时, 可能有值溢出, 因此我推测引入`siginfo_t`时gdb自动添加栈溢出保护语句
+5. 定位到问题, 那么就不能使用带 `siginfo_t` 参数的 `waitid` syscall了, 我尝试使用 `waitpid` 找到其syscall为`syscall_wait4(61)`, 工作正常
+> 这里, 我犯了个低级问题, 在asm中实现的waitpid忘记加ret返回, 程序在执行一次子进程后自动退出, 因为PC在执行waitpid后, +1执行到_exit指令位置至循环失效, 主进程退出, 因为涉及到多个进程和无限循环, 导致我又绕了一大圈.
 
 echo init | cpio -H newc -o > init.cpio
 make isoimage FDARGS="initrd=/init.cpio" FDINITRD=`pwd`/init.cpio
 qemu-system-x86_64 -cdram arch/x86/boot/image.iso
+
+
 
 
 ```python

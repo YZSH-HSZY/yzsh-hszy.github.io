@@ -74,12 +74,13 @@ pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
 &lt;li&gt;启动iso镜像 &lt;code&gt;qemu-system-x86_64 -cdrom image.iso&lt;/code&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;h3&gt;使用assembly进行系统调用,进一步精简init程序&lt;/h3&gt;
-&lt;ol&gt;
-&lt;li&gt;在linux源码目录下参考系统调用的id号 &lt;code&gt;linux/arch/x86/include/generated/asm/syscalls_64.h&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;查阅&lt;a href="https://www.intel.cn/content/www/cn/zh/support/articles/000006715/processors.html"&gt;inter x86开发手册&lt;/a&gt;了解各寄存器作用, 这里仅关注rax寄存器用于存储syscall的id&lt;/li&gt;
-&lt;li&gt;&lt;a href="https://en.wikipedia.org/wiki/X86_calling_conventions"&gt;wiki x86 体系结构的调用约定&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;ld -o init shell.o sys.o --entry main -z noexecstack&lt;/code&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;此过程需要的参考文档资源如下:
+1. 在linux源码目录下参考系统调用的id号 &lt;code&gt;linux/arch/x86/include/generated/asm/syscalls_64.h&lt;/code&gt;
+2. 查阅&lt;a href="https://www.intel.cn/content/www/cn/zh/support/articles/000006715/processors.html"&gt;inter x86开发手册&lt;/a&gt;了解各寄存器作用, 这里仅关注rax寄存器用于存储syscall的id
+3. &lt;a href="https://en.wikipedia.org/wiki/X86_calling_conventions"&gt;wiki x86 体系结构的调用约定&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;准备待链接的.c和.s源文件&lt;/p&gt;
+&lt;/blockquote&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// shell.c&lt;/span&gt;
 &lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;
 &lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;sys/wait.h&amp;gt;&lt;/span&gt;
@@ -153,10 +154,17 @@ pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;上述步骤中生成的最小init,在我调用时报错 &lt;code&gt;Segmentation fault (core dumped)&lt;/code&gt;, 在我进一步排查积累了以下经验
-1. 首先, 我想验证通过gcc和as链接obj生成程序是否可行, 而不是其他版本或库等的问题. 为此我编写了一个仅包含&lt;code&gt;write&lt;/code&gt;的系统调用和对应的asm实现syscall id寄存器(此处是eax/rax)的装载
-示例代码如下:&lt;/p&gt;
+&lt;p&gt;依次执行编译链接命令
+- &lt;code&gt;gcc -c shell.c -o shell.o&lt;/code&gt;
+- &lt;code&gt;as sys.S -o sys.o&lt;/code&gt;
+- &lt;code&gt;ld -o init shell.o sys.o --entry main -z noexecstack&lt;/code&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
+&lt;h4&gt;&lt;code&gt;Segmentation fault&lt;/code&gt; 问题排查&lt;/h4&gt;
+&lt;p&gt;上述步骤中生成的最小init,在我调用时报错 &lt;code&gt;Segmentation fault (core dumped)&lt;/code&gt;, 在我进一步排查积累了以下经验&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;首先, 我想验证通过gcc和as链接obj生成程序是否可行, 而不是其他版本或库等的问题. 为此我编写了一个仅包含&lt;code&gt;write&lt;/code&gt;的系统调用和对应的asm实现syscall id寄存器(此处是eax/rax)的装载
+示例代码如下:&lt;/li&gt;
+&lt;/ol&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// shell.c&lt;/span&gt;
 &lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;
 
@@ -189,7 +197,13 @@ pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
 &lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mf"&gt;40102&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="n"&gt;c3&lt;/span&gt;&lt;span class="w"&gt;                      &lt;/span&gt;&lt;span class="n"&gt;retq&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;可以看到在 &lt;code&gt;call write&lt;/code&gt; 之后仅有有个常量mov和pop栈恢复, 判断应该是此处有问题, 让我们通过gdb调试一下  &lt;code&gt;gdb minit&lt;/code&gt;; 在gdb命令界面中输入 &lt;code&gt;set disassemble-next-line on&lt;/code&gt; 开启自动反汇编; &lt;code&gt;layout regs -tui&lt;/code&gt; 以tui形式显示寄存器; &lt;code&gt;si&lt;/code&gt;逐步汇编指令调试, 发现在执行 &lt;code&gt;retq&lt;/code&gt; 时报 &lt;code&gt;cannot access memory at address 0x1&lt;/code&gt;, 因此我们需要避免gcc为我们自动处理的退出, 这也是为什么需要使用&lt;code&gt;_exit&lt;/code&gt; syscall退出程序&lt;/p&gt;
+&lt;p&gt;可以看到在 &lt;code&gt;call write&lt;/code&gt; 之后仅有指令:常量mov和pop栈恢复, 判断应该是此处有问题, 让我们通过gdb调试一下  &lt;code&gt;gdb minit&lt;/code&gt;; 在gdb命令界面中输入 &lt;code&gt;set disassemble-next-line on&lt;/code&gt; 开启自动反汇编; &lt;code&gt;layout regs -tui&lt;/code&gt; 以tui形式显示寄存器; &lt;code&gt;si&lt;/code&gt;逐步汇编指令调试, 发现在执行 &lt;code&gt;retq&lt;/code&gt; 时报 &lt;code&gt;cannot access memory at address 0x1&lt;/code&gt;, 因此我们需要避免gcc为我们自动处理的退出, 这也是为什么需要使用&lt;code&gt;_exit&lt;/code&gt; syscall来退出程序, 在&lt;code&gt;sys.S&lt;/code&gt;中添加_exit定义后,此部分工作正常
+3. 现在，让我们用上述步骤调试 &lt;code&gt;init&lt;/code&gt; 程序中的 &lt;code&gt;Segmentation fault&lt;/code&gt;, 问题发生在 &lt;code&gt;mov %fs:0x28, %rax&lt;/code&gt;, 查阅资料得知, 此部分用于栈溢出保护,一般和指令 &lt;code&gt;mov %rax, -0x8(%rsp)&lt;/code&gt; 配套出现, 其作用为:从线程局部空间随机读取一个值, 在函数返回时, 检查此值是否被修改, 以防止栈溢出攻击. 在64bit模式下 %fs 的实际基址由 %fs_base 决定, 此值为0, 因此出现了非法地址范围
+4. 我推断这部分应该时gcc自动完成的部分, 在上述进行仅包含 &lt;code&gt;write&lt;/code&gt; syscall 的init程序时调试时, 并没有这部分. 经过步步裁剪, 栈溢出保护由语句 &lt;code&gt;siginfo_t info;&lt;/code&gt; 引入, siginfo_t在进行临时变量拷贝时, 可能有值溢出, 因此我推测引入&lt;code&gt;siginfo_t&lt;/code&gt;时gdb自动添加栈溢出保护语句
+5. 定位到问题, 那么就不能使用带 &lt;code&gt;siginfo_t&lt;/code&gt; 参数的 &lt;code&gt;waitid&lt;/code&gt; syscall了, 我尝试使用 &lt;code&gt;waitpid&lt;/code&gt; 找到其syscall为&lt;code&gt;syscall_wait4(61)&lt;/code&gt;, 工作正常&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;这里, 我犯了个低级问题, 在asm中实现的waitpid忘记加ret返回, 程序在执行一次子进程后自动退出, 因为PC在执行waitpid后, +1执行到_exit指令位置至循环失效, 主进程退出, 因为涉及到多个进程和无限循环, 导致我又绕了一大圈.&lt;/p&gt;
+&lt;/blockquote&gt;
 &lt;p&gt;echo init | cpio -H newc -o &amp;gt; init.cpio
 make isoimage FDARGS="initrd=/init.cpio" FDINITRD=&lt;code&gt;pwd&lt;/code&gt;/init.cpio
 qemu-system-x86_64 -cdram arch/x86/boot/image.iso&lt;/p&gt;
