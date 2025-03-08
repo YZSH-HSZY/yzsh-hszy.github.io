@@ -182,6 +182,8 @@ pub/scm/linux/kernel/git/torvalds/linux.git</code>
 <span class="nf">syscall</span>
 </code></pre></div>
 
+<p><strong>为什么 <code>real_waitid</code> 函数多了一条 <code>mov r10, rcx</code>指令?</strong></p>
+<p>参考<a href="https://en.wikipedia.org/wiki/X86_calling_conventions">wiki x86 体系结构的调用约定</a>, AMD64架构下gcc编译器使用的参数寄存器依次是 <code>Integer/pointer arguments(RDI, RSI, RDX, RCX, R8, R9), Floating point arguments([XYZ]MM0–7)</code>. 而内核接口使用的参数寄存器是 <code>RDI, RSI, RDX, R10, R8 and R9</code>, 因此在汇编实现的syscall function需要将第四个参数从寄存器RCX移动到R10</p>
 <blockquote>
 <p>依次执行编译链接命令
 - <code>gcc -c shell.c -o shell.o</code>
@@ -231,13 +233,9 @@ pub/scm/linux/kernel/git/torvalds/linux.git</code>
 4. 我推断这部分应该时gcc自动完成的部分, 在上述进行仅包含 <code>write</code> syscall 的init程序时调试时, 并没有这部分. 经过步步裁剪, 栈溢出保护由语句 <code>siginfo_t info;</code> 引入, siginfo_t在进行临时变量拷贝时, 可能有值溢出, 因此我推测引入<code>siginfo_t</code>时gdb自动添加栈溢出保护语句
 5. 定位到问题, 那么就不能使用带 <code>siginfo_t</code> 参数的 <code>waitid</code> syscall了, 我尝试使用 <code>waitpid</code> 找到其syscall为<code>syscall_wait4(61)</code>, 工作正常</p>
 <blockquote>
-<p>这里, 我犯了个低级问题, 在asm中实现的waitpid忘记加ret返回, 程序在执行一次子进程后自动退出, 因为PC在执行waitpid后, +1执行到_exit指令位置至循环失效, 主进程退出, 因为涉及到多个进程和无限循环, 导致我又绕了一大圈.</p>
-</blockquote>
-<p>echo init | cpio -H newc -o &gt; init.cpio
-make isoimage FDARGS="initrd=/init.cpio" FDINITRD=<code>pwd</code>/init.cpio
-qemu-system-x86_64 -cdram arch/x86/boot/image.iso</p>
-<div class="highlight"><pre><span></span><code><span class="c1">## </span>
-</code></pre></div>                    </article>
+<p>这里, 我犯了个低级问题, 在asm中实现的waitpid忘记加ret返回, 程序在执行一次子进程后自动退出, 因为PC在执行waitpid后, 自动+1执行到_exit指令位置致循环失效, 主进程退出, 因为涉及到多个进程和无限循环, 导致我又绕了一大圈.
+6. 最后让我们查看一下 <code>init</code> 的大小并重新生成iso镜像, <code>du -sh init image.iso // 12K, 1.9M</code></p>
+</blockquote>                    </article>
                 </aside><!-- /#featured -->
                     <section id="content" class="body">
                         <h1>Other articles</h1>

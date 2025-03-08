@@ -153,6 +153,8 @@ pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
 &lt;span class="nf"&gt;syscall&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;strong&gt;为什么 &lt;code&gt;real_waitid&lt;/code&gt; 函数多了一条 &lt;code&gt;mov r10, rcx&lt;/code&gt;指令?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;参考&lt;a href="https://en.wikipedia.org/wiki/X86_calling_conventions"&gt;wiki x86 体系结构的调用约定&lt;/a&gt;, AMD64架构下gcc编译器使用的参数寄存器依次是 &lt;code&gt;Integer/pointer arguments(RDI, RSI, RDX, RCX, R8, R9), Floating point arguments([XYZ]MM0–7)&lt;/code&gt;. 而内核接口使用的参数寄存器是 &lt;code&gt;RDI, RSI, RDX, R10, R8 and R9&lt;/code&gt;, 因此在汇编实现的syscall function需要将第四个参数从寄存器RCX移动到R10&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;依次执行编译链接命令
 - &lt;code&gt;gcc -c shell.c -o shell.o&lt;/code&gt;
@@ -202,10 +204,6 @@ pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;
 4. 我推断这部分应该时gcc自动完成的部分, 在上述进行仅包含 &lt;code&gt;write&lt;/code&gt; syscall 的init程序时调试时, 并没有这部分. 经过步步裁剪, 栈溢出保护由语句 &lt;code&gt;siginfo_t info;&lt;/code&gt; 引入, siginfo_t在进行临时变量拷贝时, 可能有值溢出, 因此我推测引入&lt;code&gt;siginfo_t&lt;/code&gt;时gdb自动添加栈溢出保护语句
 5. 定位到问题, 那么就不能使用带 &lt;code&gt;siginfo_t&lt;/code&gt; 参数的 &lt;code&gt;waitid&lt;/code&gt; syscall了, 我尝试使用 &lt;code&gt;waitpid&lt;/code&gt; 找到其syscall为&lt;code&gt;syscall_wait4(61)&lt;/code&gt;, 工作正常&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;这里, 我犯了个低级问题, 在asm中实现的waitpid忘记加ret返回, 程序在执行一次子进程后自动退出, 因为PC在执行waitpid后, +1执行到_exit指令位置至循环失效, 主进程退出, 因为涉及到多个进程和无限循环, 导致我又绕了一大圈.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;echo init | cpio -H newc -o &amp;gt; init.cpio
-make isoimage FDARGS="initrd=/init.cpio" FDINITRD=&lt;code&gt;pwd&lt;/code&gt;/init.cpio
-qemu-system-x86_64 -cdram arch/x86/boot/image.iso&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;## &lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Qemu"></category></entry></feed>
+&lt;p&gt;这里, 我犯了个低级问题, 在asm中实现的waitpid忘记加ret返回, 程序在执行一次子进程后自动退出, 因为PC在执行waitpid后, 自动+1执行到_exit指令位置致循环失效, 主进程退出, 因为涉及到多个进程和无限循环, 导致我又绕了一大圈.
+6. 最后让我们查看一下 &lt;code&gt;init&lt;/code&gt; 的大小并重新生成iso镜像, &lt;code&gt;du -sh init image.iso // 12K, 1.9M&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;</content><category term="Qemu"></category></entry></feed>

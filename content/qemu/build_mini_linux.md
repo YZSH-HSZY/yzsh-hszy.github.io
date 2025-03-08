@@ -162,6 +162,11 @@ _exit:
 mov rax, 60
 syscall
 ```
+
+**为什么 `real_waitid` 函数多了一条 `mov r10, rcx`指令?**
+
+参考[wiki x86 体系结构的调用约定](https://en.wikipedia.org/wiki/X86_calling_conventions), AMD64架构下gcc编译器使用的参数寄存器依次是 `Integer/pointer arguments(RDI, RSI, RDX, RCX, R8, R9), Floating point arguments([XYZ]MM0–7)`. 而内核接口使用的参数寄存器是 `RDI, RSI, RDX, R10, R8 and R9`, 因此在汇编实现的syscall function需要将第四个参数从寄存器RCX移动到R10
+
 > 依次执行编译链接命令
 - `gcc -c shell.c -o shell.o`
 - `as sys.S -o sys.o`
@@ -209,15 +214,6 @@ ret
 3. 现在，让我们用上述步骤调试 `init` 程序中的 `Segmentation fault`, 问题发生在 `mov %fs:0x28, %rax`, 查阅资料得知, 此部分用于栈溢出保护,一般和指令 `mov %rax, -0x8(%rsp)` 配套出现, 其作用为:从线程局部空间随机读取一个值, 在函数返回时, 检查此值是否被修改, 以防止栈溢出攻击. 在64bit模式下 %fs 的实际基址由 %fs_base 决定, 此值为0, 因此出现了非法地址范围
 4. 我推断这部分应该时gcc自动完成的部分, 在上述进行仅包含 `write` syscall 的init程序时调试时, 并没有这部分. 经过步步裁剪, 栈溢出保护由语句 `siginfo_t info;` 引入, siginfo_t在进行临时变量拷贝时, 可能有值溢出, 因此我推测引入`siginfo_t`时gdb自动添加栈溢出保护语句
 5. 定位到问题, 那么就不能使用带 `siginfo_t` 参数的 `waitid` syscall了, 我尝试使用 `waitpid` 找到其syscall为`syscall_wait4(61)`, 工作正常
-> 这里, 我犯了个低级问题, 在asm中实现的waitpid忘记加ret返回, 程序在执行一次子进程后自动退出, 因为PC在执行waitpid后, +1执行到_exit指令位置至循环失效, 主进程退出, 因为涉及到多个进程和无限循环, 导致我又绕了一大圈.
+> 这里, 我犯了个低级问题, 在asm中实现的waitpid忘记加ret返回, 程序在执行一次子进程后自动退出, 因为PC在执行waitpid后, 自动+1执行到_exit指令位置致循环失效, 主进程退出, 因为涉及到多个进程和无限循环, 导致我又绕了一大圈.
+6. 最后让我们查看一下 `init` 的大小并重新生成iso镜像, `du -sh init image.iso // 12K, 1.9M`
 
-echo init | cpio -H newc -o > init.cpio
-make isoimage FDARGS="initrd=/init.cpio" FDINITRD=`pwd`/init.cpio
-qemu-system-x86_64 -cdram arch/x86/boot/image.iso
-
-
-
-
-```python
-## 
-```
