@@ -48,12 +48,13 @@
 <li><code>cpio</code>: cpio是一个将文件复制到 cpio 或 tar 存档文件或从中复制文件的程序,存档可以是磁盘上的另一个文件/磁带/管道</li>
 </ul>
 <h2>从构建linux内核开始</h2>
-<p><strong>env</strong>
-- linux内核源码 <code>git clone --depth 1 https://git.kernel.org/
-pub/scm/linux/kernel/git/torvalds/linux.git</code>
-- 依赖包 <code>apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev syslinux dosfstools</code>
-- 使用qemu启动编译后的内核 <code>apt install qemu-system-x86</code>
-- 如果需要制作iso镜像文件 <code>apt install isolinux genisoimage</code></p>
+<p><strong>env</strong></p>
+<ul>
+<li>linux内核源码 <code>git clone --depth 1 https://git.kernel.org/ pub/scm/linux/kernel/git/torvalds/linux.git</code></li>
+<li>依赖包 <code>apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev syslinux dosfstools</code></li>
+<li>使用qemu启动编译后的内核 <code>apt install qemu-system-x86</code></li>
+<li>如果需要制作iso镜像文件 <code>apt install isolinux genisoimage</code></li>
+</ul>
 <p><strong>注意</strong> 在linux目录下使用 <code>make help</code> 查看帮助, 这里我们使用 <code>make tinyconfig</code> 配置尽可能小的内核</p>
 <blockquote>
 <p>使用 <code>make menuconfig</code> 配置编译make选项, 配置如下:</p>
@@ -110,10 +111,14 @@ pub/scm/linux/kernel/git/torvalds/linux.git</code>
 </ol>
 <h3>使用assembly进行系统调用,进一步精简init程序</h3>
 <blockquote>
-<p>此过程需要的参考文档资源如下:
-1. 在linux源码目录下参考系统调用的id号 <code>linux/arch/x86/include/generated/asm/syscalls_64.h</code>
-2. 查阅<a href="https://www.intel.cn/content/www/cn/zh/support/articles/000006715/processors.html">inter x86开发手册</a>了解各寄存器作用, 这里仅关注rax寄存器用于存储syscall的id
-3. <a href="https://en.wikipedia.org/wiki/X86_calling_conventions">wiki x86 体系结构的调用约定</a></p>
+<p>此过程需要的参考文档资源如下:</p>
+</blockquote>
+<ol>
+<li>在linux源码目录下参考系统调用的id号 <code>linux/arch/x86/include/generated/asm/syscalls_64.h</code></li>
+<li>查阅<a href="https://www.intel.cn/content/www/cn/zh/support/articles/000006715/processors.html">inter x86开发手册</a>了解各寄存器作用, 这里仅关注rax寄存器用于存储syscall的id</li>
+<li><a href="https://en.wikipedia.org/wiki/X86_calling_conventions">wiki x86 体系结构的调用约定</a></li>
+</ol>
+<blockquote>
 <p>准备待链接的.c和.s源文件</p>
 </blockquote>
 <div class="highlight"><pre><span></span><code><span class="c1">// shell.c</span>
@@ -189,13 +194,16 @@ pub/scm/linux/kernel/git/torvalds/linux.git</code>
 </code></pre></div>
 
 <p><strong>为什么 <code>real_waitid</code> 函数多了一条 <code>mov r10, rcx</code>指令?</strong></p>
-<p>参考<a href="https://en.wikipedia.org/wiki/X86_calling_conventions">wiki x86 体系结构的调用约定</a>, AMD64架构下gcc编译器使用的参数寄存器依次是 <code>Integer/pointer arguments(RDI, RSI, RDX, RCX, R8, R9), Floating point arguments([XYZ]MM0–7)</code>. 而内核接口使用的参数寄存器是 <code>RDI, RSI, RDX, R10, R8 and R9</code>, 因此在汇编实现的syscall function需要将第四个参数从寄存器RCX移动到R10</p>
 <blockquote>
-<p>依次执行编译链接命令
+<p>参考<a href="https://en.wikipedia.org/wiki/X86_calling_conventions">wiki x86 体系结构的调用约定</a>
+AMD64架构下gcc编译器使用的参数寄存器依次是 <code>Integer/pointer arguments(RDI, RSI, RDX, RCX, R8, R9), Floating point arguments([XYZ]MM0–7)</code>. 
+而内核接口使用的参数寄存器是 <code>RDI, RSI, RDX, R10, R8 and R9</code>
+因此在汇编实现的syscall function需要将第四个参数从寄存器RCX移动到R10</p>
+</blockquote>
+<p><strong>依次执行编译链接命令</strong>
 - <code>gcc -c shell.c -o shell.o</code>
 - <code>as sys.S -o sys.o</code>
 - <code>ld -o init shell.o sys.o --entry main -z noexecstack</code></p>
-</blockquote>
 <h4><code>Segmentation fault</code> 问题排查</h4>
 <p>上述步骤中生成的最小init,在我调用时报错 <code>Segmentation fault (core dumped)</code>, 在我进一步排查积累了以下经验</p>
 <ol>
@@ -234,14 +242,26 @@ pub/scm/linux/kernel/git/torvalds/linux.git</code>
 <span class="w">  </span><span class="mf">40102</span><span class="n">e</span><span class="p">:</span><span class="w">   </span><span class="n">c3</span><span class="w">                      </span><span class="n">retq</span><span class="w">   </span>
 </code></pre></div>
 
-<p>可以看到在 <code>call write</code> 之后仅有指令:常量mov和pop栈恢复, 判断应该是此处有问题, 让我们通过gdb调试一下  <code>gdb minit</code>; 在gdb命令界面中输入 <code>set disassemble-next-line on</code> 开启自动反汇编; <code>layout regs -tui</code> 以tui形式显示寄存器; <code>si</code>逐步汇编指令调试, 发现在执行 <code>retq</code> 时报 <code>cannot access memory at address 0x1</code>, 因此我们需要避免gcc为我们自动处理的退出, 这也是为什么需要使用<code>_exit</code> syscall来退出程序, 在<code>sys.S</code>中添加_exit定义后,此部分工作正常
-3. 现在，让我们用上述步骤调试 <code>init</code> 程序中的 <code>Segmentation fault</code>, 问题发生在 <code>mov %fs:0x28, %rax</code>, 查阅资料得知, 此部分用于栈溢出保护,一般和指令 <code>mov %rax, -0x8(%rsp)</code> 配套出现, 其作用为:从线程局部空间随机读取一个值, 在函数返回时, 检查此值是否被修改, 以防止栈溢出攻击. 在64bit模式下 %fs 的实际基址由 %fs_base 决定, 此值为0, 因此出现了非法地址范围
-4. 我推断这部分应该时gcc自动完成的部分, 在上述进行仅包含 <code>write</code> syscall 的init程序时调试时, 并没有这部分. 经过步步裁剪, 栈溢出保护由语句 <code>siginfo_t info;</code> 引入, siginfo_t在进行临时变量拷贝时, 可能有值溢出, 因此我推测引入<code>siginfo_t</code>时gdb自动添加栈溢出保护语句
-5. 定位到问题, 那么就不能使用带 <code>siginfo_t</code> 参数的 <code>waitid</code> syscall了, 我尝试使用 <code>waitpid</code> 找到其syscall为<code>syscall_wait4(61)</code>, 工作正常</p>
 <blockquote>
-<p>这里, 我犯了个低级问题, 在asm中实现的waitpid忘记加ret返回, 程序在执行一次子进程后自动退出, 因为PC在执行waitpid后, 自动+1执行到_exit指令位置致循环失效, 主进程退出, 因为涉及到多个进程和无限循环, 导致我又绕了一大圈.
-6. 最后让我们查看一下 <code>init</code> 的大小并重新生成iso镜像, <code>du -sh init image.iso // 12K, 1.9M</code></p>
+<p>可以看到在 <code>call write</code> 之后仅有指令:常量mov和pop栈恢复, 判断应该是此处有问题, 让我们通过gdb调试一下  <code>gdb minit</code>; 在gdb命令界面中输入 <code>set disassemble-next-line on</code> 开启自动反汇编; <code>layout regs -tui</code> 以tui形式显示寄存器; <code>si</code>逐步汇编指令调试, 发现在执行 <code>retq</code> 时报 <code>cannot access memory at address 0x1</code>, 因此我们需要避免gcc为我们自动处理的退出, 这也是为什么需要使用<code>_exit</code> syscall来退出程序, 在<code>sys.S</code>中添加_exit定义后,此部分工作正常</p>
 </blockquote>
+<ol>
+<li>
+<p>现在，让我们用上述步骤调试 <code>init</code> 程序中的 <code>Segmentation fault</code>, 问题发生在 <code>mov %fs:0x28, %rax</code>, 查阅资料得知, 此部分用于栈溢出保护,一般和指令 <code>mov %rax, -0x8(%rsp)</code> 配套出现, 其作用为:从线程局部空间随机读取一个值, 在函数返回时, 检查此值是否被修改, 以防止栈溢出攻击. 在64bit模式下 %fs 的实际基址由 %fs_base 决定, 此值为0, 因此出现了非法地址范围</p>
+</li>
+<li>
+<p>我推断这部分应该时gcc自动完成的部分, 在上述进行仅包含 <code>write</code> syscall 的init程序时调试时, 并没有这部分. 经过步步裁剪, 栈溢出保护由语句 <code>siginfo_t info;</code> 引入, siginfo_t在进行临时变量拷贝时, 可能有值溢出, 因此我推测引入<code>siginfo_t</code>时gdb自动添加栈溢出保护语句</p>
+</li>
+<li>
+<p>定位到问题, 那么就不能使用带 <code>siginfo_t</code> 参数的 <code>waitid</code> syscall了, 我尝试使用 <code>waitpid</code> 找到其syscall为<code>syscall_wait4(61)</code>, 工作正常</p>
+<blockquote>
+<p>这里, 我犯了个低级问题, 在asm中实现的waitpid忘记加ret返回, 程序在执行一次子进程后自动退出, 因为PC在执行waitpid后, 自动+1执行到_exit指令位置致循环失效, 主进程退出, 因为涉及到多个进程和无限循环, 导致我又绕了一大圈.</p>
+</blockquote>
+</li>
+<li>
+<p>最后让我们查看一下 <code>init</code> 的大小并重新生成iso镜像, <code>du -sh init image.iso // 12K, 1.9M</code></p>
+</li>
+</ol>
       </div><!-- /.entry-content -->
 
     </article>
