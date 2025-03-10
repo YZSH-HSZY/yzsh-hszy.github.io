@@ -1,18 +1,12 @@
 import os
 import re
 from typing import Dict, List, Tuple
-import xml
 import logging
-import sys
 from os.path import splitext, join, dirname, basename, abspath
 from pathlib import Path
-import xml.etree
-import xml.etree.ElementTree
-import xml.parsers
 from pelican.contents import Article
 from pelican.generators import ArticlesGenerator
 from pelican import signals
-from bs4 import BeautifulSoup
 
 from html.parser import HTMLParser
 
@@ -140,7 +134,7 @@ def generate_img_plugin(article_gen: ArticlesGenerator):
                     (
                         match_g.group("prefix") + 
                         match_g.group("scope") + 
-                        f"{after_relative_path.as_posix()}" + 
+                        f"/{after_relative_path.as_posix()}" + 
                         match_g.group("scope")
                     ).replace(os.sep, '/')
                 )
