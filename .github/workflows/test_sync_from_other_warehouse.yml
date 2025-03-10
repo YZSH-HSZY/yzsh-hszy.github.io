@@ -51,7 +51,7 @@ jobs:
           echo $(pwd) && ls -R
           cp -r mblog-repo/* yzsh-repo/content/ 
           cd yzsh-repo/content 
-          find ./ -type f | grep -E -v "*\.md$" | xargs rm -rf
+          find ./ -type f | grep -E -v ".*\.md$" | grep -E -v ".*\.png$" | xargs rm -rf
           echo "the yzsh-repo content"
           ls -R ./
       
@@ -68,6 +68,7 @@ jobs:
       - name: Commit and Push Content Changes
         run: |
           cd yzsh-repo
+          rm -rf content
           git config user.name "YZSH-HSZY"
           git config user.email "yzsh_hszy@outlook.com"
           git add .

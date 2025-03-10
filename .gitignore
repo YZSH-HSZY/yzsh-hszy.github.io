@@ -166,6 +166,10 @@ test
 .vscode
 output
 
+content
+*.png
+*.md
+
 Makefile
 pelicanconf.py
 publishconf.py

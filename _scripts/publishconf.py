@@ -2,9 +2,15 @@
 # explicitly specify it as your config file.
 
 import os
+from posixpath import dirname
 import sys
 
+sys.path.append(dirname(__file__))
 sys.path.append(os.curdir)
+
+import plugin_md_image
+
+PLUGINS = [plugin_md_image]
 
 AUTHOR = 'YZSH-HSZY'
 SITENAME = 'Welcome to YZSH-HSZY blog.'
