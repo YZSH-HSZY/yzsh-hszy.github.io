@@ -167,8 +167,6 @@ test
 output
 
 content
-*.png
-*.md
 
 Makefile
 pelicanconf.py

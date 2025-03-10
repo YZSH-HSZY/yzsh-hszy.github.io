@@ -53,3 +53,5 @@ ARTICLE_SAVE_AS = "{date:%Y}-{date:%m}-{date:%d}-{slug}.html"
 ARTICLE_URL = ARTICLE_SAVE_AS
 PAGE_SAVE_AS = ARTICLE_SAVE_AS
 PAGE_URL = ARTICLE_SAVE_AS
+
+STATIC_SAVE_AS = "static/{path}"
