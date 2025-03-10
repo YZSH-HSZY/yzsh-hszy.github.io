@@ -20,8 +20,8 @@ Category: Qemu
 ## 从构建linux内核开始
 
 **env**
-- linux内核源码 `git clone --depth 1 https://git.kernel.org/
-pub/scm/linux/kernel/git/torvalds/linux.git`
+
+- linux内核源码 `git clone --depth 1 https://git.kernel.org/ pub/scm/linux/kernel/git/torvalds/linux.git`
 - 依赖包 `apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev syslinux dosfstools`
 - 使用qemu启动编译后的内核 `apt install qemu-system-x86`
 - 如果需要制作iso镜像文件 `apt install isolinux genisoimage`
@@ -84,11 +84,13 @@ int main(){
 ### 使用assembly进行系统调用,进一步精简init程序
 
 > 此过程需要的参考文档资源如下:
+
 1. 在linux源码目录下参考系统调用的id号 `linux/arch/x86/include/generated/asm/syscalls_64.h`
 2. 查阅[inter x86开发手册](https://www.intel.cn/content/www/cn/zh/support/articles/000006715/processors.html)了解各寄存器作用, 这里仅关注rax寄存器用于存储syscall的id
 3. [wiki x86 体系结构的调用约定](https://en.wikipedia.org/wiki/X86_calling_conventions)
 
 > 准备待链接的.c和.s源文件
+
 ```c
 // shell.c
 #include <unistd.h>
@@ -165,9 +167,12 @@ syscall
 
 **为什么 `real_waitid` 函数多了一条 `mov r10, rcx`指令?**
 
-参考[wiki x86 体系结构的调用约定](https://en.wikipedia.org/wiki/X86_calling_conventions), AMD64架构下gcc编译器使用的参数寄存器依次是 `Integer/pointer arguments(RDI, RSI, RDX, RCX, R8, R9), Floating point arguments([XYZ]MM0–7)`. 而内核接口使用的参数寄存器是 `RDI, RSI, RDX, R10, R8 and R9`, 因此在汇编实现的syscall function需要将第四个参数从寄存器RCX移动到R10
+> 参考[wiki x86 体系结构的调用约定](https://en.wikipedia.org/wiki/X86_calling_conventions)
+> AMD64架构下gcc编译器使用的参数寄存器依次是 `Integer/pointer arguments(RDI, RSI, RDX, RCX, R8, R9), Floating point arguments([XYZ]MM0–7)`. 
+> 而内核接口使用的参数寄存器是 `RDI, RSI, RDX, R10, R8 and R9`
+> 因此在汇编实现的syscall function需要将第四个参数从寄存器RCX移动到R10
 
-> 依次执行编译链接命令
+**依次执行编译链接命令**
 - `gcc -c shell.c -o shell.o`
 - `as sys.S -o sys.o`
 - `ld -o init shell.o sys.o --entry main -z noexecstack`
@@ -197,6 +202,7 @@ mov rax, 1
 syscall
 ret
 ```
+
 2. 但是我仍得到了 `Segmentation fault`,不同的是在此之前程序有期望的输出`# `, 此时想要继续探究下去, 我就需要探索汇编了, 但这方面我不太熟悉, 因此消耗了一些时间. 首先因为具有期望输出, 使用判断此时asm系统调用应该可用, 了解到 `objdump` 这一反汇编工具, 因此将生成的程序反汇编 `objdump -D minit > mm.S` , 主要关注syscall之后的部分
 ```
 0000000000401000 <main>:
@@ -210,10 +216,14 @@ ret
   40102c:	0f 05                	syscall 
   40102e:	c3                   	retq   
 ```
-可以看到在 `call write` 之后仅有指令:常量mov和pop栈恢复, 判断应该是此处有问题, 让我们通过gdb调试一下  `gdb minit`; 在gdb命令界面中输入 `set disassemble-next-line on` 开启自动反汇编; `layout regs -tui` 以tui形式显示寄存器; `si`逐步汇编指令调试, 发现在执行 `retq` 时报 `cannot access memory at address 0x1`, 因此我们需要避免gcc为我们自动处理的退出, 这也是为什么需要使用`_exit` syscall来退出程序, 在`sys.S`中添加_exit定义后,此部分工作正常
+> 可以看到在 `call write` 之后仅有指令:常量mov和pop栈恢复, 判断应该是此处有问题, 让我们通过gdb调试一下  `gdb minit`; 在gdb命令界面中输入 `set disassemble-next-line on` 开启自动反汇编; `layout regs -tui` 以tui形式显示寄存器; `si`逐步汇编指令调试, 发现在执行 `retq` 时报 `cannot access memory at address 0x1`, 因此我们需要避免gcc为我们自动处理的退出, 这也是为什么需要使用`_exit` syscall来退出程序, 在`sys.S`中添加_exit定义后,此部分工作正常
+
 3. 现在，让我们用上述步骤调试 `init` 程序中的 `Segmentation fault`, 问题发生在 `mov %fs:0x28, %rax`, 查阅资料得知, 此部分用于栈溢出保护,一般和指令 `mov %rax, -0x8(%rsp)` 配套出现, 其作用为:从线程局部空间随机读取一个值, 在函数返回时, 检查此值是否被修改, 以防止栈溢出攻击. 在64bit模式下 %fs 的实际基址由 %fs_base 决定, 此值为0, 因此出现了非法地址范围
+
 4. 我推断这部分应该时gcc自动完成的部分, 在上述进行仅包含 `write` syscall 的init程序时调试时, 并没有这部分. 经过步步裁剪, 栈溢出保护由语句 `siginfo_t info;` 引入, siginfo_t在进行临时变量拷贝时, 可能有值溢出, 因此我推测引入`siginfo_t`时gdb自动添加栈溢出保护语句
+
 5. 定位到问题, 那么就不能使用带 `siginfo_t` 参数的 `waitid` syscall了, 我尝试使用 `waitpid` 找到其syscall为`syscall_wait4(61)`, 工作正常
 > 这里, 我犯了个低级问题, 在asm中实现的waitpid忘记加ret返回, 程序在执行一次子进程后自动退出, 因为PC在执行waitpid后, 自动+1执行到_exit指令位置致循环失效, 主进程退出, 因为涉及到多个进程和无限循环, 导致我又绕了一大圈.
+
 6. 最后让我们查看一下 `init` 的大小并重新生成iso镜像, `du -sh init image.iso // 12K, 1.9M`
 
