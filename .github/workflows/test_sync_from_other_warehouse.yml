@@ -49,6 +49,7 @@ jobs:
       - name: Copy MD Files To Current Repository
         run: |
           echo $(pwd) && ls -R
+          mkdir -p yzsh-repo/content 
           cp -r mblog-repo/* yzsh-repo/content/ 
           cd yzsh-repo/content 
           find ./ -type f | grep -E -v ".*\.md$" | grep -E -v ".*\.png$" | xargs rm -rf
