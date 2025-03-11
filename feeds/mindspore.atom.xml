@@ -318,7 +318,7 @@ rescale img data is:
 &lt;span class="n"&gt;plot_waveform&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;waveform&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sample_rate&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;title&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Original waveform&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img alt="png" src="mindspore/fourth-blog_files/fourth-blog_25_0.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="png" src="/static/mindspore/fourth-blog_files/fourth-blog_25_0.png"&gt;&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# 进行Spectrogram变换&lt;/span&gt;
 &lt;span class="n"&gt;n_fft&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1024&lt;/span&gt;
 &lt;span class="n"&gt;win_length&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;
@@ -338,7 +338,7 @@ rescale img data is:
 &lt;span class="n"&gt;plot_spectrogram&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;spec&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;title&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;audio&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img alt="png" src="mindspore/fourth-blog_files/fourth-blog_26_0.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="png" src="/static/mindspore/fourth-blog_files/fourth-blog_26_0.png"&gt;&lt;/p&gt;
 &lt;h3&gt;GriffinLim&lt;/h3&gt;
 &lt;p&gt;从线性幅度频谱图恢复信号波形&lt;/p&gt;
 &lt;h3&gt;Mel Filter Bank&lt;/h3&gt;
@@ -429,7 +429,7 @@ rescale img data is:
 &lt;span class="n"&gt;visualize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;train_dataset&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img alt="png" src="mindspore/third-blog_files/third-blog_9_0.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="png" src="/static/mindspore/third-blog_files/third-blog_9_0.png"&gt;&lt;/p&gt;
 &lt;h3&gt;数据集常用操作&lt;/h3&gt;
 &lt;p&gt;Pipeline的设计理念使得数据集的常用操作采用&lt;code&gt;dataset = dataset.operation()&lt;/code&gt;的异步执行方式，执行操作返回新的Dataset，此时不执行具体操作，而是在Pipeline中加入节点，最终进行迭代时，并行执行整个Pipeline。&lt;/p&gt;
 &lt;h4&gt;shuffle&lt;/h4&gt;
@@ -441,7 +441,7 @@ rescale img data is:
 &lt;span class="c1"&gt;# 从下图中可以看到数据顺序发生变化&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img alt="png" src="mindspore/third-blog_files/third-blog_12_0.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="png" src="/static/mindspore/third-blog_files/third-blog_12_0.png"&gt;&lt;/p&gt;
 &lt;h4&gt;map&lt;/h4&gt;
 &lt;p&gt;&lt;code&gt;map&lt;/code&gt;操作是数据预处理的关键操作，可以针对数据集指定列（column）添加数据变换（Transforms），将数据变换应用于该列数据的每个元素，并返回包含变换后元素的新数据集。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# 如何查看数据集列名，可以通过create_dict_iterator的dict.keys集合获取&lt;/span&gt;
@@ -1181,4 +1181,4 @@ CHW格式是指按照通道数、高度和宽度的顺序排列图像尺寸的�
 dataset`s cloumns is:  [&amp;#39;image&amp;#39;, &amp;#39;label&amp;#39;]
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img alt="png" src="mindspore/blog-doc_quikStarting_files/blog-doc_quikStarting_5_1.png"</content><category term="MindSpore"></category></entry></feed>
+&lt;p&gt;&lt;img alt="png" src="/static/mindspore/blog-doc_quikStarting_files/blog-doc_quikStarting_5_1.png"</content><category term="MindSpore"></category></entry></feed>

@@ -117,7 +117,7 @@
 <span class="n">visualize</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
 </code></pre></div>
 
-<p><img alt="png" src="mindspore/third-blog_files/third-blog_9_0.png"></p>
+<p><img alt="png" src="/static/mindspore/third-blog_files/third-blog_9_0.png"></p>
 <h3>数据集常用操作</h3>
 <p>Pipeline的设计理念使得数据集的常用操作采用<code>dataset = dataset.operation()</code>的异步执行方式，执行操作返回新的Dataset，此时不执行具体操作，而是在Pipeline中加入节点，最终进行迭代时，并行执行整个Pipeline。</p>
 <h4>shuffle</h4>
@@ -129,7 +129,7 @@
 <span class="c1"># 从下图中可以看到数据顺序发生变化</span>
 </code></pre></div>
 
-<p><img alt="png" src="mindspore/third-blog_files/third-blog_12_0.png"></p>
+<p><img alt="png" src="/static/mindspore/third-blog_files/third-blog_12_0.png"></p>
 <h4>map</h4>
 <p><code>map</code>操作是数据预处理的关键操作，可以针对数据集指定列（column）添加数据变换（Transforms），将数据变换应用于该列数据的每个元素，并返回包含变换后元素的新数据集。</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># 如何查看数据集列名，可以通过create_dict_iterator的dict.keys集合获取</span>
