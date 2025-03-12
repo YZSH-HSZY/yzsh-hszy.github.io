@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>Welcome to YZSH-HSZY blog. - YZSH-HSZY</title><link>https://yzsh-hszy.github.io/</link><description></description><lastBuildDate>Mon, 10 Feb 2025 12:00:00 +0800</lastBuildDate><item><title>Build Mini Linux Distro And Use Qemu Running.</title><link>https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html</link><description>&lt;h1&gt;介绍&lt;/h1&gt;
+<rss version="2.0"><channel><title>Welcome to YZSH-HSZY blog. - YZSH-HSZY</title><link>https://yzsh-hszy.github.io/</link><description></description><lastBuildDate>Mon, 10 Mar 2025 12:00:00 +0800</lastBuildDate><item><title>Customize Virtual Device Using Qemu.</title><link>https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html</link><description>&lt;h1&gt;笔记介绍&lt;/h1&gt;
+&lt;p&gt;该博客用于记录学习在qemu中添加自定义开发板的过程&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; qemu 官方在 &lt;code&gt;hw/misc/edu.c&lt;/code&gt; 中提供了一个教学用的设备样例, 可参考此文件实现模拟设 …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">YZSH-HSZY</dc:creator><pubDate>Mon, 10 Mar 2025 12:00:00 +0800</pubDate><guid isPermaLink="false">tag:yzsh-hszy.github.io,2025-03-10:/2025-03-10-customize-virtual-device-using-qemu.html</guid><category>Qemu</category></item><item><title>Build Mini Linux Distro And Use Qemu Running.</title><link>https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html</link><description>&lt;h1&gt;介绍&lt;/h1&gt;
 &lt;p&gt;这是使用qemu的使用教程, 以构建最小linux发行版为例.
 &lt;a href="https://github.com/nir9/welcome/tree/master"&gt;参nir9博客&lt;/a&gt;&lt;/p&gt;
 &lt;h2&gt;术语参考&lt;/h2&gt;

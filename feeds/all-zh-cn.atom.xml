@@ -1,5 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Welcome to YZSH-HSZY blog.</title><link href="https://yzsh-hszy.github.io/" rel="alternate"></link><link href="https://yzsh-hszy.github.io/feeds/all-zh-cn.atom.xml" rel="self"></link><id>https://yzsh-hszy.github.io/</id><updated>2025-02-10T12:00:00+08:00</updated><entry><title>Build Mini Linux Distro And Use Qemu Running.</title><link href="https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html" rel="alternate"></link><published>2025-02-10T12:00:00+08:00</published><updated>2025-02-10T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-02-10:/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html</id><summary type="html">&lt;h1&gt;介绍&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Welcome to YZSH-HSZY blog.</title><link href="https://yzsh-hszy.github.io/" rel="alternate"></link><link href="https://yzsh-hszy.github.io/feeds/all-zh-cn.atom.xml" rel="self"></link><id>https://yzsh-hszy.github.io/</id><updated>2025-03-10T12:00:00+08:00</updated><entry><title>Customize Virtual Device Using Qemu.</title><link href="https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html" rel="alternate"></link><published>2025-03-10T12:00:00+08:00</published><updated>2025-03-10T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-03-10:/2025-03-10-customize-virtual-device-using-qemu.html</id><summary type="html">&lt;h1&gt;笔记介绍&lt;/h1&gt;
+&lt;p&gt;该博客用于记录学习在qemu中添加自定义开发板的过程&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; qemu 官方在 &lt;code&gt;hw/misc/edu.c&lt;/code&gt; 中提供了一个教学用的设备样例, 可参考此文件实现模拟设 …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;笔记介绍&lt;/h1&gt;
+&lt;p&gt;该博客用于记录学习在qemu中添加自定义开发板的过程&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; qemu 官方在 &lt;code&gt;hw/misc/edu.c&lt;/code&gt; 中提供了一个教学用的设备样例, 可参考此文件实现模拟设备创建.&lt;/p&gt;
+&lt;h2&gt;QEMU Object Model&lt;/h2&gt;
+&lt;p&gt;在 qemu 中使用一套叫做 &lt;code&gt;Qemu Object Model&lt;/code&gt; 的东西来实现面向对象式开发模拟设备，主要由这四个组件构成：
+- Type：用来定义一个「类」的基本属性，例如类的名字、大小、构造函数等
+- Class：用来定义一个「类」的静态内容，例如类中存储的静态数据、方法函数指针等
+- Object：动态分配的一个「类」的具体的实例（instance），储存类的动态数据
+- Property：动态对象数据的访问器（accessor），可以通过监视器接口进行检查&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;一个定义设备obj的示例&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;pci_edu_register_types&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;InterfaceInfo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;interfaces&lt;/span&gt;&lt;span class="p"&gt;[]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;INTERFACE_CONVENTIONAL_PCI_DEVICE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;TypeInfo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;edu_info&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;TYPE_PCI_EDU_DEVICE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parent&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;TYPE_PCI_DEVICE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;instance_size&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;sizeof&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;EduState&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;instance_init&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;edu_instance_init&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;class_init&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;edu_class_init&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;interfaces&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;interfaces&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;type_register_static&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;edu_info&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="n"&gt;type_init&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pci_edu_register_types&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;QEMU添加设备流程&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;在 &lt;code&gt;hw/{target_architecture}/&lt;/code&gt; 下, 创建新设备定义文件&lt;/li&gt;
+&lt;li&gt;实例化虚拟设备的 &lt;code&gt;TypeInfo&lt;/code&gt;, 并提供 &lt;code&gt;type_register_static&lt;/code&gt; 注册, &lt;code&gt;type_init&lt;/code&gt; 调用&lt;/li&gt;
+&lt;li&gt;TODO&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;QEMU API介绍&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;type_init&lt;/code&gt; 宏, 会被扩展为&lt;code&gt;gcc attribute constructor&lt;/code&gt;修饰的函数&lt;code&gt;do_qemu_init_##&lt;/code&gt;函数, 此属性修饰的函数会在程序的&lt;code&gt;main()&lt;/code&gt;函数之前自动调用, 其最终的作用是将一个 &lt;code&gt;TypeInfo&lt;/code&gt; 结构体实例通过  &lt;code&gt;type_register_static&lt;/code&gt; 函数注册到 &lt;code&gt;GHashTable&lt;/code&gt; 中&lt;/li&gt;
+&lt;/ul&gt;</content><category term="Qemu"></category></entry><entry><title>Build Mini Linux Distro And Use Qemu Running.</title><link href="https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html" rel="alternate"></link><published>2025-02-10T12:00:00+08:00</published><updated>2025-02-10T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-02-10:/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html</id><summary type="html">&lt;h1&gt;介绍&lt;/h1&gt;
 &lt;p&gt;这是使用qemu的使用教程, 以构建最小linux发行版为例.
 &lt;a href="https://github.com/nir9/welcome/tree/master"&gt;参nir9博客&lt;/a&gt;&lt;/p&gt;
 &lt;h2&gt;术语参考&lt;/h2&gt;

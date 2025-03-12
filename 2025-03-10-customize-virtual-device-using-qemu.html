@@ -4,9 +4,10 @@
                         <meta charset="utf-8" />
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                         <meta name="generator" content="Pelican" />
-                        <title>Welcome to YZSH-HSZY blog. - Qemu</title>
+                        <title>Customize Virtual Device Using Qemu.</title>
                         <link rel="stylesheet" href="https://yzsh-hszy.github.io/theme/css/main.css" />
                                 <link href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Welcome to YZSH-HSZY blog. Atom Feed" />
+    <meta name="description" content="笔记介绍 该博客用于记录学习在qemu中添加自定义开发板的过程 注意 qemu 官方在 hw/misc/edu.c 中提供了一个教学用的设备样例, 可参考此文件实现模拟设 …" />
         </head>
 
         <body id="index" class="home">
@@ -19,10 +20,15 @@
                                                 <li><a href="https://yzsh-hszy.github.io/category/test.html">Test</a></li>
                         </ul></nav>
                 </header><!-- /#banner -->
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html" rel="bookmark"
+             title="Permalink to Customize Virtual Device Using Qemu.">Customize Virtual Device Using Qemu.</a></h1>
+      </header>
 
-                <aside id="featured" class="body">
-                    <article>
-                        <h1 class="entry-title"><a href="https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html">Customize Virtual Device Using Qemu.</a></h1>
+      <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2025-03-10T12:00:00+08:00">
                 Published: Mon 10 March 2025
@@ -33,7 +39,7 @@
                 </address>
         <p>In <a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a>.</p>
         
-</footer><!-- /.post-info --><h1>笔记介绍</h1>
+</footer><!-- /.post-info -->        <h1>笔记介绍</h1>
 <p>该博客用于记录学习在qemu中添加自定义开发板的过程</p>
 <p><strong>注意</strong> qemu 官方在 <code>hw/misc/edu.c</code> 中提供了一个教学用的设备样例, 可参考此文件实现模拟设备创建.</p>
 <h2>QEMU Object Model</h2>
@@ -73,41 +79,11 @@
 <h2>QEMU API介绍</h2>
 <ul>
 <li><code>type_init</code> 宏, 会被扩展为<code>gcc attribute constructor</code>修饰的函数<code>do_qemu_init_##</code>函数, 此属性修饰的函数会在程序的<code>main()</code>函数之前自动调用, 其最终的作用是将一个 <code>TypeInfo</code> 结构体实例通过  <code>type_register_static</code> 函数注册到 <code>GHashTable</code> 中</li>
-</ul>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+</ul>
+      </div><!-- /.entry-content -->
 
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html" rel="bookmark"
-                               title="Permalink to Build Mini Linux Distro And Use Qemu Running.">Build Mini Linux Distro And Use Qemu Running.</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2025-02-10T12:00:00+08:00">
-                Published: Mon 10 February 2025
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
-                </address>
-        <p>In <a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a>.</p>
-        
-</footer><!-- /.post-info -->                        <h1>介绍</h1>
-<p>这是使用qemu的使用教程, 以构建最小linux发行版为例.
-<a href="https://github.com/nir9/welcome/tree/master">参nir9博客</a></p>
-<h2>术语参考</h2>
-<ul>
-<li><code>initrd</code>: 初始化RAM磁盘, 是在实际根文件系统之前装载的初始根文件系统. initrd绑定到内核时会被内核引导过程加载,然后挂载 …</li></ul>
-                        <a class="readmore" href="https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-                    </ol><!-- /#posts-list -->
-                    </section><!-- /#content -->
+    </article>
+  </section>
                 <section id="extras" class="body">
                                 <div class="blogroll">
                                         <h2>links</h2>

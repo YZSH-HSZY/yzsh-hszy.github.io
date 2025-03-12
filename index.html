@@ -22,7 +22,71 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html">Build Mini Linux Distro And Use Qemu Running.</a></h1>
+                        <h1 class="entry-title"><a href="https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html">Customize Virtual Device Using Qemu.</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2025-03-10T12:00:00+08:00">
+                Published: Mon 10 March 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
+                </address>
+        <p>In <a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a>.</p>
+        
+</footer><!-- /.post-info --><h1>笔记介绍</h1>
+<p>该博客用于记录学习在qemu中添加自定义开发板的过程</p>
+<p><strong>注意</strong> qemu 官方在 <code>hw/misc/edu.c</code> 中提供了一个教学用的设备样例, 可参考此文件实现模拟设备创建.</p>
+<h2>QEMU Object Model</h2>
+<p>在 qemu 中使用一套叫做 <code>Qemu Object Model</code> 的东西来实现面向对象式开发模拟设备，主要由这四个组件构成：
+- Type：用来定义一个「类」的基本属性，例如类的名字、大小、构造函数等
+- Class：用来定义一个「类」的静态内容，例如类中存储的静态数据、方法函数指针等
+- Object：动态分配的一个「类」的具体的实例（instance），储存类的动态数据
+- Property：动态对象数据的访问器（accessor），可以通过监视器接口进行检查</p>
+<blockquote>
+<p>一个定义设备obj的示例</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">pci_edu_register_types</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="n">InterfaceInfo</span><span class="w"> </span><span class="n">interfaces</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="n">INTERFACE_CONVENTIONAL_PCI_DEVICE</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">};</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">TypeInfo</span><span class="w"> </span><span class="n">edu_info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_PCI_EDU_DEVICE</span><span class="p">,</span>
+<span class="w">        </span><span class="p">.</span><span class="n">parent</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_PCI_DEVICE</span><span class="p">,</span>
+<span class="w">        </span><span class="p">.</span><span class="n">instance_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">EduState</span><span class="p">),</span>
+<span class="w">        </span><span class="p">.</span><span class="n">instance_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">edu_instance_init</span><span class="p">,</span>
+<span class="w">        </span><span class="p">.</span><span class="n">class_init</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">edu_class_init</span><span class="p">,</span>
+<span class="w">        </span><span class="p">.</span><span class="n">interfaces</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">interfaces</span><span class="p">,</span>
+<span class="w">    </span><span class="p">};</span>
+<span class="w">    </span><span class="n">type_register_static</span><span class="p">(</span><span class="o">&amp;</span><span class="n">edu_info</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="n">type_init</span><span class="p">(</span><span class="n">pci_edu_register_types</span><span class="p">)</span>
+</code></pre></div>
+
+<h2>QEMU添加设备流程</h2>
+<ol>
+<li>在 <code>hw/{target_architecture}/</code> 下, 创建新设备定义文件</li>
+<li>实例化虚拟设备的 <code>TypeInfo</code>, 并提供 <code>type_register_static</code> 注册, <code>type_init</code> 调用</li>
+<li>TODO</li>
+</ol>
+<h2>QEMU API介绍</h2>
+<ul>
+<li><code>type_init</code> 宏, 会被扩展为<code>gcc attribute constructor</code>修饰的函数<code>do_qemu_init_##</code>函数, 此属性修饰的函数会在程序的<code>main()</code>函数之前自动调用, 其最终的作用是将一个 <code>TypeInfo</code> 结构体实例通过  <code>type_register_static</code> 函数注册到 <code>GHashTable</code> 中</li>
+</ul>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html" rel="bookmark"
+                               title="Permalink to Build Mini Linux Distro And Use Qemu Running.">Build Mini Linux Distro And Use Qemu Running.</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2025-02-10T12:00:00+08:00">
                 Published: Mon 10 February 2025
@@ -33,234 +97,15 @@
                 </address>
         <p>In <a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a>.</p>
         
-</footer><!-- /.post-info --><h1>介绍</h1>
+</footer><!-- /.post-info -->                        <h1>介绍</h1>
 <p>这是使用qemu的使用教程, 以构建最小linux发行版为例.
 <a href="https://github.com/nir9/welcome/tree/master">参nir9博客</a></p>
 <h2>术语参考</h2>
 <ul>
-<li><code>initrd</code>: 初始化RAM磁盘, 是在实际根文件系统之前装载的初始根文件系统. initrd绑定到内核时会被内核引导过程加载,然后挂载initrd以加载模块使真正的文件系统可用</li>
-<li><code>cpio</code>: cpio是一个将文件复制到 cpio 或 tar 存档文件或从中复制文件的程序,存档可以是磁盘上的另一个文件/磁带/管道</li>
-</ul>
-<h2>从构建linux内核开始</h2>
-<p><strong>env</strong></p>
-<ul>
-<li>linux内核源码 <code>git clone --depth 1 https://git.kernel.org/ pub/scm/linux/kernel/git/torvalds/linux.git</code></li>
-<li>依赖包 <code>apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev syslinux dosfstools</code></li>
-<li>使用qemu启动编译后的内核 <code>apt install qemu-system-x86</code></li>
-<li>如果需要制作iso镜像文件 <code>apt install isolinux genisoimage</code></li>
-</ul>
-<p><strong>注意</strong> 在linux目录下使用 <code>make help</code> 查看帮助, 这里我们使用 <code>make tinyconfig</code> 配置尽可能小的内核</p>
-<blockquote>
-<p>使用 <code>make menuconfig</code> 配置编译make选项, 配置如下:</p>
-</blockquote>
-<div class="highlight"><pre><span></span><code><span class="mf">64</span><span class="o">-</span><span class="n">bit</span><span class="w"> </span><span class="n">kernel</span>
-<span class="n">General</span><span class="w"> </span><span class="n">setup</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Initial</span><span class="w"> </span><span class="n">RAM</span><span class="w"> </span><span class="n">filesystem</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">RAM</span><span class="w"> </span><span class="n">disk</span><span class="w"> </span><span class="p">(</span><span class="n">initramfs</span><span class="o">/</span><span class="n">initrd</span><span class="p">)</span><span class="w"> </span><span class="n">support</span><span class="w"> </span>
-<span class="n">General</span><span class="w"> </span><span class="n">setup</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Configure</span><span class="w"> </span><span class="n">standard</span><span class="w"> </span><span class="n">kernel</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="p">(</span><span class="nb">exp</span><span class="n">ert</span><span class="w"> </span><span class="n">users</span><span class="p">)</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Enable</span><span class="w"> </span><span class="n">support</span><span class="w"> </span><span class="kr">for</span><span class="w"> </span><span class="kr">print</span><span class="n">k</span><span class="w"> </span>
-<span class="n">Executable</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="kr">for</span><span class="n">mats</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Kernel</span><span class="w"> </span><span class="n">support</span><span class="w"> </span><span class="kr">for</span><span class="w"> </span><span class="n">ELF</span><span class="w"> </span><span class="n">binaries</span><span class="w"> </span>
-<span class="n">Device</span><span class="w"> </span><span class="n">Drivers</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Character</span><span class="w"> </span><span class="n">devices</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Enable</span><span class="w"> </span><span class="n">TTY</span>
-</code></pre></div>
-
-<blockquote>
-<p>以上配置分别代表生成 <code>64位内核</code>;<code>启用RAM文件系统和初始化根文件系统</code>;<code>启用文本打印支持</code>;<code>支持ELF格式执行文件</code>;<code>启用tty字符设备</code>
-使用 <code>make -j $(nproc)</code> 构建, 默认生成的内核镜像在 <code>arch/x86/boot/bzImage</code>,为压缩的kernel镜像,约780K
-查看内核镜像的运行 <code>qemu-system-x86_64 --kernel arch/x86/boot/bzImage</code></p>
-</blockquote>
-<p><strong>注意</strong> 此时qemu启动kernel会显示 <code>not working init found</code>, 因为此时没有准备启动初始程序</p>
-<h2>构建一个mini-shell</h2>
-<p>上述步骤中, 我们完成了一个轻量式的linux-kernel构建,接下来准备构建一个轻量的shell来作为init程序</p>
-<ol>
-<li>编写一个简易的调用shell命令程序, 使用POISX接口<code>write/read/execve/waitid</code></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/wait.h&gt;</span>
-
-<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(){</span>
-<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">cmd</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
-<span class="w">    </span><span class="k">for</span><span class="p">(;;){</span>
-<span class="w">        </span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;# &quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
-<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">cmd</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">);</span>
-<span class="w">        </span><span class="c1">// write(1, &quot;&quot;, );</span>
-<span class="w">        </span><span class="n">cmd</span><span class="p">[</span><span class="n">count</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="w">        </span><span class="kt">pid_t</span><span class="w"> </span><span class="n">child</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fork</span><span class="p">();</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">child</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">-1</span><span class="p">){</span>
-<span class="w">            </span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fork failed!</span><span class="se">\n</span><span class="s">exit!!!&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">21</span><span class="p">);</span>
-<span class="w">            </span><span class="k">break</span><span class="p">;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">child</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">){</span>
-<span class="w">            </span><span class="n">execve</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
-<span class="w">            </span><span class="k">break</span><span class="p">;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="kt">siginfo_t</span><span class="w"> </span><span class="n">infop</span><span class="p">;</span>
-<span class="w">        </span><span class="n">waitid</span><span class="p">(</span><span class="n">P_ALL</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">infop</span><span class="p">,</span><span class="w"> </span><span class="n">WEXITED</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<ol>
-<li><code>gcc -static shell.c -o init</code> 编译为静态可执行文件</li>
-<li><code>echo init | cpio -H newc -o &gt; init.cpio</code> 生成一个initrd</li>
-<li>重新编译为iso内核 <code>make isoimage FDARGS="initrd=/init.cpio" FDINITRD=$(pwd)/init.cpio</code> 生成的arch/x96/boot/image.iso 镜像大小为2.2M</li>
-<li>启动iso镜像 <code>qemu-system-x86_64 -cdrom image.iso</code></li>
-</ol>
-<h3>使用assembly进行系统调用,进一步精简init程序</h3>
-<blockquote>
-<p>此过程需要的参考文档资源如下:</p>
-</blockquote>
-<ol>
-<li>在linux源码目录下参考系统调用的id号 <code>linux/arch/x86/include/generated/asm/syscalls_64.h</code></li>
-<li>查阅<a href="https://www.intel.cn/content/www/cn/zh/support/articles/000006715/processors.html">inter x86开发手册</a>了解各寄存器作用, 这里仅关注rax寄存器用于存储syscall的id</li>
-<li><a href="https://en.wikipedia.org/wiki/X86_calling_conventions">wiki x86 体系结构的调用约定</a></li>
-</ol>
-<blockquote>
-<p>准备待链接的.c和.s源文件</p>
-</blockquote>
-<div class="highlight"><pre><span></span><code><span class="c1">// shell.c</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/wait.h&gt;</span>
-
-<span class="kt">int</span><span class="w"> </span><span class="nf">real_waitid</span><span class="p">(</span><span class="n">idtype_t</span><span class="w"> </span><span class="n">idtype</span><span class="p">,</span><span class="w"> </span><span class="kt">id_t</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="kt">siginfo_t</span><span class="w"> </span><span class="o">*</span><span class="n">infop</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">options</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="p">);</span>
-
-<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-<span class="p">{</span>
-<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">command</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
-<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(;;)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;# &quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
-<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">command</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">);</span>
-<span class="w">        </span><span class="c1">// /bin/ls\n -&gt; /bin/ls\0</span>
-<span class="w">        </span><span class="n">command</span><span class="p">[</span><span class="n">count</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="w">        </span><span class="kt">pid_t</span><span class="w"> </span><span class="n">fork_result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fork</span><span class="p">();</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fork_result</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">execve</span><span class="p">(</span><span class="n">command</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<span class="w">            </span><span class="k">break</span><span class="p">;</span>
-<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="c1">// wait</span>
-<span class="w">            </span><span class="c1">// </span>
-<span class="w">            </span><span class="kt">siginfo_t</span><span class="w"> </span><span class="n">info</span><span class="p">;</span>
-<span class="w">            </span><span class="n">real_waitid</span><span class="p">(</span><span class="n">P_ALL</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">info</span><span class="p">,</span><span class="w"> </span><span class="n">WEXITED</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="n">_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="nf">sys.S</span>
-<span class="na">.intel_syntax</span><span class="w"> </span><span class="no">noprefix</span>
-
-<span class="na">.global</span><span class="w"> </span><span class="no">write</span>
-<span class="na">.global</span><span class="w"> </span><span class="no">read</span>
-<span class="na">.global</span><span class="w"> </span><span class="no">fork</span>
-<span class="na">.global</span><span class="w"> </span><span class="no">execve</span>
-<span class="na">.global</span><span class="w"> </span><span class="no">real_waitid</span>
-<span class="na">.global</span><span class="w"> </span><span class="no">_exit</span>
-
-<span class="nl">write:</span>
-<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span>
-<span class="nf">syscall</span>
-<span class="nf">ret</span>
-
-<span class="nl">read:</span>
-<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span>
-<span class="nf">syscall</span>
-<span class="nf">ret</span>
-
-<span class="nl">execve:</span>
-<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">59</span>
-<span class="nf">syscall</span>
-<span class="nf">ret</span>
-
-
-<span class="nl">fork:</span>
-<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">57</span>
-<span class="nf">syscall</span>
-<span class="nf">ret</span>
-
-<span class="nl">real_waitid:</span>
-<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">247</span>
-<span class="nf">mov</span><span class="w"> </span><span class="no">r10</span><span class="p">,</span><span class="w"> </span><span class="no">rcx</span>
-<span class="nf">syscall</span>
-<span class="nf">ret</span>
-
-<span class="nl">_exit:</span>
-<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span>
-<span class="nf">syscall</span>
-</code></pre></div>
-
-<p><strong>为什么 <code>real_waitid</code> 函数多了一条 <code>mov r10, rcx</code>指令?</strong></p>
-<blockquote>
-<p>参考<a href="https://en.wikipedia.org/wiki/X86_calling_conventions">wiki x86 体系结构的调用约定</a>
-AMD64架构下gcc编译器使用的参数寄存器依次是 <code>Integer/pointer arguments(RDI, RSI, RDX, RCX, R8, R9), Floating point arguments([XYZ]MM0–7)</code>. 
-而内核接口使用的参数寄存器是 <code>RDI, RSI, RDX, R10, R8 and R9</code>
-因此在汇编实现的syscall function需要将第四个参数从寄存器RCX移动到R10</p>
-</blockquote>
-<p><strong>依次执行编译链接命令</strong>
-- <code>gcc -c shell.c -o shell.o</code>
-- <code>as sys.S -o sys.o</code>
-- <code>ld -o init shell.o sys.o --entry main -z noexecstack</code></p>
-<h4><code>Segmentation fault</code> 问题排查</h4>
-<p>上述步骤中生成的最小init,在我调用时报错 <code>Segmentation fault (core dumped)</code>, 在我进一步排查积累了以下经验</p>
-<ol>
-<li>首先, 我想验证通过gcc和as链接obj生成程序是否可行, 而不是其他版本或库等的问题. 为此我编写了一个仅包含<code>write</code>的系统调用和对应的asm实现syscall id寄存器(此处是eax/rax)的装载
-示例代码如下:</li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="c1">// shell.c</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
-
-<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(){</span>
-<span class="w">    </span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;# &quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
-<span class="p">}</span>
-<span class="c1">// sys.S</span>
-<span class="p">.</span><span class="n">intel_syntax</span><span class="w"> </span><span class="n">noprefix</span>
-
-<span class="p">.</span><span class="n">global</span><span class="w"> </span><span class="n">write</span>
-
-<span class="nl">write</span><span class="p">:</span>
-<span class="n">mov</span><span class="w"> </span><span class="n">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span>
-<span class="n">syscall</span>
-<span class="n">ret</span>
-</code></pre></div>
-
-<ol>
-<li>但是我仍得到了 <code>Segmentation fault</code>,不同的是在此之前程序有期望的输出<code>#</code>, 此时想要继续探究下去, 我就需要探索汇编了, 但这方面我不太熟悉, 因此消耗了一些时间. 首先因为具有期望输出, 使用判断此时asm系统调用应该可用, 了解到 <code>objdump</code> 这一反汇编工具, 因此将生成的程序反汇编 <code>objdump -D minit &gt; mm.S</code> , 主要关注syscall之后的部分</li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="mf">0000000000401000</span><span class="w"> </span><span class="o">&lt;</span><span class="n">main</span><span class="o">&gt;</span><span class="p">:</span>
-<span class="w">  </span><span class="mf">401019</span><span class="p">:</span><span class="w">   </span><span class="n">e8</span><span class="w"> </span><span class="mf">07</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w">          </span><span class="n">callq</span><span class="w">  </span><span class="mf">401025</span><span class="w"> </span><span class="o">&lt;</span><span class="n">write</span><span class="o">&gt;</span>
-<span class="w">  </span><span class="mf">40101</span><span class="n">e</span><span class="p">:</span><span class="w">   </span><span class="n">b8</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w">          </span><span class="n">mov</span><span class="w">    </span><span class="err">$</span><span class="mf">0</span><span class="n">x0</span><span class="p">,</span><span class="err">%</span><span class="n">eax</span>
-<span class="w">  </span><span class="mf">401023</span><span class="p">:</span><span class="w">   </span><span class="mf">5</span><span class="n">d</span><span class="w">                      </span><span class="n">pop</span><span class="w">    </span><span class="err">%</span><span class="n">rbp</span>
-<span class="w">  </span><span class="mf">401024</span><span class="p">:</span><span class="w">   </span><span class="n">c3</span><span class="w">                      </span><span class="n">retq</span><span class="w">   </span>
-
-<span class="mf">0000000000401025</span><span class="w"> </span><span class="o">&lt;</span><span class="n">write</span><span class="o">&gt;</span><span class="p">:</span>
-<span class="w">  </span><span class="mf">401025</span><span class="p">:</span><span class="w">   </span><span class="mf">48</span><span class="w"> </span><span class="n">c7</span><span class="w"> </span><span class="n">c0</span><span class="w"> </span><span class="mf">01</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w">    </span><span class="n">mov</span><span class="w">    </span><span class="err">$</span><span class="mf">0</span><span class="n">x1</span><span class="p">,</span><span class="err">%</span><span class="n">rax</span>
-<span class="w">  </span><span class="mf">40102</span><span class="n">c</span><span class="p">:</span><span class="w">   </span><span class="mf">0</span><span class="n">f</span><span class="w"> </span><span class="mf">05</span><span class="w">                   </span><span class="kr">sys</span><span class="n">call</span><span class="w"> </span>
-<span class="w">  </span><span class="mf">40102</span><span class="n">e</span><span class="p">:</span><span class="w">   </span><span class="n">c3</span><span class="w">                      </span><span class="n">retq</span><span class="w">   </span>
-</code></pre></div>
-
-<blockquote>
-<p>可以看到在 <code>call write</code> 之后仅有指令:常量mov和pop栈恢复, 判断应该是此处有问题, 让我们通过gdb调试一下  <code>gdb minit</code>; 在gdb命令界面中输入 <code>set disassemble-next-line on</code> 开启自动反汇编; <code>layout regs -tui</code> 以tui形式显示寄存器; <code>si</code>逐步汇编指令调试, 发现在执行 <code>retq</code> 时报 <code>cannot access memory at address 0x1</code>, 因此我们需要避免gcc为我们自动处理的退出, 这也是为什么需要使用<code>_exit</code> syscall来退出程序, 在<code>sys.S</code>中添加_exit定义后,此部分工作正常</p>
-</blockquote>
-<ol>
-<li>
-<p>现在，让我们用上述步骤调试 <code>init</code> 程序中的 <code>Segmentation fault</code>, 问题发生在 <code>mov %fs:0x28, %rax</code>, 查阅资料得知, 此部分用于栈溢出保护,一般和指令 <code>mov %rax, -0x8(%rsp)</code> 配套出现, 其作用为:从线程局部空间随机读取一个值, 在函数返回时, 检查此值是否被修改, 以防止栈溢出攻击. 在64bit模式下 %fs 的实际基址由 %fs_base 决定, 此值为0, 因此出现了非法地址范围</p>
-</li>
-<li>
-<p>我推断这部分应该时gcc自动完成的部分, 在上述进行仅包含 <code>write</code> syscall 的init程序时调试时, 并没有这部分. 经过步步裁剪, 栈溢出保护由语句 <code>siginfo_t info;</code> 引入, siginfo_t在进行临时变量拷贝时, 可能有值溢出, 因此我推测引入<code>siginfo_t</code>时gdb自动添加栈溢出保护语句</p>
-</li>
-<li>
-<p>定位到问题, 那么就不能使用带 <code>siginfo_t</code> 参数的 <code>waitid</code> syscall了, 我尝试使用 <code>waitpid</code> 找到其syscall为<code>syscall_wait4(61)</code>, 工作正常</p>
-<blockquote>
-<p>这里, 我犯了个低级问题, 在asm中实现的waitpid忘记加ret返回, 程序在执行一次子进程后自动退出, 因为PC在执行waitpid后, 自动+1执行到_exit指令位置致循环失效, 主进程退出, 因为涉及到多个进程和无限循环, 导致我又绕了一大圈.</p>
-</blockquote>
-</li>
-<li>
-<p>最后让我们查看一下 <code>init</code> 的大小并重新生成iso镜像, <code>du -sh init image.iso // 12K, 1.9M</code></p>
-</li>
-</ol>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+<li><code>initrd</code>: 初始化RAM磁盘, 是在实际根文件系统之前装载的初始根文件系统. initrd绑定到内核时会被内核引导过程加载,然后挂载 …</li></ul>
+                        <a class="readmore" href="https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>
@@ -480,29 +325,6 @@ AMD64架构下gcc编译器使用的参数寄存器依次是 <code>Integer/pointe
 </footer><!-- /.post-info -->                        <h2>数据集 Dataset</h2>
 <p>数据是深度学习的基础，高质量的数据输入将在整个深度神经网络中起到积极作用。MindSpore提供基于Pipeline的数据引擎，通过数据集（Dataset）和数据变 …</p>
                         <a class="readmore" href="https://yzsh-hszy.github.io/2024-07-03-mindspore-learen-notes-construct-dataset.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="https://yzsh-hszy.github.io/2024-07-02-mindspore-learen-notes-tensor-understand.html" rel="bookmark"
-                               title="Permalink to Mindspore Learen Notes -- Tensor Understand.">Mindspore Learen Notes -- Tensor Understand.</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2024-07-02T12:00:00+08:00">
-                Published: Tue 02 July 2024
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
-                </address>
-        <p>In <a href="https://yzsh-hszy.github.io/category/mindspore.html">Mindspore</a>.</p>
-        
-</footer><!-- /.post-info -->                        <h2>张量介绍</h2>
-<p>张量（Tensor）是一个可用来表示在一些矢量、标量和其他张量之间的线性关系的多线性函数，这些线性关系的基本例 …</p>
-                        <a class="readmore" href="https://yzsh-hszy.github.io/2024-07-02-mindspore-learen-notes-tensor-understand.html">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
                     </ol><!-- /#posts-list -->
