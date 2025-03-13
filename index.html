@@ -68,7 +68,7 @@
 <ol>
 <li>在 <code>hw/{target_architecture}/</code> 下, 创建新设备定义文件</li>
 <li>实例化虚拟设备的 <code>TypeInfo</code>, 并提供 <code>type_register_static</code> 注册, <code>type_init</code> 调用</li>
-<li>TODO</li>
+<li>设置 <code>TypeInfo</code> 设备obj的 <code>class_init</code> class初始函数指针, 对于模拟开发板, 在<code>class_init</code>指定的方法中需要实例化<code>MACHINE_CLASS</code>并配置</li>
 </ol>
 <h2>QEMU API介绍</h2>
 <ul>

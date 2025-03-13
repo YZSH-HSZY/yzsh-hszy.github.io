@@ -36,7 +36,7 @@
 &lt;ol&gt;
 &lt;li&gt;在 &lt;code&gt;hw/{target_architecture}/&lt;/code&gt; 下, 创建新设备定义文件&lt;/li&gt;
 &lt;li&gt;实例化虚拟设备的 &lt;code&gt;TypeInfo&lt;/code&gt;, 并提供 &lt;code&gt;type_register_static&lt;/code&gt; 注册, &lt;code&gt;type_init&lt;/code&gt; 调用&lt;/li&gt;
-&lt;li&gt;TODO&lt;/li&gt;
+&lt;li&gt;设置 &lt;code&gt;TypeInfo&lt;/code&gt; 设备obj的 &lt;code&gt;class_init&lt;/code&gt; class初始函数指针, 对于模拟开发板, 在&lt;code&gt;class_init&lt;/code&gt;指定的方法中需要实例化&lt;code&gt;MACHINE_CLASS&lt;/code&gt;并配置&lt;/li&gt;
 &lt;/ol&gt;
 &lt;h2&gt;QEMU API介绍&lt;/h2&gt;
 &lt;ul&gt;
@@ -57,7 +57,7 @@
 &lt;h2&gt;从构建linux内核开始&lt;/h2&gt;
 &lt;p&gt;&lt;strong&gt;env&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;linux内核源码 &lt;code&gt;git clone --depth 1 https://git.kernel.org/ pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;linux内核源码 &lt;code&gt;git clone --depth 1 https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;依赖包 &lt;code&gt;apt install bzip2 libncurses-dev flex bison bc cpio libelf-dev libssl-dev syslinux dosfstools&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;使用qemu启动编译后的内核 &lt;code&gt;apt install qemu-system-x86&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;如果需要制作iso镜像文件 &lt;code&gt;apt install isolinux genisoimage&lt;/code&gt;&lt;/li&gt;
