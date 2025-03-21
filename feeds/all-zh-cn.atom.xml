@@ -1,5 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Welcome to YZSH-HSZY blog.</title><link href="https://yzsh-hszy.github.io/" rel="alternate"></link><link href="https://yzsh-hszy.github.io/feeds/all-zh-cn.atom.xml" rel="self"></link><id>https://yzsh-hszy.github.io/</id><updated>2025-03-10T12:00:00+08:00</updated><entry><title>Customize Virtual Device Using Qemu.</title><link href="https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html" rel="alternate"></link><published>2025-03-10T12:00:00+08:00</published><updated>2025-03-10T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-03-10:/2025-03-10-customize-virtual-device-using-qemu.html</id><summary type="html">&lt;h1&gt;笔记介绍&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Welcome to YZSH-HSZY blog.</title><link href="https://yzsh-hszy.github.io/" rel="alternate"></link><link href="https://yzsh-hszy.github.io/feeds/all-zh-cn.atom.xml" rel="self"></link><id>https://yzsh-hszy.github.io/</id><updated>2025-03-20T12:00:00+08:00</updated><entry><title>Linux SSH Port Forward Example.</title><link href="https://yzsh-hszy.github.io/2025-03-20-linux-ssh-port-forward-example.html" rel="alternate"></link><published>2025-03-20T12:00:00+08:00</published><updated>2025-03-20T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-03-20:/2025-03-20-linux-ssh-port-forward-example.html</id><summary type="html">&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;此文章记录使用ssh进行端口转发的示例。&lt;/p&gt;
+&lt;p&gt;ssh能够将其他tcp端口的网络数据通ssh连接来转发, 并且提供自动加密及解密服务, 也叫做tunnel(隧道). 如&lt;code&gt;Telnet&lt;/code&gt;/&lt;code&gt;SMTP&lt;/code&gt;/&lt;code&gt;LDAP&lt;/code&gt;等应用.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ssh隧道优点:
+1. 避免了用户名,密码及隐私 …&lt;/p&gt;&lt;/blockquote&gt;</summary><content type="html">&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;此文章记录使用ssh进行端口转发的示例。&lt;/p&gt;
+&lt;p&gt;ssh能够将其他tcp端口的网络数据通ssh连接来转发, 并且提供自动加密及解密服务, 也叫做tunnel(隧道). 如&lt;code&gt;Telnet&lt;/code&gt;/&lt;code&gt;SMTP&lt;/code&gt;/&lt;code&gt;LDAP&lt;/code&gt;等应用.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ssh隧道优点:
+1. 避免了用户名,密码及隐私信息的明文传输
+2. 突破防火墙的一些限制进行tcp连接&lt;/p&gt;
+&lt;p&gt;参考文档
+- &lt;a href="https://zhuanlan.zhihu.com/p/469638489"&gt;知乎-ssh端口转发(跳板机)实战详解&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;本地转发&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;示例:&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ssh&lt;span class="w"&gt; &lt;/span&gt;-g&lt;span class="w"&gt; &lt;/span&gt;-L&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;6013&lt;/span&gt;:192.168.8.16:6013&lt;span class="w"&gt; &lt;/span&gt;-fN&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;192&lt;/span&gt;.168.8.14
+将所有连接到*:6013的连接转发到192.168.8.16:6013,&lt;span class="w"&gt; &lt;/span&gt;通过与192.168.8.14的ssh隧道
+&lt;span class="c1"&gt;# Options:&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;-g&lt;span class="w"&gt; &lt;/span&gt;允许远程主机连接到本地转发端口,此时监听地址为&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;0.0.0.0:local_port&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;不带-g选项则为&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;127.0.0.1:local_port&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;-L&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;bind_address:&lt;span class="o"&gt;]&lt;/span&gt;port:host:hostport
+&lt;span class="w"&gt;        &lt;/span&gt;指定到本地&lt;span class="o"&gt;(&lt;/span&gt;客户端&lt;span class="o"&gt;)&lt;/span&gt;主机上给定tcp_port/unix_socket的连接将被转发到远程端的给定主机和tcp_port/unix_socket。&lt;span class="o"&gt;(&lt;/span&gt;即所有连接本地port的连接被转发到远程port&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;这是通过分配一个套接字来监听本地端的TCP端口（可选地绑定到指定的绑定地址）或Unix套接字来实现的。每当连接到本地端口或套接字时，该连接就会通过安全通道转发，并从远程计算机连接到主机端口hostport或Unix套接字远程套接字。
+&lt;span class="w"&gt;    &lt;/span&gt;-f&lt;span class="w"&gt;  &lt;/span&gt;请求ssh在命令执行之前进入后台.&lt;span class="w"&gt; &lt;/span&gt;如果ssh将要询问密码或密码短语,但用户希望它在后台执行.这意味着-n&lt;span class="o"&gt;(&lt;/span&gt;即重定向stdin到/dev/null&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;-N&lt;span class="w"&gt;  &lt;/span&gt;不执行远程命令,&lt;span class="w"&gt; &lt;/span&gt;在进行端口转发时比较有用.&lt;span class="w"&gt; &lt;/span&gt;一版的ssh连接执行login_shell&lt;span class="o"&gt;(&lt;/span&gt;如/bin/bash&lt;span class="o"&gt;)&lt;/span&gt;命令
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;远程转发&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;ssh&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;6666&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mf"&gt;192.168.8.14&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;22&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;fN&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;admin&lt;/span&gt;&lt;span class="mf"&gt;@192.168.8.16&lt;/span&gt;
+&lt;span class="n"&gt;将连接到远程主机上给定TCP端口&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;192.168.8.16&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;6666&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;的连接转发到本地端&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;192.168.8.14&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;22&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Linux"></category></entry><entry><title>Linux Root File System Make.</title><link href="https://yzsh-hszy.github.io/2025-03-15-linux-root-file-system-make.html" rel="alternate"></link><published>2025-03-15T12:00:00+08:00</published><updated>2025-03-15T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-03-15:/2025-03-15-linux-root-file-system-make.html</id><content type="html">&lt;h1&gt;笔记介绍&lt;/h1&gt;
+&lt;p&gt;此文件记载我学习定制linux系统中关于 &lt;code&gt;root file system&lt;/code&gt; 的部分&lt;/p&gt;
+&lt;h2&gt;参考文档&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.cnblogs.com/wsg1100/p/13127636.html"&gt;博客园-制作ubuntu-base rootfs博客&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><category term="Linux"></category></entry><entry><title>Customize Virtual Device Using Qemu.</title><link href="https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html" rel="alternate"></link><published>2025-03-10T12:00:00+08:00</published><updated>2025-03-10T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-03-10:/2025-03-10-customize-virtual-device-using-qemu.html</id><summary type="html">&lt;h1&gt;笔记介绍&lt;/h1&gt;
 &lt;p&gt;该博客用于记录学习在qemu中添加自定义开发板的过程&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; qemu 官方在 &lt;code&gt;hw/misc/edu.c&lt;/code&gt; 中提供了一个教学用的设备样例, 可参考此文件实现模拟设 …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;笔记介绍&lt;/h1&gt;
 &lt;p&gt;该博客用于记录学习在qemu中添加自定义开发板的过程&lt;/p&gt;

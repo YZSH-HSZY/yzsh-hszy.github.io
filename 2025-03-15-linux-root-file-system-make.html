@@ -4,9 +4,10 @@
                         <meta charset="utf-8" />
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                         <meta name="generator" content="Pelican" />
-                        <title>Welcome to YZSH-HSZY blog.</title>
+                        <title>Linux Root File System Make.</title>
                         <link rel="stylesheet" href="https://yzsh-hszy.github.io/theme/css/main.css" />
                                 <link href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Welcome to YZSH-HSZY blog. Atom Feed" />
+    <meta name="description" content="笔记介绍 此文件记载我学习定制linux系统中关于 root file system 的部分 参考文档 博客园-制作ubuntu-base rootfs博客" />
         </head>
 
         <body id="index" class="home">
@@ -14,46 +15,41 @@
                         <h1><a href="https://yzsh-hszy.github.io/">Welcome to YZSH-HSZY blog.</a></h1>
                         <nav><ul>
                                                 <li><a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a></li>
-                                                <li><a href="https://yzsh-hszy.github.io/category/linux.html">Linux</a></li>
+                                                <li class="active"><a href="https://yzsh-hszy.github.io/category/linux.html">Linux</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/mindspore.html">Mindspore</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/test.html">Test</a></li>
                         </ul></nav>
                 </header><!-- /#banner -->
-    <section id="content" class="body">
-        <h1>Archives for Welcome to YZSH-HSZY blog.</h1>
+  <section id="content" class="body">
+    <article>
+      <header>
+        <h1 class="entry-title">
+          <a href="https://yzsh-hszy.github.io/2025-03-15-linux-root-file-system-make.html" rel="bookmark"
+             title="Permalink to Linux Root File System Make.">Linux Root File System Make.</a></h1>
+      </header>
 
-        <dl>
-                <dt>Thu 20 March 2025</dt>
-                <dd><a href="https://yzsh-hszy.github.io/2025-03-20-linux-ssh-port-forward-example.html">Linux SSH Port Forward Example.</a></dd>
-                <dt>Sat 15 March 2025</dt>
-                <dd><a href="https://yzsh-hszy.github.io/2025-03-15-linux-root-file-system-make.html">Linux Root File System Make.</a></dd>
-                <dt>Mon 10 March 2025</dt>
-                <dd><a href="https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html">Customize Virtual Device Using Qemu.</a></dd>
-                <dt>Mon 10 February 2025</dt>
-                <dd><a href="https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html">Build Mini Linux Distro And Use Qemu Running.</a></dd>
-                <dt>Mon 30 December 2024</dt>
-                <dd><a href="https://yzsh-hszy.github.io/2024-12-30-multiprocess-blog.html">multiprocess blog.</a></dd>
-                <dt>Thu 18 July 2024</dt>
-                <dd><a href="https://yzsh-hszy.github.io/2024-07-18-cpython-learen-notes.html">Cpython Learen Notes.</a></dd>
-                <dt>Thu 18 July 2024</dt>
-                <dd><a href="https://yzsh-hszy.github.io/2024-07-18-cpython-package-publish-notes.html">Cpython Package Publish Notes.</a></dd>
-                <dt>Thu 18 July 2024</dt>
-                <dd><a href="https://yzsh-hszy.github.io/2024-07-18-python-super-class-example-notes.html">Python Super Class Example Notes.</a></dd>
-                <dt>Thu 18 July 2024</dt>
-                <dd><a href="https://yzsh-hszy.github.io/2024-07-18-python-thread-package-example-notes.html">Python Thread Package Example Notes.</a></dd>
-                <dt>Thu 18 July 2024</dt>
-                <dd><a href="https://yzsh-hszy.github.io/2024-07-18-python-unicode-and-utf-8-different-notes.html">Python Unicode And Utf-8 Different Notes.</a></dd>
-                <dt>Thu 04 July 2024</dt>
-                <dd><a href="https://yzsh-hszy.github.io/2024-07-04-mindspore-learen-notes-data-transfroms-operation-learen.html">Mindspore Learen Notes -- Data Transfroms Operation Learen.</a></dd>
-                <dt>Wed 03 July 2024</dt>
-                <dd><a href="https://yzsh-hszy.github.io/2024-07-03-mindspore-learen-notes-construct-dataset.html">Mindspore Learen Notes -- Construct Dataset.</a></dd>
-                <dt>Tue 02 July 2024</dt>
-                <dd><a href="https://yzsh-hszy.github.io/2024-07-02-mindspore-learen-notes-tensor-understand.html">Mindspore Learen Notes -- Tensor Understand.</a></dd>
-                <dt>Mon 01 July 2024</dt>
-                <dd><a href="https://yzsh-hszy.github.io/2024-07-01-mindspore-learen-notes-quikstart.html">MindSpore Learen Notes -- QuikStart.</a></dd>
-        </dl>
-    </section>
+      <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2025-03-15T12:00:00+08:00">
+                Published: Sat 15 March 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
+                </address>
+        <p>In <a href="https://yzsh-hszy.github.io/category/linux.html">Linux</a>.</p>
+        
+</footer><!-- /.post-info -->        <h1>笔记介绍</h1>
+<p>此文件记载我学习定制linux系统中关于 <code>root file system</code> 的部分</p>
+<h2>参考文档</h2>
+<ul>
+<li><a href="https://www.cnblogs.com/wsg1100/p/13127636.html">博客园-制作ubuntu-base rootfs博客</a></li>
+</ul>
+      </div><!-- /.entry-content -->
+
+    </article>
+  </section>
                 <section id="extras" class="body">
                                 <div class="blogroll">
                                         <h2>links</h2>

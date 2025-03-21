@@ -14,6 +14,7 @@
                         <h1><a href="https://yzsh-hszy.github.io/">Welcome to YZSH-HSZY blog.</a></h1>
                         <nav><ul>
                                                 <li><a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/linux.html">Linux</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/mindspore.html">Mindspore</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/test.html">Test</a></li>
@@ -22,7 +23,86 @@
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html">Customize Virtual Device Using Qemu.</a></h1>
+                        <h1 class="entry-title"><a href="https://yzsh-hszy.github.io/2025-03-20-linux-ssh-port-forward-example.html">Linux SSH Port Forward Example.</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2025-03-20T12:00:00+08:00">
+                Published: Thu 20 March 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
+                </address>
+        <p>In <a href="https://yzsh-hszy.github.io/category/linux.html">Linux</a>.</p>
+        
+</footer><!-- /.post-info --><h1>介绍</h1>
+<p>此文章记录使用ssh进行端口转发的示例。</p>
+<p>ssh能够将其他tcp端口的网络数据通ssh连接来转发, 并且提供自动加密及解密服务, 也叫做tunnel(隧道). 如<code>Telnet</code>/<code>SMTP</code>/<code>LDAP</code>等应用.</p>
+<blockquote>
+<p>ssh隧道优点:
+1. 避免了用户名,密码及隐私信息的明文传输
+2. 突破防火墙的一些限制进行tcp连接</p>
+<p>参考文档
+- <a href="https://zhuanlan.zhihu.com/p/469638489">知乎-ssh端口转发(跳板机)实战详解</a></p>
+</blockquote>
+<h2>本地转发</h2>
+<blockquote>
+<p>示例:</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code>ssh<span class="w"> </span>-g<span class="w"> </span>-L<span class="w"> </span><span class="m">6013</span>:192.168.8.16:6013<span class="w"> </span>-fN<span class="w"> </span><span class="m">192</span>.168.8.14
+将所有连接到*:6013的连接转发到192.168.8.16:6013,<span class="w"> </span>通过与192.168.8.14的ssh隧道
+<span class="c1"># Options:</span>
+<span class="w">    </span>-g<span class="w"> </span>允许远程主机连接到本地转发端口,此时监听地址为<span class="w"> </span><span class="s2">&quot;0.0.0.0:local_port&quot;</span><span class="w"> </span>不带-g选项则为<span class="w"> </span><span class="s2">&quot;127.0.0.1:local_port&quot;</span>
+<span class="w">    </span>-L<span class="w"> </span><span class="o">[</span>bind_address:<span class="o">]</span>port:host:hostport
+<span class="w">        </span>指定到本地<span class="o">(</span>客户端<span class="o">)</span>主机上给定tcp_port/unix_socket的连接将被转发到远程端的给定主机和tcp_port/unix_socket。<span class="o">(</span>即所有连接本地port的连接被转发到远程port<span class="o">)</span>
+<span class="w">        </span>这是通过分配一个套接字来监听本地端的TCP端口（可选地绑定到指定的绑定地址）或Unix套接字来实现的。每当连接到本地端口或套接字时，该连接就会通过安全通道转发，并从远程计算机连接到主机端口hostport或Unix套接字远程套接字。
+<span class="w">    </span>-f<span class="w">  </span>请求ssh在命令执行之前进入后台.<span class="w"> </span>如果ssh将要询问密码或密码短语,但用户希望它在后台执行.这意味着-n<span class="o">(</span>即重定向stdin到/dev/null<span class="o">)</span>
+<span class="w">    </span>-N<span class="w">  </span>不执行远程命令,<span class="w"> </span>在进行端口转发时比较有用.<span class="w"> </span>一版的ssh连接执行login_shell<span class="o">(</span>如/bin/bash<span class="o">)</span>命令
+</code></pre></div>
+
+<h2>远程转发</h2>
+<div class="highlight"><pre><span></span><code><span class="n">ssh</span><span class="w"> </span><span class="o">-</span><span class="n">R</span><span class="w"> </span><span class="mi">6666</span><span class="o">:</span><span class="mf">192.168.8.14</span><span class="o">:</span><span class="mi">22</span><span class="w"> </span><span class="o">-</span><span class="n">fN</span><span class="w"> </span><span class="n">admin</span><span class="mf">@192.168.8.16</span>
+<span class="n">将连接到远程主机上给定TCP端口</span><span class="p">(</span><span class="mf">192.168.8.16</span><span class="o">:</span><span class="mi">6666</span><span class="p">)</span><span class="n">的连接转发到本地端</span><span class="p">(</span><span class="mf">192.168.8.14</span><span class="o">:</span><span class="mi">22</span><span class="p">)</span>
+</code></pre></div>                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="https://yzsh-hszy.github.io/2025-03-15-linux-root-file-system-make.html" rel="bookmark"
+                               title="Permalink to Linux Root File System Make.">Linux Root File System Make.</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2025-03-15T12:00:00+08:00">
+                Published: Sat 15 March 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
+                </address>
+        <p>In <a href="https://yzsh-hszy.github.io/category/linux.html">Linux</a>.</p>
+        
+</footer><!-- /.post-info -->                        <h1>笔记介绍</h1>
+<p>此文件记载我学习定制linux系统中关于 <code>root file system</code> 的部分</p>
+<h2>参考文档</h2>
+<ul>
+<li><a href="https://www.cnblogs.com/wsg1100/p/13127636.html">博客园-制作ubuntu-base rootfs博客</a></li>
+</ul>
+                        <a class="readmore" href="https://yzsh-hszy.github.io/2025-03-15-linux-root-file-system-make.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html" rel="bookmark"
+                               title="Permalink to Customize Virtual Device Using Qemu.">Customize Virtual Device Using Qemu.</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2025-03-10T12:00:00+08:00">
                 Published: Mon 10 March 2025
@@ -33,52 +113,12 @@
                 </address>
         <p>In <a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a>.</p>
         
-</footer><!-- /.post-info --><h1>笔记介绍</h1>
+</footer><!-- /.post-info -->                        <h1>笔记介绍</h1>
 <p>该博客用于记录学习在qemu中添加自定义开发板的过程</p>
-<p><strong>注意</strong> qemu 官方在 <code>hw/misc/edu.c</code> 中提供了一个教学用的设备样例, 可参考此文件实现模拟设备创建.</p>
-<h2>QEMU Object Model</h2>
-<p>在 qemu 中使用一套叫做 <code>Qemu Object Model</code> 的东西来实现面向对象式开发模拟设备，主要由这四个组件构成：
-- Type：用来定义一个「类」的基本属性，例如类的名字、大小、构造函数等
-- Class：用来定义一个「类」的静态内容，例如类中存储的静态数据、方法函数指针等
-- Object：动态分配的一个「类」的具体的实例（instance），储存类的动态数据
-- Property：动态对象数据的访问器（accessor），可以通过监视器接口进行检查</p>
-<blockquote>
-<p>一个定义设备obj的示例</p>
-</blockquote>
-<div class="highlight"><pre><span></span><code><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">pci_edu_register_types</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="n">InterfaceInfo</span><span class="w"> </span><span class="n">interfaces</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="n">INTERFACE_CONVENTIONAL_PCI_DEVICE</span><span class="w"> </span><span class="p">},</span>
-<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="p">},</span>
-<span class="w">    </span><span class="p">};</span>
-<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">TypeInfo</span><span class="w"> </span><span class="n">edu_info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_PCI_EDU_DEVICE</span><span class="p">,</span>
-<span class="w">        </span><span class="p">.</span><span class="n">parent</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_PCI_DEVICE</span><span class="p">,</span>
-<span class="w">        </span><span class="p">.</span><span class="n">instance_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">EduState</span><span class="p">),</span>
-<span class="w">        </span><span class="p">.</span><span class="n">instance_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">edu_instance_init</span><span class="p">,</span>
-<span class="w">        </span><span class="p">.</span><span class="n">class_init</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">edu_class_init</span><span class="p">,</span>
-<span class="w">        </span><span class="p">.</span><span class="n">interfaces</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">interfaces</span><span class="p">,</span>
-<span class="w">    </span><span class="p">};</span>
-<span class="w">    </span><span class="n">type_register_static</span><span class="p">(</span><span class="o">&amp;</span><span class="n">edu_info</span><span class="p">);</span>
-<span class="p">}</span>
-<span class="n">type_init</span><span class="p">(</span><span class="n">pci_edu_register_types</span><span class="p">)</span>
-</code></pre></div>
-
-<h2>QEMU添加设备流程</h2>
-<ol>
-<li>在 <code>hw/{target_architecture}/</code> 下, 创建新设备定义文件</li>
-<li>实例化虚拟设备的 <code>TypeInfo</code>, 并提供 <code>type_register_static</code> 注册, <code>type_init</code> 调用</li>
-<li>设置 <code>TypeInfo</code> 设备obj的 <code>class_init</code> class初始函数指针, 对于模拟开发板, 在<code>class_init</code>指定的方法中需要实例化<code>MACHINE_CLASS</code>并配置</li>
-</ol>
-<h2>QEMU API介绍</h2>
-<ul>
-<li><code>type_init</code> 宏, 会被扩展为<code>gcc attribute constructor</code>修饰的函数<code>do_qemu_init_##</code>函数, 此属性修饰的函数会在程序的<code>main()</code>函数之前自动调用, 其最终的作用是将一个 <code>TypeInfo</code> 结构体实例通过  <code>type_register_static</code> 函数注册到 <code>GHashTable</code> 中</li>
-</ul>                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+<p><strong>注意</strong> qemu 官方在 <code>hw/misc/edu.c</code> 中提供了一个教学用的设备样例, 可参考此文件实现模拟设 …</p>
+                        <a class="readmore" href="https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>
@@ -279,52 +319,6 @@
     <span class="nb">print</span><span class="p">(</span>
         <span class="s1">&#39;the true add error nums equals range(1, pow(2,19 …</span></code></pre></div>
                         <a class="readmore" href="https://yzsh-hszy.github.io/2024-07-18-python-unicode-and-utf-8-different-notes.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="https://yzsh-hszy.github.io/2024-07-04-mindspore-learen-notes-data-transfroms-operation-learen.html" rel="bookmark"
-                               title="Permalink to Mindspore Learen Notes -- Data Transfroms Operation Learen.">Mindspore Learen Notes -- Data Transfroms Operation Learen.</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2024-07-04T12:00:00+08:00">
-                Published: Thu 04 July 2024
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
-                </address>
-        <p>In <a href="https://yzsh-hszy.github.io/category/mindspore.html">Mindspore</a>.</p>
-        
-</footer><!-- /.post-info -->                        <h1>数据变换 Transforms</h1>
-<p>通常情况下，直接加载的原始数据并不能直接送入神经网络进行训练，我们需要对其进行数据预处理。MindSpore提供不同种类的数据变换（Transforms），配 …</p>
-                        <a class="readmore" href="https://yzsh-hszy.github.io/2024-07-04-mindspore-learen-notes-data-transfroms-operation-learen.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="https://yzsh-hszy.github.io/2024-07-03-mindspore-learen-notes-construct-dataset.html" rel="bookmark"
-                               title="Permalink to Mindspore Learen Notes -- Construct Dataset.">Mindspore Learen Notes -- Construct Dataset.</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2024-07-03T12:00:00+08:00">
-                Published: Wed 03 July 2024
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
-                </address>
-        <p>In <a href="https://yzsh-hszy.github.io/category/mindspore.html">Mindspore</a>.</p>
-        
-</footer><!-- /.post-info -->                        <h2>数据集 Dataset</h2>
-<p>数据是深度学习的基础，高质量的数据输入将在整个深度神经网络中起到积极作用。MindSpore提供基于Pipeline的数据引擎，通过数据集（Dataset）和数据变 …</p>
-                        <a class="readmore" href="https://yzsh-hszy.github.io/2024-07-03-mindspore-learen-notes-construct-dataset.html">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
                     </ol><!-- /#posts-list -->

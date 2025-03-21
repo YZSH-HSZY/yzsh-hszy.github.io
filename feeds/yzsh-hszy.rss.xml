@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>Welcome to YZSH-HSZY blog. - YZSH-HSZY</title><link>https://yzsh-hszy.github.io/</link><description></description><lastBuildDate>Mon, 10 Mar 2025 12:00:00 +0800</lastBuildDate><item><title>Customize Virtual Device Using Qemu.</title><link>https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html</link><description>&lt;h1&gt;笔记介绍&lt;/h1&gt;
+<rss version="2.0"><channel><title>Welcome to YZSH-HSZY blog. - YZSH-HSZY</title><link>https://yzsh-hszy.github.io/</link><description></description><lastBuildDate>Thu, 20 Mar 2025 12:00:00 +0800</lastBuildDate><item><title>Linux SSH Port Forward Example.</title><link>https://yzsh-hszy.github.io/2025-03-20-linux-ssh-port-forward-example.html</link><description>&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;此文章记录使用ssh进行端口转发的示例。&lt;/p&gt;
+&lt;p&gt;ssh能够将其他tcp端口的网络数据通ssh连接来转发, 并且提供自动加密及解密服务, 也叫做tunnel(隧道). 如&lt;code&gt;Telnet&lt;/code&gt;/&lt;code&gt;SMTP&lt;/code&gt;/&lt;code&gt;LDAP&lt;/code&gt;等应用.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ssh隧道优点:
+1. 避免了用户名,密码及隐私 …&lt;/p&gt;&lt;/blockquote&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">YZSH-HSZY</dc:creator><pubDate>Thu, 20 Mar 2025 12:00:00 +0800</pubDate><guid isPermaLink="false">tag:yzsh-hszy.github.io,2025-03-20:/2025-03-20-linux-ssh-port-forward-example.html</guid><category>Linux</category></item><item><title>Linux Root File System Make.</title><link>https://yzsh-hszy.github.io/2025-03-15-linux-root-file-system-make.html</link><description>&lt;h1&gt;笔记介绍&lt;/h1&gt;
+&lt;p&gt;此文件记载我学习定制linux系统中关于 &lt;code&gt;root file system&lt;/code&gt; 的部分&lt;/p&gt;
+&lt;h2&gt;参考文档&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.cnblogs.com/wsg1100/p/13127636.html"&gt;博客园-制作ubuntu-base rootfs博客&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">YZSH-HSZY</dc:creator><pubDate>Sat, 15 Mar 2025 12:00:00 +0800</pubDate><guid isPermaLink="false">tag:yzsh-hszy.github.io,2025-03-15:/2025-03-15-linux-root-file-system-make.html</guid><category>Linux</category></item><item><title>Customize Virtual Device Using Qemu.</title><link>https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html</link><description>&lt;h1&gt;笔记介绍&lt;/h1&gt;
 &lt;p&gt;该博客用于记录学习在qemu中添加自定义开发板的过程&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; qemu 官方在 &lt;code&gt;hw/misc/edu.c&lt;/code&gt; 中提供了一个教学用的设备样例, 可参考此文件实现模拟设 …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">YZSH-HSZY</dc:creator><pubDate>Mon, 10 Mar 2025 12:00:00 +0800</pubDate><guid isPermaLink="false">tag:yzsh-hszy.github.io,2025-03-10:/2025-03-10-customize-virtual-device-using-qemu.html</guid><category>Qemu</category></item><item><title>Build Mini Linux Distro And Use Qemu Running.</title><link>https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html</link><description>&lt;h1&gt;介绍&lt;/h1&gt;
 &lt;p&gt;这是使用qemu的使用教程, 以构建最小linux发行版为例.
