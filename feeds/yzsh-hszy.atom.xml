@@ -32,7 +32,12 @@
 &lt;h2&gt;远程转发&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;ssh&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;6666&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mf"&gt;192.168.8.14&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;22&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;fN&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;admin&lt;/span&gt;&lt;span class="mf"&gt;@192.168.8.16&lt;/span&gt;
 &lt;span class="n"&gt;将连接到远程主机上给定TCP端口&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;192.168.8.16&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;6666&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;的连接转发到本地端&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;192.168.8.14&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;22&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Linux"></category></entry><entry><title>Linux Root File System Make.</title><link href="https://yzsh-hszy.github.io/2025-03-15-linux-root-file-system-make.html" rel="alternate"></link><published>2025-03-15T12:00:00+08:00</published><updated>2025-03-15T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-03-15:/2025-03-15-linux-root-file-system-make.html</id><content type="html">&lt;h1&gt;笔记介绍&lt;/h1&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;双层x11转发&lt;/h2&gt;
+&lt;p&gt;private-host &lt;code&gt;ssh -L 6015:192.100.1.104:6015 -fN localhost&lt;/code&gt;
+middle-host &lt;code&gt;ssh -g -L 6015:192.168.8.16:6015 -fN localhost&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;此时可以在private-host上运行x11-app转发到192.168.8.16上显示&lt;/p&gt;</content><category term="Linux"></category></entry><entry><title>Linux Root File System Make.</title><link href="https://yzsh-hszy.github.io/2025-03-15-linux-root-file-system-make.html" rel="alternate"></link><published>2025-03-15T12:00:00+08:00</published><updated>2025-03-15T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-03-15:/2025-03-15-linux-root-file-system-make.html</id><content type="html">&lt;h1&gt;笔记介绍&lt;/h1&gt;
 &lt;p&gt;此文件记载我学习定制linux系统中关于 &lt;code&gt;root file system&lt;/code&gt; 的部分&lt;/p&gt;
 &lt;h2&gt;参考文档&lt;/h2&gt;
 &lt;ul&gt;

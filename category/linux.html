@@ -62,7 +62,12 @@
 <h2>远程转发</h2>
 <div class="highlight"><pre><span></span><code><span class="n">ssh</span><span class="w"> </span><span class="o">-</span><span class="n">R</span><span class="w"> </span><span class="mi">6666</span><span class="o">:</span><span class="mf">192.168.8.14</span><span class="o">:</span><span class="mi">22</span><span class="w"> </span><span class="o">-</span><span class="n">fN</span><span class="w"> </span><span class="n">admin</span><span class="mf">@192.168.8.16</span>
 <span class="n">将连接到远程主机上给定TCP端口</span><span class="p">(</span><span class="mf">192.168.8.16</span><span class="o">:</span><span class="mi">6666</span><span class="p">)</span><span class="n">的连接转发到本地端</span><span class="p">(</span><span class="mf">192.168.8.14</span><span class="o">:</span><span class="mi">22</span><span class="p">)</span>
-</code></pre></div>                    </article>
+</code></pre></div>
+
+<h2>双层x11转发</h2>
+<p>private-host <code>ssh -L 6015:192.100.1.104:6015 -fN localhost</code>
+middle-host <code>ssh -g -L 6015:192.168.8.16:6015 -fN localhost</code></p>
+<p>此时可以在private-host上运行x11-app转发到192.168.8.16上显示</p>                    </article>
                 </aside><!-- /#featured -->
                     <section id="content" class="body">
                         <h1>Other articles</h1>
