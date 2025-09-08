@@ -9,8 +9,9 @@ sys.path.append(dirname(__file__))
 sys.path.append(os.curdir)
 
 import plugin_md_image
+import plugin_md_support_github
 
-PLUGINS = [plugin_md_image]
+PLUGINS = [plugin_md_image, plugin_md_support_github]
 
 AUTHOR = 'YZSH-HSZY'
 SITENAME = 'Welcome to YZSH-HSZY blog.'

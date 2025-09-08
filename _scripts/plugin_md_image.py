@@ -1,3 +1,6 @@
+"""
+the plugin for generate img label
+"""
 import os
 import re
 from typing import Dict, List, Tuple
@@ -61,6 +64,7 @@ def generate_img_plugin(article_gen: ArticlesGenerator):
         for idx, (scope, target) in enumerate(scopes_values):
             if idx == 0:
                 ret += source[:scope[0]] + target
+                if idx == len(scopes_values) - 1: ret += source[scope[1]:]
                 continue
             ret += source[scopes_values[idx - 1][0][1]:scope[0]] + target
             if idx == len(scopes_values) - 1:
