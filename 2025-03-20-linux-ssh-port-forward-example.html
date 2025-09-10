@@ -7,7 +7,7 @@
                         <title>Linux SSH Port Forward Example.</title>
                         <link rel="stylesheet" href="https://yzsh-hszy.github.io/theme/css/main.css" />
                                 <link href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Welcome to YZSH-HSZY blog. Atom Feed" />
-    <meta name="description" content="介绍 此文章记录使用ssh进行端口转发的示例。 ssh能够将其他tcp端口的网络数据通ssh连接来转发, 并且提供自动加密及解密服务, 也叫做tunnel(隧道). 如Telnet/SMTP/LDAP等应用. ssh隧道优点: 1. 避免了用户名,密码及隐私 …" />
+    <meta name="description" content="介绍 此文章记录使用ssh进行端口转发的示例。 ssh能够将其他tcp端口的网络数据通ssh连接来转发, 并且提供自动加密及解密服务, 也叫做tunnel(隧道). 如Telnet/SMTP/LDAP等应用. ssh隧道优点: 避免了用户名,密码及隐私信 …" />
         </head>
 
         <body id="index" class="home">
@@ -44,36 +44,41 @@
 <p>此文章记录使用ssh进行端口转发的示例。</p>
 <p>ssh能够将其他tcp端口的网络数据通ssh连接来转发, 并且提供自动加密及解密服务, 也叫做tunnel(隧道). 如<code>Telnet</code>/<code>SMTP</code>/<code>LDAP</code>等应用.</p>
 <blockquote>
-<p>ssh隧道优点:
-1. 避免了用户名,密码及隐私信息的明文传输
-2. 突破防火墙的一些限制进行tcp连接</p>
-<p>参考文档
-- <a href="https://zhuanlan.zhihu.com/p/469638489">知乎-ssh端口转发(跳板机)实战详解</a></p>
+<p>ssh隧道优点:</p>
 </blockquote>
+<ol>
+<li>避免了用户名,密码及隐私信息的明文传输</li>
+<li>突破防火墙的一些限制进行tcp连接</li>
+</ol>
+<blockquote>
+<p>参考文档</p>
+</blockquote>
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/469638489">知乎-ssh端口转发(跳板机)实战详解</a></li>
+</ul>
 <h2>本地转发</h2>
 <blockquote>
 <p>示例:</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code>ssh<span class="w"> </span>-g<span class="w"> </span>-L<span class="w"> </span><span class="m">6013</span>:192.168.8.16:6013<span class="w"> </span>-fN<span class="w"> </span><span class="m">192</span>.168.8.14
-将所有连接到*:6013的连接转发到192.168.8.16:6013,<span class="w"> </span>通过与192.168.8.14的ssh隧道
-<span class="c1"># Options:</span>
-<span class="w">    </span>-g<span class="w"> </span>允许远程主机连接到本地转发端口,此时监听地址为<span class="w"> </span><span class="s2">&quot;0.0.0.0:local_port&quot;</span><span class="w"> </span>不带-g选项则为<span class="w"> </span><span class="s2">&quot;127.0.0.1:local_port&quot;</span>
-<span class="w">    </span>-L<span class="w"> </span><span class="o">[</span>bind_address:<span class="o">]</span>port:host:hostport
-<span class="w">        </span>指定到本地<span class="o">(</span>客户端<span class="o">)</span>主机上给定tcp_port/unix_socket的连接将被转发到远程端的给定主机和tcp_port/unix_socket。<span class="o">(</span>即所有连接本地port的连接被转发到远程port<span class="o">)</span>
-<span class="w">        </span>这是通过分配一个套接字来监听本地端的TCP端口（可选地绑定到指定的绑定地址）或Unix套接字来实现的。每当连接到本地端口或套接字时，该连接就会通过安全通道转发，并从远程计算机连接到主机端口hostport或Unix套接字远程套接字。
-<span class="w">    </span>-f<span class="w">  </span>请求ssh在命令执行之前进入后台.<span class="w"> </span>如果ssh将要询问密码或密码短语,但用户希望它在后台执行.这意味着-n<span class="o">(</span>即重定向stdin到/dev/null<span class="o">)</span>
-<span class="w">    </span>-N<span class="w">  </span>不执行远程命令,<span class="w"> </span>在进行端口转发时比较有用.<span class="w"> </span>一版的ssh连接执行login_shell<span class="o">(</span>如/bin/bash<span class="o">)</span>命令
-</code></pre></div>
-
+<pre><code class="language-sh">ssh -g -L 6013:192.168.8.16:6013 -fN 192.168.8.14
+将所有连接到*:6013的连接转发到192.168.8.16:6013, 通过与192.168.8.14的ssh隧道
+# Options:
+    -g 允许远程主机连接到本地转发端口,此时监听地址为 &quot;0.0.0.0:local_port&quot; 不带-g选项则为 &quot;127.0.0.1:local_port&quot;
+    -L [bind_address:]port:host:hostport
+        指定到本地(客户端)主机上给定tcp_port/unix_socket的连接将被转发到远程端的给定主机和tcp_port/unix_socket。(即所有连接本地port的连接被转发到远程port)
+        这是通过分配一个套接字来监听本地端的TCP端口（可选地绑定到指定的绑定地址）或Unix套接字来实现的。每当连接到本地端口或套接字时，该连接就会通过安全通道转发，并从远程计算机连接到主机端口hostport或Unix套接字远程套接字。
+    -f  请求ssh在命令执行之前进入后台. 如果ssh将要询问密码或密码短语,但用户希望它在后台执行.这意味着-n(即重定向stdin到/dev/null)
+    -N  不执行远程命令, 在进行端口转发时比较有用. 一版的ssh连接执行login_shell(如/bin/bash)命令
+</code></pre>
 <h2>远程转发</h2>
-<div class="highlight"><pre><span></span><code><span class="n">ssh</span><span class="w"> </span><span class="o">-</span><span class="n">R</span><span class="w"> </span><span class="mi">6666</span><span class="o">:</span><span class="mf">192.168.8.14</span><span class="o">:</span><span class="mi">22</span><span class="w"> </span><span class="o">-</span><span class="n">fN</span><span class="w"> </span><span class="n">admin</span><span class="mf">@192.168.8.16</span>
-<span class="n">将连接到远程主机上给定TCP端口</span><span class="p">(</span><span class="mf">192.168.8.16</span><span class="o">:</span><span class="mi">6666</span><span class="p">)</span><span class="n">的连接转发到本地端</span><span class="p">(</span><span class="mf">192.168.8.14</span><span class="o">:</span><span class="mi">22</span><span class="p">)</span>
-</code></pre></div>
-
+<pre><code>ssh -R 6666:192.168.8.14:22 -fN admin@192.168.8.16
+将连接到远程主机上给定TCP端口(192.168.8.16:6666)的连接转发到本地端(192.168.8.14:22)
+</code></pre>
 <h2>双层x11转发</h2>
 <p>private-host <code>ssh -L 6015:192.100.1.104:6015 -fN localhost</code>
 middle-host <code>ssh -g -L 6015:192.168.8.16:6015 -fN localhost</code></p>
 <p>此时可以在private-host上运行x11-app转发到192.168.8.16上显示</p>
+
       </div><!-- /.entry-content -->
 
     </article>

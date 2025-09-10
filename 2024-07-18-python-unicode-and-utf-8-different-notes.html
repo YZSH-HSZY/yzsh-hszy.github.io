@@ -40,35 +40,36 @@
                 </address>
         <p>In <a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a>.</p>
         
-</footer><!-- /.post-info -->        <div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;all_unicode_char.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">err_nums</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">true_nums</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">19</span><span class="p">)):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">UnicodeEncodeError</span><span class="p">:</span>
-            <span class="n">err_nums</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">s</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-            <span class="n">true_nums</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="nb">print</span><span class="p">(</span>
-        <span class="s1">&#39;the true add error nums equals range(1, pow(2,19)):&#39;</span><span class="p">,</span>
-        <span class="p">(</span><span class="n">err_nums</span> <span class="o">+</span> <span class="n">true_nums</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">19</span><span class="p">)))</span>
-    <span class="p">)</span>
-</code></pre></div>
+</footer><!-- /.post-info -->        <pre><code class="language-python">with open('all_unicode_char.txt', 'wb') as f:
+    err_nums = 0
+    true_nums = 0
+    for i in range(1, pow(2, 19)):
+        try:
+            s = chr(i).encode('utf8')
+        except UnicodeEncodeError:
+            err_nums += 1
+            s = None
+        if s:
+            f.write(s)
+            true_nums += 1
+    print(
+        'the true add error nums equals range(1, pow(2,19)):',
+        (err_nums + true_nums) == len(range(1,pow(2,19)))
+    )
 
+</code></pre>
 <p>unicode中文范围
-U4e00-u9fa5 </p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">re</span>
-<span class="c1"># import jsonpath</span>
-<span class="c1"># jsonpath.jsonpath(</span>
-<span class="c1">#     {&quot;l&quot;:0,&quot;tx&quot;:{&quot;b&quot;:[8]},&quot;b&quot;:[1,2,9]},</span>
-<span class="c1">#     &quot;$..b[?(8 not in @)]&quot;)</span>
-<span class="n">l</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;[</span><span class="se">\u4e00</span><span class="s1">-</span><span class="se">\u9fa5</span><span class="s1"> ]&#39;</span><span class="p">,</span> <span class="s1">&#39;那就&#39;</span><span class="p">)</span>
-<span class="n">l</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[\u4e00-\u9fa5 ]&#39;</span><span class="p">,</span> <span class="s1">&#39;那就&#39;</span><span class="p">)</span>
-<span class="n">pp</span><span class="o">=</span><span class="s1">&#39;xs&#39;</span>
-</code></pre></div>
+U4e00-u9fa5</p>
+<pre><code class="language-python">import re
+# import jsonpath
+# jsonpath.jsonpath(
+#     {&quot;l&quot;:0,&quot;tx&quot;:{&quot;b&quot;:[8]},&quot;b&quot;:[1,2,9]},
+#     &quot;$..b[?(8 not in @)]&quot;)
+l=re.match('[\u4e00-\u9fa5 ]', '那就')
+l=re.match(r'[\u4e00-\u9fa5 ]', '那就')
+pp='xs'
+</code></pre>
+
       </div><!-- /.entry-content -->
 
     </article>

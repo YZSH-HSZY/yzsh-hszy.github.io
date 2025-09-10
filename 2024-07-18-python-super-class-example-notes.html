@@ -7,7 +7,7 @@
                         <title>Python Super Class Example Notes.</title>
                         <link rel="stylesheet" href="https://yzsh-hszy.github.io/theme/css/main.css" />
                                 <link href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Welcome to YZSH-HSZY blog. Atom Feed" />
-    <meta name="description" content="super笔记 在oop编程中，我们经常需要使用super来调用父类的方法，各个编程语言均有对应的super实现。在python中提供超类super的类定义，有以下几种调用方式。 1. 在类定义代码段中，使用无参数的 …" />
+    <meta name="description" content="super笔记 在oop编程中，我们经常需要使用super来调用父类的方法，各个编程语言均有对应的super实现。在python中提供超类super的类定义，有以下几种调用方式。 在类定义代码段中，使用无参数的 super …" />
         </head>
 
         <body id="index" class="home">
@@ -41,54 +41,59 @@
         <p>In <a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a>.</p>
         
 </footer><!-- /.post-info -->        <h2>super笔记</h2>
-<p>在oop编程中，我们经常需要使用super来调用父类的方法，各个编程语言均有对应的super实现。在python中提供超类super的类定义，有以下几种调用方式。
-1. 在类定义代码段中，使用无参数的 <code>super()</code> 调用
-2. 通过super通过的初始化方法 <code>super(type, object_or_type=None)</code> 调用，该初始化方法有三种重载方法:
-    - 单参数 <code>super(type)</code>,此时返回的super超类对象是未绑定的
-    - <code>super(type, obj)</code>,必须满足 <code>isinstance(obj,type)</code>
-    - <code>super(type, type2)</code>,必须满足 <code>issubclass(type,type2)</code></p>
+<p>在oop编程中，我们经常需要使用super来调用父类的方法，各个编程语言均有对应的super实现。在python中提供超类super的类定义，有以下几种调用方式。</p>
+<ol>
+<li>在类定义代码段中，使用无参数的 <code>super()</code> 调用</li>
+<li>通过super通过的初始化方法 <code>super(type, object_or_type=None)</code> 调用，该初始化方法有三种重载方法:
+<ul>
+<li>单参数 <code>super(type)</code>,此时返回的super超类对象是未绑定的</li>
+<li><code>super(type, obj)</code>,必须满足 <code>isinstance(obj,type)</code></li>
+<li><code>super(type, type2)</code>,必须满足 <code>issubclass(type,type2)</code></li>
+</ul>
+</li>
+</ol>
 <p><strong>注意</strong> 返回一个代理对象，它会将方法调用委托给 type 的父类或兄弟类。 这对于访问已在类中被重写的继承方法很有用。</p>
 <p><a href="https://docs.python.org/zh-cn/3/library/functions.html#super">python官方super介绍</a></p>
-<div class="highlight"><pre><span></span><code><span class="sd">&quot;&quot;&quot; </span>
-<span class="sd">    演示super(type, obj)和super(type,type2)调用</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="k">class</span> <span class="nc">Father</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">father_obj_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;this is obj of Father&#39;</span>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">father_classmethod</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;this is method of Father method&#39;</span>
+<pre><code class="language-python">&quot;&quot;&quot; 
+    演示super(type, obj)和super(type,type2)调用
+&quot;&quot;&quot;
+class Father:
+    def father_obj_method(self):
+        return 'this is obj of Father'
+    @classmethod
+    def father_classmethod(cls):
+        return 'this is method of Father method'
 
-<span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Father</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">father_obj_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;overwrite obj method&#39;</span>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">father_classmethod</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;overwrite classmethod&#39;</span>
+class Child(Father):
+    def father_obj_method(self):
+        return 'overwrite obj method'
+    @classmethod
+    def father_classmethod(cls):
+        return 'overwrite classmethod'
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">child_obj</span> <span class="o">=</span> <span class="n">Child</span><span class="p">()</span>
-    <span class="n">father_obj</span> <span class="o">=</span> <span class="n">Father</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;this is child obj`s method:&#39;</span><span class="p">,</span> <span class="n">child_obj</span><span class="o">.</span><span class="n">father_obj_method</span><span class="p">())</span>
-    <span class="c1"># 获取super代理对象，访问child_obj的父对象部分</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get child obj`s Father obj method:&#39;</span><span class="p">,</span> <span class="nb">super</span><span class="p">(</span><span class="n">Child</span><span class="p">,</span> <span class="n">child_obj</span><span class="p">)</span><span class="o">.</span><span class="n">father_obj_method</span><span class="p">())</span>
+if __name__ == &quot;__main__&quot;:
+    child_obj = Child()
+    father_obj = Father()
+    print('this is child obj`s method:', child_obj.father_obj_method())
+    # 获取super代理对象，访问child_obj的父对象部分
+    print('get child obj`s Father obj method:', super(Child, child_obj).father_obj_method())
 
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;this is Child classmethod:&#39;</span><span class="p">,</span> <span class="n">child_obj</span><span class="o">.</span><span class="n">father_classmethod</span><span class="p">())</span>
-    <span class="c1"># 获取super代理对象，访问Child类的父类部分</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get Child class`s Father classmethod:&#39;</span><span class="p">,</span> <span class="nb">super</span><span class="p">(</span><span class="n">Child</span><span class="p">,</span> <span class="n">Child</span><span class="p">)</span><span class="o">.</span><span class="n">father_classmethod</span><span class="p">())</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code>this is child obj`s method: overwrite obj method
+    print('this is Child classmethod:', child_obj.father_classmethod())
+    # 获取super代理对象，访问Child类的父类部分
+    print('get Child class`s Father classmethod:', super(Child, Child).father_classmethod())
+</code></pre>
+<pre><code>this is child obj`s method: overwrite obj method
 get child obj`s Father obj method: this is obj of Father
 this is Child classmethod: overwrite classmethod
 get Child class`s Father classmethod: this is method of Father method
-</code></pre></div>
-
+</code></pre>
 <h3>super的父类查找顺序</h3>
 <p>在python官方文档中是这样描述的:</p>
 <blockquote>
 <p>object_or_type 确定要用于搜索的解析顺序。 搜索会从 type 之后的类开始。
 举例来说，如果 object_or_type 的 <code>__mro__</code> 为 <code>D -&gt; B -&gt; C -&gt; A -&gt; object</code> 并且 type 的值为 B，则 super() 将会搜索 <code>C -&gt; A -&gt; object</code>。</p>
+</blockquote>
+<blockquote>
 <p>object_or_type 的 <code>__mro__</code> 属性列出了 getattr() 和 super() 所共同使用的方法解析搜索顺序。 该属性是动态的并可在任何继承层级结构发生更新时被改变。</p>
 </blockquote>
 <p><strong>注意</strong> __mro__属性是被类方法mro()填充的，它在类实例化时被调用。即mro定义在元类type上，</p>
@@ -96,32 +101,33 @@ get Child class`s Father classmethod: this is method of Father method
 <blockquote>
 <blockquote>
 <p>type.mro
-<method 'mro' of 'type' objects>
+&lt;method 'mro' of 'type' objects&gt;
 list.mro
-<built-in method mro of type object at 0x00007FF9553BFAF0>
+&lt;built-in method mro of type object at 0x00007FF9553BFAF0&gt;
 object.mro
-<built-in method mro of type object at 0x00007FF9553C2E00></p>
+&lt;built-in method mro of type object at 0x00007FF9553C2E00&gt;</p>
 </blockquote>
 </blockquote>
 </blockquote>
-<div class="highlight"><pre><span></span><code><span class="n">Python</span><span class="mf">-3.12.3</span><span class="o">/</span><span class="n">Objects</span><span class="o">/</span><span class="n">typeobject</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="o">:</span><span class="mi">10147</span>
-<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">PyObject_HEAD</span>
-<span class="w">    </span><span class="n">PyTypeObject</span><span class="w"> </span><span class="o">*</span><span class="n">type</span><span class="p">;</span>
-<span class="w">    </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">obj</span><span class="p">;</span>
-<span class="w">    </span><span class="n">PyTypeObject</span><span class="w"> </span><span class="o">*</span><span class="n">obj_type</span><span class="p">;</span>
-<span class="p">}</span><span class="w"> </span><span class="n">superobject</span><span class="p">;</span>
+<pre><code class="language-C">Python-3.12.3/Objects/typeobject.c :10147
+typedef struct {
+    PyObject_HEAD
+    PyTypeObject *type;
+    PyObject *obj;
+    PyTypeObject *obj_type;
+} superobject;
 
-<span class="k">static</span><span class="w"> </span><span class="n">PyMemberDef</span><span class="w"> </span><span class="n">super_members</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="p">{</span><span class="s">&quot;__thisclass__&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">T_OBJECT</span><span class="p">,</span><span class="w"> </span><span class="n">offsetof</span><span class="p">(</span><span class="n">superobject</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="p">),</span><span class="w"> </span><span class="n">READONLY</span><span class="p">,</span>
-<span class="w">     </span><span class="s">&quot;the class invoking super()&quot;</span><span class="p">},</span>
-<span class="w">    </span><span class="p">{</span><span class="s">&quot;__self__&quot;</span><span class="p">,</span><span class="w">  </span><span class="n">T_OBJECT</span><span class="p">,</span><span class="w"> </span><span class="n">offsetof</span><span class="p">(</span><span class="n">superobject</span><span class="p">,</span><span class="w"> </span><span class="n">obj</span><span class="p">),</span><span class="w"> </span><span class="n">READONLY</span><span class="p">,</span>
-<span class="w">     </span><span class="s">&quot;the instance invoking super(); may be None&quot;</span><span class="p">},</span>
-<span class="w">    </span><span class="p">{</span><span class="s">&quot;__self_class__&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">T_OBJECT</span><span class="p">,</span><span class="w"> </span><span class="n">offsetof</span><span class="p">(</span><span class="n">superobject</span><span class="p">,</span><span class="w"> </span><span class="n">obj_type</span><span class="p">),</span><span class="w"> </span><span class="n">READONLY</span><span class="p">,</span>
-<span class="w">     </span><span class="s">&quot;the type of the instance invoking super(); may be None&quot;</span><span class="p">},</span>
-<span class="w">    </span><span class="p">{</span><span class="mi">0</span><span class="p">}</span>
-<span class="p">};</span>
-</code></pre></div>
+static PyMemberDef super_members[] = {
+    {&quot;__thisclass__&quot;, T_OBJECT, offsetof(superobject, type), READONLY,
+     &quot;the class invoking super()&quot;},
+    {&quot;__self__&quot;,  T_OBJECT, offsetof(superobject, obj), READONLY,
+     &quot;the instance invoking super(); may be None&quot;},
+    {&quot;__self_class__&quot;, T_OBJECT, offsetof(superobject, obj_type), READONLY,
+     &quot;the type of the instance invoking super(); may be None&quot;},
+    {0}
+};
+</code></pre>
+
       </div><!-- /.entry-content -->
 
     </article>

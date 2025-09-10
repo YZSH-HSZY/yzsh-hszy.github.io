@@ -50,58 +50,63 @@
 <h2>cpython编译</h2>
 <p><a href="https://devguide.python.org/getting-started/setup-building/#build-dependencies">python官方开发构建文档</a></p>
 <p>在进行cpython的编译时，需要注意可能缺少相应的依赖项，可以使用<code>apt search</code>和<code>apt-file</code>命令找到包在机器上的安装名和文件存在与那些包中。</p>
-<p>这里列出一些需要的安装包
-- build-essential 包含一系列的C/C++开发工具，主要为GNU系列编译器
-- python3-pip python的pip包管理器
-- manpages-dev 适用于开发环境的man手册(包含系统调用和库调用的介绍信息)
-- pkg-config 管理库的编译和链接标志的工具，在项目包含依赖库时有用
-- cmake 一个简易的、生成makefile文件的项目构建工具
-- gdb GNU系列的调试器，进行源码调试的工具</p>
-<p><strong>注意</strong> 模块n/a(not available)有以下几种情况:
-1. 模块不支持当前 Python 版本：某些模块可能只支持特定的 Python 版本，如果你使用的 Python 版本不在支持范围内，模块可能无法编译。
-2. 缺少依赖库：某些模块可能依赖于特定的库或框架，如果这些库或框架未安装或不可用，模块可能无法编译。
-3. 编译错误：模块的源代码可能存在错误，导致编译失败。
-4. 不支持当前操作系统：某些模块可能只支持特定的操作系统，如果你使用的操作系统不在支持范围内，模块可能无法编译。</p>
+<p>这里列出一些需要的安装包</p>
+<ul>
+<li>build-essential 包含一系列的C/C++开发工具，主要为GNU系列编译器</li>
+<li>python3-pip python的pip包管理器</li>
+<li>manpages-dev 适用于开发环境的man手册(包含系统调用和库调用的介绍信息)</li>
+<li>pkg-config 管理库的编译和链接标志的工具，在项目包含依赖库时有用</li>
+<li>cmake 一个简易的、生成makefile文件的项目构建工具</li>
+<li>gdb GNU系列的调试器，进行源码调试的工具</li>
+</ul>
+<p><strong>注意</strong> 模块n/a(not available)有以下几种情况:</p>
+<ol>
+<li>模块不支持当前 Python 版本：某些模块可能只支持特定的 Python 版本，如果你使用的 Python 版本不在支持范围内，模块可能无法编译。</li>
+<li>缺少依赖库：某些模块可能依赖于特定的库或框架，如果这些库或框架未安装或不可用，模块可能无法编译。</li>
+<li>编译错误：模块的源代码可能存在错误，导致编译失败。</li>
+<li>不支持当前操作系统：某些模块可能只支持特定的操作系统，如果你使用的操作系统不在支持范围内，模块可能无法编译。</li>
+</ol>
 <h3>编译过程</h3>
-<div class="highlight"><pre><span></span><code>./configure<span class="w"> </span>--help<span class="w">  </span><span class="c1"># 查看帮助信息</span>
-<span class="c1"># 调试构建</span>
-mkdir<span class="w"> </span>debug
-<span class="nb">cd</span><span class="w"> </span>debug
-../configure<span class="w"> </span>--with-pydebug
+<pre><code class="language-sh">./configure --help  # 查看帮助信息
+# 调试构建
+mkdir debug
+cd debug
+../configure --with-pydebug
 make
-make<span class="w"> </span><span class="nb">test</span>
-</code></pre></div>
-
+make test
+</code></pre>
 <h4>configure文件生成</h4>
 <p>CPython 的 <code>configure</code> 脚本是使用 <code>GNU Autoconf</code> 从 <code>configure.ac</code> 生成
 你可以在更改 <code>configure.ac</code> 后，运行 <code>make regen-configure</code> 生成 <code>configure</code>/<code>pyconfig.h.in</code>/<code>aclocal.m4</code></p>
-<p><strong>注意</strong> 不同cpython版本使用的autoconf版本不同
-- 对于 Python 3.12 及更新版本，需要 <code>GNU Autoconf v2.71</code>
-- 对于 Python 3.11 及更早版本，需要 <code>GNU Autoconf v2.69</code></p>
+<p><strong>注意</strong> 不同cpython版本使用的autoconf版本不同</p>
+<ul>
+<li>对于 Python 3.12 及更新版本，需要 <code>GNU Autoconf v2.71</code></li>
+<li>对于 Python 3.11 及更早版本，需要 <code>GNU Autoconf v2.69</code></li>
+</ul>
 <h3>编译过程中报缺少模块的错误</h3>
 <p>一般是由于缺少头文件造成的，可以通过<code>find</code>查看有无对应头文件，无则需要安装开发库，可通过<code>apt-file</code>搜索可安装包，以下是一些模块对应缺少的依赖库</p>
 <ul>
 <li>no module _ssl
-    安装tk-itk4-dev tcl-itcl4-dev libssl-dev</li>
+安装tk-itk4-dev tcl-itcl4-dev libssl-dev</li>
 <li>ctype
-    libffi-dev</li>
+libffi-dev</li>
 <li>readline
-    [libreadline-dev | lib32readline-dev]</li>
+[libreadline-dev | lib32readline-dev]</li>
 <li>_bz2
-    libbz2-dev
-     介绍:
-      high-quality block-sorting file compressor library- development(高质量的块排序文件压缩程序库-开发)</li>
+libbz2-dev
+介绍:
+high-quality block-sorting file compressor library- development(高质量的块排序文件压缩程序库-开发)</li>
 <li>_lzma
-    liblzma-dev
-     介绍:
-      XZ-format compression library(xz格式的压缩算法库)
-      注意: 5.6.0,5.6.1版本中存在xz安全漏洞,请安装低版本</li>
+liblzma-dev
+介绍:
+XZ-format compression library(xz格式的压缩算法库)
+注意: 5.6.0,5.6.1版本中存在xz安全漏洞,请安装低版本</li>
 <li>_gdbm _dbm
-    libgdbm-dev libgdbm-compat-dev
-     介绍:
-      dbm: kv型数据库<br>
-      libgdbm-dev: GNU dbm database routines(GNU数据库例程)
-      libgdbm-compat-dev: legacy support development files(遗留支持开发文件)。解决无dbm.h文件问题    </li>
+libgdbm-dev libgdbm-compat-dev
+介绍:
+dbm: kv型数据库<br />
+libgdbm-dev: GNU dbm database routines(GNU数据库例程)
+libgdbm-compat-dev: legacy support development files(遗留支持开发文件)。解决无dbm.h文件问题</li>
 </ul>
 <p><strong>注意</strong> <code>apt-file</code>需要使用<code>apt install apt-file</code>安装，并且使用<code>apt-file update</code>更新数据库之后，才能使用。</p>
 <h3>使用 <code>dev container</code> 进行 <code>cpython</code> 的学习开发</h3>
@@ -133,41 +138,48 @@ make<span class="w"> </span><span class="nb">test</span>
 <p>上下文无关语言的典型代表: 正则语言 -- 一种通过有限状态机或正则表达式表达的语言，这种语言是上下文无关语言的子集。
 一个表示数字相加的BNF示例如下:</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code><span class="o">&lt;</span><span class="nv">addition</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">&lt;</span><span class="nv">number</span><span class="o">&gt;+&lt;</span><span class="nv">number</span><span class="o">&gt;</span>
-<span class="o">&lt;</span><span class="nv">number</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">&lt;</span><span class="nv">sign</span><span class="o">&gt;&lt;</span><span class="nv">integer</span><span class="o">&gt;|&lt;</span><span class="nv">integer</span><span class="o">&gt;</span>
-<span class="o">&lt;</span><span class="nv">integer</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">&lt;</span><span class="nv">digit</span><span class="o">&gt;|&lt;</span><span class="nv">digit</span><span class="o">&gt;&lt;</span><span class="nv">integer</span><span class="o">&gt;</span>
-<span class="o">&lt;</span><span class="nv">digit</span><span class="o">&gt;::=</span><span class="mi">0</span><span class="o">|</span><span class="mi">1</span><span class="o">|</span><span class="mi">2</span><span class="o">|</span><span class="mi">3</span><span class="o">|</span><span class="mi">4</span><span class="o">|</span><span class="mi">5</span><span class="o">|</span><span class="mi">6</span><span class="o">|</span><span class="mi">7</span><span class="o">|</span><span class="mi">8</span><span class="o">|</span><span class="mi">9</span>
-<span class="o">&lt;</span><span class="nv">sign</span><span class="o">&gt;</span><span class="w"> </span><span class="o">::=</span><span class="w"> </span><span class="o">+|-</span>
-</code></pre></div>
-
+<pre><code>&lt;addition&gt; ::= &lt;number&gt;+&lt;number&gt;
+&lt;number&gt; ::= &lt;sign&gt;&lt;integer&gt;|&lt;integer&gt;
+&lt;integer&gt; ::= &lt;digit&gt;|&lt;digit&gt;&lt;integer&gt;
+&lt;digit&gt;::=0|1|2|3|4|5|6|7|8|9
+&lt;sign&gt; ::= +|-
+</code></pre>
 <h2>cpython源码分析</h2>
 <blockquote>
 <p>环境: Fedora Linux 40 ,clang version 18.1.8, Python 3.14.0a3+, git commit id: b00e1254fc, vscode devcontainer</p>
 </blockquote>
 <p>由上述目录描述可知, Programs中存放的是 <code>CPython</code> 解释器相关的实现部分, 其中 <code>python.c</code> 定义了程序的入口</p>
-<p>当我们使用python执行脚本时, 从命令行中获取的参数会被 Modules/main.c 的 <code>Py_BytesMain</code> 处理, 它会构建一个 <code>_PyArgv</code> 类型的py参数封装, 并提供指针传递给 <code>pymain_main</code> 调用, 在 <code>pymain_main</code> 中py进行以下步骤:
-1. 初始化py进程状态 <code>pymain_init</code> 
-    - <code>_PyRuntime_Initialize(&amp;_PyRuntime)</code> 做一些运行初始化设置
-    - <code>PyPreConfig_InitPythonConfig(&amp;preconfig);</code> 预处理py的配置信息,主要是编码方式、调试开关以及一些其他的命令选项
-    - <code>PyConfig_SetBytesArgv(&amp;config, args-&gt;argc, args-&gt;bytes_argv);</code> 设置py配置信息
-    - <code>Py_InitializeFromConfig(&amp;config);</code> 根据配置信息初始化py全局设置
-    - <code>PyConfig_Clear</code> 清理局部解析的config对象
-2. 如果上一步的初始化正常，则调用 <code>Py_RunMain</code> 会转动 <code>pymain_run_python</code> 处理，其中会根据 <code>PyConfig *config</code> 选择py的执行方式，有 <code>pymain_run_command/pymain_run_module/pymain_run_file/pymain_run_stdin</code> 几种执行方式
-    - <code>pymain_run_command</code> 在使用 <code>python -c {COMMAND}</code> 解释作为字符串传入的程序时执行</p>
+<p>当我们使用python执行脚本时, 从命令行中获取的参数会被 Modules/main.c 的 <code>Py_BytesMain</code> 处理, 它会构建一个 <code>_PyArgv</code> 类型的py参数封装, 并提供指针传递给 <code>pymain_main</code> 调用, 在 <code>pymain_main</code> 中py进行以下步骤:</p>
+<ol>
+<li>初始化py进程状态 <code>pymain_init</code>
+<ul>
+<li><code>_PyRuntime_Initialize(&amp;_PyRuntime)</code> 做一些运行初始化设置</li>
+<li><code>PyPreConfig_InitPythonConfig(&amp;preconfig);</code> 预处理py的配置信息,主要是编码方式、调试开关以及一些其他的命令选项</li>
+<li><code>PyConfig_SetBytesArgv(&amp;config, args-&gt;argc, args-&gt;bytes_argv);</code> 设置py配置信息</li>
+<li><code>Py_InitializeFromConfig(&amp;config);</code> 根据配置信息初始化py全局设置</li>
+<li><code>PyConfig_Clear</code> 清理局部解析的config对象</li>
+</ul>
+</li>
+<li>如果上一步的初始化正常，则调用 <code>Py_RunMain</code> 会转动 <code>pymain_run_python</code> 处理，其中会根据 <code>PyConfig *config</code> 选择py的执行方式，有 <code>pymain_run_command/pymain_run_module/pymain_run_file/pymain_run_stdin</code> 几种执行方式
+<ul>
+<li><code>pymain_run_command</code> 在使用 <code>python -c {COMMAND}</code> 解释作为字符串传入的程序时执行</li>
+</ul>
+</li>
+</ol>
 <p><strong>注意</strong> POSIX和WINDOWS的cpython的main入口的区别在于window上使用 <code>wchar_t*</code> 来引用unicode参数</p>
 <p><a href="https://hackmd.io/@klouielu/ByMHBMjFe?type=view">参使用gdb观察py对象的构建</a></p>
-<div class="highlight"><pre><span></span><code>Enable<span class="w"> </span>debuginfod<span class="w"> </span><span class="k">for</span><span class="w"> </span>this<span class="w"> </span>session?<span class="w"> </span><span class="o">(</span>y<span class="w"> </span>or<span class="w"> </span><span class="o">[</span>n<span class="o">])</span><span class="w"> </span>y
-Debuginfod<span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>enabled.
-To<span class="w"> </span>make<span class="w"> </span>this<span class="w"> </span>setting<span class="w"> </span>permanent,<span class="w"> </span>add<span class="w"> </span><span class="s1">&#39;set debuginfod enabled on&#39;</span><span class="w"> </span>to<span class="w"> </span>.gdbinit.
-Downloading<span class="w"> </span>separate<span class="w"> </span>debug<span class="w"> </span>info<span class="w"> </span><span class="k">for</span><span class="w"> </span>system-supplied<span class="w"> </span>DSO<span class="w"> </span>at<span class="w"> </span>0x7ffd481b7000
-Downloading<span class="w"> </span>separate<span class="w"> </span>debug<span class="w"> </span>info<span class="w"> </span><span class="k">for</span><span class="w"> </span>/lib64/libm.so.6<span class="w">                                                                          </span>
-Downloading<span class="w"> </span>separate<span class="w"> </span>debug<span class="w"> </span>info<span class="w"> </span><span class="k">for</span><span class="w"> </span>/lib64/libc.so.6<span class="w">                                                                          </span>
-<span class="o">[</span>Thread<span class="w"> </span>debugging<span class="w"> </span>using<span class="w"> </span>libthread_db<span class="w"> </span>enabled<span class="o">]</span><span class="w">                                                                                 </span>
-Using<span class="w"> </span>host<span class="w"> </span>libthread_db<span class="w"> </span>library<span class="w"> </span><span class="s2">&quot;/lib64/libthread_db.so.1&quot;</span>.
-</code></pre></div>
-
+<pre><code class="language-sh">Enable debuginfod for this session? (y or [n]) y
+Debuginfod has been enabled.
+To make this setting permanent, add 'set debuginfod enabled on' to .gdbinit.
+Downloading separate debug info for system-supplied DSO at 0x7ffd481b7000
+Downloading separate debug info for /lib64/libm.so.6                                                                          
+Downloading separate debug info for /lib64/libc.so.6                                                                          
+[Thread debugging using libthread_db enabled]                                                                                 
+Using host libthread_db library &quot;/lib64/libthread_db.so.1&quot;.
+</code></pre>
 <p><a href="https://wiki.archlinux.org/title/Debugging/Getting_traces">参gdb获取调试栈信息</a></p>
 <h2>分析实例</h2>
+
       </div><!-- /.entry-content -->
 
     </article>

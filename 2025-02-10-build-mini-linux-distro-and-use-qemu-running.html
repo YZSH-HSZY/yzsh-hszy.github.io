@@ -60,13 +60,12 @@
 <blockquote>
 <p>使用 <code>make menuconfig</code> 配置编译make选项, 配置如下:</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code><span class="mf">64</span><span class="o">-</span><span class="n">bit</span><span class="w"> </span><span class="n">kernel</span>
-<span class="n">General</span><span class="w"> </span><span class="n">setup</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Initial</span><span class="w"> </span><span class="n">RAM</span><span class="w"> </span><span class="n">filesystem</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">RAM</span><span class="w"> </span><span class="n">disk</span><span class="w"> </span><span class="p">(</span><span class="n">initramfs</span><span class="o">/</span><span class="n">initrd</span><span class="p">)</span><span class="w"> </span><span class="n">support</span><span class="w"> </span>
-<span class="n">General</span><span class="w"> </span><span class="n">setup</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Configure</span><span class="w"> </span><span class="n">standard</span><span class="w"> </span><span class="n">kernel</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="p">(</span><span class="nb">exp</span><span class="n">ert</span><span class="w"> </span><span class="n">users</span><span class="p">)</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Enable</span><span class="w"> </span><span class="n">support</span><span class="w"> </span><span class="kr">for</span><span class="w"> </span><span class="kr">print</span><span class="n">k</span><span class="w"> </span>
-<span class="n">Executable</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="kr">for</span><span class="n">mats</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Kernel</span><span class="w"> </span><span class="n">support</span><span class="w"> </span><span class="kr">for</span><span class="w"> </span><span class="n">ELF</span><span class="w"> </span><span class="n">binaries</span><span class="w"> </span>
-<span class="n">Device</span><span class="w"> </span><span class="n">Drivers</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Character</span><span class="w"> </span><span class="n">devices</span><span class="w">  </span><span class="o">---&gt;</span><span class="n">Enable</span><span class="w"> </span><span class="n">TTY</span>
-</code></pre></div>
-
+<pre><code>64-bit kernel
+General setup  ---&gt;Initial RAM filesystem and RAM disk (initramfs/initrd) support 
+General setup  ---&gt;Configure standard kernel features (expert users)  ---&gt;Enable support for printk 
+Executable file formats  ---&gt;Kernel support for ELF binaries 
+Device Drivers  ---&gt;Character devices  ---&gt;Enable TTY
+</code></pre>
 <blockquote>
 <p>以上配置分别代表生成 <code>64位内核</code>;<code>启用RAM文件系统和初始化根文件系统</code>;<code>启用文本打印支持</code>;<code>支持ELF格式执行文件</code>;<code>启用tty字符设备</code>
 使用 <code>make -j $(nproc)</code> 构建, 默认生成的内核镜像在 <code>arch/x86/boot/bzImage</code>,为压缩的kernel镜像,约780K
@@ -78,36 +77,35 @@
 <ol>
 <li>编写一个简易的调用shell命令程序, 使用POISX接口<code>write/read/execve/waitid</code></li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/wait.h&gt;</span>
+<pre><code class="language-c">#include &lt;unistd.h&gt;
+#include &lt;sys/wait.h&gt;
 
-<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(){</span>
-<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">cmd</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
-<span class="w">    </span><span class="k">for</span><span class="p">(;;){</span>
-<span class="w">        </span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;# &quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
-<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">cmd</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">);</span>
-<span class="w">        </span><span class="c1">// write(1, &quot;&quot;, );</span>
-<span class="w">        </span><span class="n">cmd</span><span class="p">[</span><span class="n">count</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="w">        </span><span class="kt">pid_t</span><span class="w"> </span><span class="n">child</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fork</span><span class="p">();</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">child</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">-1</span><span class="p">){</span>
-<span class="w">            </span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fork failed!</span><span class="se">\n</span><span class="s">exit!!!&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">21</span><span class="p">);</span>
-<span class="w">            </span><span class="k">break</span><span class="p">;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">child</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">){</span>
-<span class="w">            </span><span class="n">execve</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
-<span class="w">            </span><span class="k">break</span><span class="p">;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="kt">siginfo_t</span><span class="w"> </span><span class="n">infop</span><span class="p">;</span>
-<span class="w">        </span><span class="n">waitid</span><span class="p">(</span><span class="n">P_ALL</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">infop</span><span class="p">,</span><span class="w"> </span><span class="n">WEXITED</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<ol>
+int main(){
+    char cmd[255];
+    for(;;){
+        write(1, &quot;# &quot;, 2);
+        int count = read(0, cmd, 255);
+        // write(1, &quot;&quot;, );
+        cmd[count - 1] = 0;
+        pid_t child = fork();
+        if (child == -1){
+            write(1, &quot;fork failed!\nexit!!!&quot;, 21);
+            break;
+        }
+        if (child == 0){
+            execve(cmd, 0, NULL);
+            break;
+        }
+        siginfo_t infop;
+        waitid(P_ALL, 0, &amp;infop, WEXITED);
+    }
+    return 0;
+}
+</code></pre>
+<ol start="2">
 <li><code>gcc -static shell.c -o init</code> 编译为静态可执行文件</li>
 <li><code>echo init | cpio -H newc -o &gt; init.cpio</code> 生成一个initrd</li>
-<li>重新编译为iso内核 <code>make isoimage FDARGS="initrd=/init.cpio" FDINITRD=$(pwd)/init.cpio</code> 生成的arch/x96/boot/image.iso 镜像大小为2.2M</li>
+<li>重新编译为iso内核 <code>make isoimage FDARGS=&quot;initrd=/init.cpio&quot; FDINITRD=$(pwd)/init.cpio</code> 生成的arch/x96/boot/image.iso 镜像大小为2.2M</li>
 <li>启动iso镜像 <code>qemu-system-x86_64 -cdrom image.iso</code></li>
 </ol>
 <h3>使用assembly进行系统调用,进一步精简init程序</h3>
@@ -122,131 +120,129 @@
 <blockquote>
 <p>准备待链接的.c和.s源文件</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code><span class="c1">// shell.c</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/wait.h&gt;</span>
+<pre><code class="language-c">// shell.c
+#include &lt;unistd.h&gt;
+#include &lt;sys/wait.h&gt;
 
-<span class="kt">int</span><span class="w"> </span><span class="nf">real_waitid</span><span class="p">(</span><span class="n">idtype_t</span><span class="w"> </span><span class="n">idtype</span><span class="p">,</span><span class="w"> </span><span class="kt">id_t</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="kt">siginfo_t</span><span class="w"> </span><span class="o">*</span><span class="n">infop</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">options</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="p">);</span>
+int real_waitid(idtype_t idtype, id_t id, siginfo_t *infop, int options, void*);
 
-<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
-<span class="p">{</span>
-<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">command</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
-<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(;;)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;# &quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
-<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">command</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">);</span>
-<span class="w">        </span><span class="c1">// /bin/ls\n -&gt; /bin/ls\0</span>
-<span class="w">        </span><span class="n">command</span><span class="p">[</span><span class="n">count</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="w">        </span><span class="kt">pid_t</span><span class="w"> </span><span class="n">fork_result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fork</span><span class="p">();</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fork_result</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">execve</span><span class="p">(</span><span class="n">command</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<span class="w">            </span><span class="k">break</span><span class="p">;</span>
-<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="c1">// wait</span>
-<span class="w">            </span><span class="c1">// </span>
-<span class="w">            </span><span class="kt">siginfo_t</span><span class="w"> </span><span class="n">info</span><span class="p">;</span>
-<span class="w">            </span><span class="n">real_waitid</span><span class="p">(</span><span class="n">P_ALL</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">info</span><span class="p">,</span><span class="w"> </span><span class="n">WEXITED</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
+int main()
+{
+	char command[255];
+	for (;;) {
+		write(1, &quot;# &quot;, 2);
+		int count = read(0, command, 255);
+		// /bin/ls\n -&gt; /bin/ls\0
+		command[count - 1] = 0;
+		pid_t fork_result = fork();
+		if (fork_result == 0) {
+			execve(command, 0, 0);
+			break;
+		} else {
+			// wait
+			// 
+			siginfo_t info;
+			real_waitid(P_ALL, 0, &amp;info, WEXITED, 0);
+		}
+	}
 
-<span class="w">    </span><span class="n">_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div>
+	_exit(0);
+}
+</code></pre>
+<pre><code class="language-asm">sys.S
+.intel_syntax noprefix
 
-<div class="highlight"><pre><span></span><code><span class="nf">sys.S</span>
-<span class="na">.intel_syntax</span><span class="w"> </span><span class="no">noprefix</span>
+.global write
+.global read
+.global fork
+.global execve
+.global real_waitid
+.global _exit
 
-<span class="na">.global</span><span class="w"> </span><span class="no">write</span>
-<span class="na">.global</span><span class="w"> </span><span class="no">read</span>
-<span class="na">.global</span><span class="w"> </span><span class="no">fork</span>
-<span class="na">.global</span><span class="w"> </span><span class="no">execve</span>
-<span class="na">.global</span><span class="w"> </span><span class="no">real_waitid</span>
-<span class="na">.global</span><span class="w"> </span><span class="no">_exit</span>
+write:
+mov rax, 1
+syscall
+ret
 
-<span class="nl">write:</span>
-<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span>
-<span class="nf">syscall</span>
-<span class="nf">ret</span>
+read:
+mov rax, 0
+syscall
+ret
 
-<span class="nl">read:</span>
-<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span>
-<span class="nf">syscall</span>
-<span class="nf">ret</span>
-
-<span class="nl">execve:</span>
-<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">59</span>
-<span class="nf">syscall</span>
-<span class="nf">ret</span>
+execve:
+mov rax, 59
+syscall
+ret
 
 
-<span class="nl">fork:</span>
-<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">57</span>
-<span class="nf">syscall</span>
-<span class="nf">ret</span>
+fork:
+mov rax, 57
+syscall
+ret
 
-<span class="nl">real_waitid:</span>
-<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">247</span>
-<span class="nf">mov</span><span class="w"> </span><span class="no">r10</span><span class="p">,</span><span class="w"> </span><span class="no">rcx</span>
-<span class="nf">syscall</span>
-<span class="nf">ret</span>
+real_waitid:
+mov rax, 247
+mov r10, rcx
+syscall
+ret
 
-<span class="nl">_exit:</span>
-<span class="nf">mov</span><span class="w"> </span><span class="no">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span>
-<span class="nf">syscall</span>
-</code></pre></div>
-
+_exit:
+mov rax, 60
+syscall
+</code></pre>
 <p><strong>为什么 <code>real_waitid</code> 函数多了一条 <code>mov r10, rcx</code>指令?</strong></p>
 <blockquote>
 <p>参考<a href="https://en.wikipedia.org/wiki/X86_calling_conventions">wiki x86 体系结构的调用约定</a>
-AMD64架构下gcc编译器使用的参数寄存器依次是 <code>Integer/pointer arguments(RDI, RSI, RDX, RCX, R8, R9), Floating point arguments([XYZ]MM0–7)</code>. 
+AMD64架构下gcc编译器使用的参数寄存器依次是 <code>Integer/pointer arguments(RDI, RSI, RDX, RCX, R8, R9), Floating point arguments([XYZ]MM0–7)</code>.
 而内核接口使用的参数寄存器是 <code>RDI, RSI, RDX, R10, R8 and R9</code>
 因此在汇编实现的syscall function需要将第四个参数从寄存器RCX移动到R10</p>
 </blockquote>
-<p><strong>依次执行编译链接命令</strong>
-- <code>gcc -c shell.c -o shell.o</code>
-- <code>as sys.S -o sys.o</code>
-- <code>ld -o init shell.o sys.o --entry main -z noexecstack</code></p>
+<p><strong>依次执行编译链接命令</strong></p>
+<ul>
+<li><code>gcc -c shell.c -o shell.o</code></li>
+<li><code>as sys.S -o sys.o</code></li>
+<li><code>ld -o init shell.o sys.o --entry main -z noexecstack</code></li>
+</ul>
 <h4><code>Segmentation fault</code> 问题排查</h4>
 <p>上述步骤中生成的最小init,在我调用时报错 <code>Segmentation fault (core dumped)</code>, 在我进一步排查积累了以下经验</p>
 <ol>
 <li>首先, 我想验证通过gcc和as链接obj生成程序是否可行, 而不是其他版本或库等的问题. 为此我编写了一个仅包含<code>write</code>的系统调用和对应的asm实现syscall id寄存器(此处是eax/rax)的装载
 示例代码如下:</li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="c1">// shell.c</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
+<pre><code>// shell.c
+#include &lt;unistd.h&gt;
 
-<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(){</span>
-<span class="w">    </span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;# &quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
-<span class="p">}</span>
-<span class="c1">// sys.S</span>
-<span class="p">.</span><span class="n">intel_syntax</span><span class="w"> </span><span class="n">noprefix</span>
+int main(){
+    write(1, &quot;# &quot;, 2);
+}
+// sys.S
+.intel_syntax noprefix
 
-<span class="p">.</span><span class="n">global</span><span class="w"> </span><span class="n">write</span>
+.global write
 
-<span class="nl">write</span><span class="p">:</span>
-<span class="n">mov</span><span class="w"> </span><span class="n">rax</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span>
-<span class="n">syscall</span>
-<span class="n">ret</span>
-</code></pre></div>
-
-<ol>
-<li>但是我仍得到了 <code>Segmentation fault</code>,不同的是在此之前程序有期望的输出<code>#</code>, 此时想要继续探究下去, 我就需要探索汇编了, 但这方面我不太熟悉, 因此消耗了一些时间. 首先因为具有期望输出, 使用判断此时asm系统调用应该可用, 了解到 <code>objdump</code> 这一反汇编工具, 因此将生成的程序反汇编 <code>objdump -D minit &gt; mm.S</code> , 主要关注syscall之后的部分</li>
+write:
+mov rax, 1
+syscall
+ret
+</code></pre>
+<ol start="2">
+<li>但是我仍得到了 <code>Segmentation fault</code>,不同的是在此之前程序有期望的输出<code># </code>, 此时想要继续探究下去, 我就需要探索汇编了, 但这方面我不太熟悉, 因此消耗了一些时间. 首先因为具有期望输出, 使用判断此时asm系统调用应该可用, 了解到 <code>objdump</code> 这一反汇编工具, 因此将生成的程序反汇编 <code>objdump -D minit &gt; mm.S</code> , 主要关注syscall之后的部分</li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="mf">0000000000401000</span><span class="w"> </span><span class="o">&lt;</span><span class="n">main</span><span class="o">&gt;</span><span class="p">:</span>
-<span class="w">  </span><span class="mf">401019</span><span class="p">:</span><span class="w">   </span><span class="n">e8</span><span class="w"> </span><span class="mf">07</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w">          </span><span class="n">callq</span><span class="w">  </span><span class="mf">401025</span><span class="w"> </span><span class="o">&lt;</span><span class="n">write</span><span class="o">&gt;</span>
-<span class="w">  </span><span class="mf">40101</span><span class="n">e</span><span class="p">:</span><span class="w">   </span><span class="n">b8</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w">          </span><span class="n">mov</span><span class="w">    </span><span class="err">$</span><span class="mf">0</span><span class="n">x0</span><span class="p">,</span><span class="err">%</span><span class="n">eax</span>
-<span class="w">  </span><span class="mf">401023</span><span class="p">:</span><span class="w">   </span><span class="mf">5</span><span class="n">d</span><span class="w">                      </span><span class="n">pop</span><span class="w">    </span><span class="err">%</span><span class="n">rbp</span>
-<span class="w">  </span><span class="mf">401024</span><span class="p">:</span><span class="w">   </span><span class="n">c3</span><span class="w">                      </span><span class="n">retq</span><span class="w">   </span>
+<pre><code>0000000000401000 &lt;main&gt;:
+  401019:	e8 07 00 00 00       	callq  401025 &lt;write&gt;
+  40101e:	b8 00 00 00 00       	mov    $0x0,%eax
+  401023:	5d                   	pop    %rbp
+  401024:	c3                   	retq   
 
-<span class="mf">0000000000401025</span><span class="w"> </span><span class="o">&lt;</span><span class="n">write</span><span class="o">&gt;</span><span class="p">:</span>
-<span class="w">  </span><span class="mf">401025</span><span class="p">:</span><span class="w">   </span><span class="mf">48</span><span class="w"> </span><span class="n">c7</span><span class="w"> </span><span class="n">c0</span><span class="w"> </span><span class="mf">01</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w"> </span><span class="mf">00</span><span class="w">    </span><span class="n">mov</span><span class="w">    </span><span class="err">$</span><span class="mf">0</span><span class="n">x1</span><span class="p">,</span><span class="err">%</span><span class="n">rax</span>
-<span class="w">  </span><span class="mf">40102</span><span class="n">c</span><span class="p">:</span><span class="w">   </span><span class="mf">0</span><span class="n">f</span><span class="w"> </span><span class="mf">05</span><span class="w">                   </span><span class="kr">sys</span><span class="n">call</span><span class="w"> </span>
-<span class="w">  </span><span class="mf">40102</span><span class="n">e</span><span class="p">:</span><span class="w">   </span><span class="n">c3</span><span class="w">                      </span><span class="n">retq</span><span class="w">   </span>
-</code></pre></div>
-
+0000000000401025 &lt;write&gt;:
+  401025:	48 c7 c0 01 00 00 00 	mov    $0x1,%rax
+  40102c:	0f 05                	syscall 
+  40102e:	c3                   	retq   
+</code></pre>
 <blockquote>
 <p>可以看到在 <code>call write</code> 之后仅有指令:常量mov和pop栈恢复, 判断应该是此处有问题, 让我们通过gdb调试一下  <code>gdb minit</code>; 在gdb命令界面中输入 <code>set disassemble-next-line on</code> 开启自动反汇编; <code>layout regs -tui</code> 以tui形式显示寄存器; <code>si</code>逐步汇编指令调试, 发现在执行 <code>retq</code> 时报 <code>cannot access memory at address 0x1</code>, 因此我们需要避免gcc为我们自动处理的退出, 这也是为什么需要使用<code>_exit</code> syscall来退出程序, 在<code>sys.S</code>中添加_exit定义后,此部分工作正常</p>
 </blockquote>
-<ol>
+<ol start="3">
 <li>
 <p>现在，让我们用上述步骤调试 <code>init</code> 程序中的 <code>Segmentation fault</code>, 问题发生在 <code>mov %fs:0x28, %rax</code>, 查阅资料得知, 此部分用于栈溢出保护,一般和指令 <code>mov %rax, -0x8(%rsp)</code> 配套出现, 其作用为:从线程局部空间随机读取一个值, 在函数返回时, 检查此值是否被修改, 以防止栈溢出攻击. 在64bit模式下 %fs 的实际基址由 %fs_base 决定, 此值为0, 因此出现了非法地址范围</p>
 </li>
@@ -255,14 +251,15 @@ AMD64架构下gcc编译器使用的参数寄存器依次是 <code>Integer/pointe
 </li>
 <li>
 <p>定位到问题, 那么就不能使用带 <code>siginfo_t</code> 参数的 <code>waitid</code> syscall了, 我尝试使用 <code>waitpid</code> 找到其syscall为<code>syscall_wait4(61)</code>, 工作正常</p>
+</li>
+</ol>
 <blockquote>
 <p>这里, 我犯了个低级问题, 在asm中实现的waitpid忘记加ret返回, 程序在执行一次子进程后自动退出, 因为PC在执行waitpid后, 自动+1执行到_exit指令位置致循环失效, 主进程退出, 因为涉及到多个进程和无限循环, 导致我又绕了一大圈.</p>
 </blockquote>
-</li>
-<li>
-<p>最后让我们查看一下 <code>init</code> 的大小并重新生成iso镜像, <code>du -sh init image.iso // 12K, 1.9M</code></p>
-</li>
+<ol start="6">
+<li>最后让我们查看一下 <code>init</code> 的大小并重新生成iso镜像, <code>du -sh init image.iso // 12K, 1.9M</code></li>
 </ol>
+
       </div><!-- /.entry-content -->
 
     </article>

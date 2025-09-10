@@ -38,36 +38,41 @@
 <p>此文章记录使用ssh进行端口转发的示例。</p>
 <p>ssh能够将其他tcp端口的网络数据通ssh连接来转发, 并且提供自动加密及解密服务, 也叫做tunnel(隧道). 如<code>Telnet</code>/<code>SMTP</code>/<code>LDAP</code>等应用.</p>
 <blockquote>
-<p>ssh隧道优点:
-1. 避免了用户名,密码及隐私信息的明文传输
-2. 突破防火墙的一些限制进行tcp连接</p>
-<p>参考文档
-- <a href="https://zhuanlan.zhihu.com/p/469638489">知乎-ssh端口转发(跳板机)实战详解</a></p>
+<p>ssh隧道优点:</p>
 </blockquote>
+<ol>
+<li>避免了用户名,密码及隐私信息的明文传输</li>
+<li>突破防火墙的一些限制进行tcp连接</li>
+</ol>
+<blockquote>
+<p>参考文档</p>
+</blockquote>
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/469638489">知乎-ssh端口转发(跳板机)实战详解</a></li>
+</ul>
 <h2>本地转发</h2>
 <blockquote>
 <p>示例:</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code>ssh<span class="w"> </span>-g<span class="w"> </span>-L<span class="w"> </span><span class="m">6013</span>:192.168.8.16:6013<span class="w"> </span>-fN<span class="w"> </span><span class="m">192</span>.168.8.14
-将所有连接到*:6013的连接转发到192.168.8.16:6013,<span class="w"> </span>通过与192.168.8.14的ssh隧道
-<span class="c1"># Options:</span>
-<span class="w">    </span>-g<span class="w"> </span>允许远程主机连接到本地转发端口,此时监听地址为<span class="w"> </span><span class="s2">&quot;0.0.0.0:local_port&quot;</span><span class="w"> </span>不带-g选项则为<span class="w"> </span><span class="s2">&quot;127.0.0.1:local_port&quot;</span>
-<span class="w">    </span>-L<span class="w"> </span><span class="o">[</span>bind_address:<span class="o">]</span>port:host:hostport
-<span class="w">        </span>指定到本地<span class="o">(</span>客户端<span class="o">)</span>主机上给定tcp_port/unix_socket的连接将被转发到远程端的给定主机和tcp_port/unix_socket。<span class="o">(</span>即所有连接本地port的连接被转发到远程port<span class="o">)</span>
-<span class="w">        </span>这是通过分配一个套接字来监听本地端的TCP端口（可选地绑定到指定的绑定地址）或Unix套接字来实现的。每当连接到本地端口或套接字时，该连接就会通过安全通道转发，并从远程计算机连接到主机端口hostport或Unix套接字远程套接字。
-<span class="w">    </span>-f<span class="w">  </span>请求ssh在命令执行之前进入后台.<span class="w"> </span>如果ssh将要询问密码或密码短语,但用户希望它在后台执行.这意味着-n<span class="o">(</span>即重定向stdin到/dev/null<span class="o">)</span>
-<span class="w">    </span>-N<span class="w">  </span>不执行远程命令,<span class="w"> </span>在进行端口转发时比较有用.<span class="w"> </span>一版的ssh连接执行login_shell<span class="o">(</span>如/bin/bash<span class="o">)</span>命令
-</code></pre></div>
-
+<pre><code class="language-sh">ssh -g -L 6013:192.168.8.16:6013 -fN 192.168.8.14
+将所有连接到*:6013的连接转发到192.168.8.16:6013, 通过与192.168.8.14的ssh隧道
+# Options:
+    -g 允许远程主机连接到本地转发端口,此时监听地址为 &quot;0.0.0.0:local_port&quot; 不带-g选项则为 &quot;127.0.0.1:local_port&quot;
+    -L [bind_address:]port:host:hostport
+        指定到本地(客户端)主机上给定tcp_port/unix_socket的连接将被转发到远程端的给定主机和tcp_port/unix_socket。(即所有连接本地port的连接被转发到远程port)
+        这是通过分配一个套接字来监听本地端的TCP端口（可选地绑定到指定的绑定地址）或Unix套接字来实现的。每当连接到本地端口或套接字时，该连接就会通过安全通道转发，并从远程计算机连接到主机端口hostport或Unix套接字远程套接字。
+    -f  请求ssh在命令执行之前进入后台. 如果ssh将要询问密码或密码短语,但用户希望它在后台执行.这意味着-n(即重定向stdin到/dev/null)
+    -N  不执行远程命令, 在进行端口转发时比较有用. 一版的ssh连接执行login_shell(如/bin/bash)命令
+</code></pre>
 <h2>远程转发</h2>
-<div class="highlight"><pre><span></span><code><span class="n">ssh</span><span class="w"> </span><span class="o">-</span><span class="n">R</span><span class="w"> </span><span class="mi">6666</span><span class="o">:</span><span class="mf">192.168.8.14</span><span class="o">:</span><span class="mi">22</span><span class="w"> </span><span class="o">-</span><span class="n">fN</span><span class="w"> </span><span class="n">admin</span><span class="mf">@192.168.8.16</span>
-<span class="n">将连接到远程主机上给定TCP端口</span><span class="p">(</span><span class="mf">192.168.8.16</span><span class="o">:</span><span class="mi">6666</span><span class="p">)</span><span class="n">的连接转发到本地端</span><span class="p">(</span><span class="mf">192.168.8.14</span><span class="o">:</span><span class="mi">22</span><span class="p">)</span>
-</code></pre></div>
-
+<pre><code>ssh -R 6666:192.168.8.14:22 -fN admin@192.168.8.16
+将连接到远程主机上给定TCP端口(192.168.8.16:6666)的连接转发到本地端(192.168.8.14:22)
+</code></pre>
 <h2>双层x11转发</h2>
 <p>private-host <code>ssh -L 6015:192.100.1.104:6015 -fN localhost</code>
 middle-host <code>ssh -g -L 6015:192.168.8.16:6015 -fN localhost</code></p>
-<p>此时可以在private-host上运行x11-app转发到192.168.8.16上显示</p>                    </article>
+<p>此时可以在private-host上运行x11-app转发到192.168.8.16上显示</p>
+                    </article>
                 </aside><!-- /#featured -->
                     <section id="content" class="body">
                         <h1>Other articles</h1>
@@ -97,6 +102,7 @@ middle-host <code>ssh -g -L 6015:192.168.8.16:6015 -fN localhost</code></p>
 <ul>
 <li><a href="https://www.cnblogs.com/wsg1100/p/13127636.html">博客园-制作ubuntu-base rootfs博客</a></li>
 </ul>
+
                         <a class="readmore" href="https://yzsh-hszy.github.io/2025-03-15-linux-root-file-system-make.html">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
@@ -225,8 +231,9 @@ middle-host <code>ssh -g -L 6015:192.168.8.16:6015 -fN localhost</code></p>
         
 </footer><!-- /.post-info -->                        <h2>如何在 pypi(即python package index，python包索引)上发布自己新建的工具包？</h2>
 <h3>setup.cfg vs setup.py vs pyproject.toml区别</h3>
-<p>这三个文件是Python项目的配置文件,他们分别用于不同的目的:
-1. setup.cfg: 这 …</p>
+<p>这三个文件是Python项目的配置文件,他们分别用于不同的目的:</p>
+<ol>
+<li>setup.cfg: 这是 …</li></ol>
                         <a class="readmore" href="https://yzsh-hszy.github.io/2024-07-18-cpython-package-publish-notes.html">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
@@ -249,8 +256,9 @@ middle-host <code>ssh -g -L 6015:192.168.8.16:6015 -fN localhost</code></p>
         <p>In <a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a>.</p>
         
 </footer><!-- /.post-info -->                        <h2>super笔记</h2>
-<p>在oop编程中，我们经常需要使用super来调用父类的方法，各个编程语言均有对应的super实现。在python中提供超类super的类定义，有以下几种调用方式。
-1. 在类定义代码段中，使用无参数的 …</p>
+<p>在oop编程中，我们经常需要使用super来调用父类的方法，各个编程语言均有对应的super实现。在python中提供超类super的类定义，有以下几种调用方式。</p>
+<ol>
+<li>在类定义代码段中，使用无参数的 <code>super …</code></li></ol>
                         <a class="readmore" href="https://yzsh-hszy.github.io/2024-07-18-python-super-class-example-notes.html">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
@@ -272,22 +280,22 @@ middle-host <code>ssh -g -L 6015:192.168.8.16:6015 -fN localhost</code></p>
                 </address>
         <p>In <a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a>.</p>
         
-</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">atexit</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
-<span class="k">def</span> <span class="nf">test_p</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;this is test&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y, %H:%M:%S&quot;</span><span class="p">)))</span>
-    <span class="k">assert</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">1</span>
-<span class="c1"># atexit.register(test_p)</span>
-
-<span class="k">def</span> <span class="nf">thread_print</span><span class="p">():</span>
-    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mf">1e3</span><span class="p">:</span>
-        <span class="n">sleep</span><span class="p">(</span><span class="mf">.001</span><span class="p">)</span>
-        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;threading end print&#39;</span><span class="p">)</span>
-<span class="k">def …</span></code></pre></div>
+</footer><!-- /.post-info -->                        <pre><code class="language-python">import atexit
+from datetime import datetime
+import threading
+from time import sleep
+def test_p():
+    print('this is test', str(datetime.now().strftime(&quot;%d/%m/%Y, %H:%M:%S&quot;)))
+    assert 1 == 1
+# atexit.register(test_p)
+    
+def thread_print():
+    i = 0
+    while i &lt; 1e3:
+        sleep(.001)
+        i += 1
+    print('threading end print')
+def …</code></pre>
                         <a class="readmore" href="https://yzsh-hszy.github.io/2024-07-18-python-thread-package-example-notes.html">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
@@ -309,20 +317,20 @@ middle-host <code>ssh -g -L 6015:192.168.8.16:6015 -fN localhost</code></p>
                 </address>
         <p>In <a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a>.</p>
         
-</footer><!-- /.post-info -->                        <div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;all_unicode_char.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">err_nums</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">true_nums</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">19</span><span class="p">)):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">UnicodeEncodeError</span><span class="p">:</span>
-            <span class="n">err_nums</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">s</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-            <span class="n">true_nums</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="nb">print</span><span class="p">(</span>
-        <span class="s1">&#39;the true add error nums equals range(1, pow(2,19 …</span></code></pre></div>
+</footer><!-- /.post-info -->                        <pre><code class="language-python">with open('all_unicode_char.txt', 'wb') as f:
+    err_nums = 0
+    true_nums = 0
+    for i in range(1, pow(2, 19)):
+        try:
+            s = chr(i).encode('utf8')
+        except UnicodeEncodeError:
+            err_nums += 1
+            s = None
+        if s:
+            f.write(s)
+            true_nums += 1
+    print(
+        'the true add error nums equals range(1, pow(2,19 …</code></pre>
                         <a class="readmore" href="https://yzsh-hszy.github.io/2024-07-18-python-unicode-and-utf-8-different-notes.html">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>

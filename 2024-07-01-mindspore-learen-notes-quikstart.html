@@ -94,169 +94,235 @@ CHW格式是指按照通道数、高度和宽度的顺序排列图像尺寸的�
 </li>
 </ul>
 <h2>实战</h2>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">mindspore</span>
-<span class="kn">from</span> <span class="nn">mindspore</span> <span class="kn">import</span> <span class="n">nn</span>
-<span class="kn">from</span> <span class="nn">mindspore.dataset</span> <span class="kn">import</span> <span class="n">vision</span><span class="p">,</span> <span class="n">transforms</span>
-<span class="kn">from</span> <span class="nn">mindspore.dataset</span> <span class="kn">import</span> <span class="n">MnistDataset</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mindspore base moudle import&#39;</span><span class="p">)</span>
+<pre><code class="language-python">import mindspore
+from mindspore import nn
+from mindspore.dataset import vision, transforms
+from mindspore.dataset import MnistDataset
+print('mindspore base moudle import')
 
-<span class="c1"># mindspore.dataset 模块提供api来加载和处理各种常用数据集，如MNIST、CIFAR-10, CIFAR-100, VOC, COCO, ImageNet, CelebA, CLUE等</span>
-<span class="c1"># 它还支持数据集包括 MindRecord、TFRecord、Manifest等。用户还可以定义他们自己的数据集在这个模块。此外，该模块还提供了在加载时采样数据的api。</span>
-</code></pre></div>
+# mindspore.dataset 模块提供api来加载和处理各种常用数据集，如MNIST、CIFAR-10, CIFAR-100, VOC, COCO, ImageNet, CelebA, CLUE等
+# 它还支持数据集包括 MindRecord、TFRecord、Manifest等。用户还可以定义他们自己的数据集在这个模块。此外，该模块还提供了在加载时采样数据的api。
+</code></pre>
+<pre><code>mindspore base moudle import
+</code></pre>
+<pre><code class="language-python"># MNIST_Data数据集下载
+# mnist数据集是由美国国家标准与技术研究所提供的手写数字图片数据集
+from download import download
 
-<div class="highlight"><pre><span></span><code>mindspore base moudle import
-</code></pre></div>
+url = &quot;https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/&quot; \
+      &quot;notebook/datasets/MNIST_Data.zip&quot;
+path = download(url, &quot;./&quot;, kind=&quot;zip&quot;, replace=True)
+</code></pre>
+<pre><code>Downloading data from https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/MNIST_Data.zip (10.3 MB)
 
-<div class="highlight"><pre><span></span><code><span class="c1"># MNIST_Data数据集下载</span>
-<span class="c1"># mnist数据集是由美国国家标准与技术研究所提供的手写数字图片数据集</span>
-<span class="kn">from</span> <span class="nn">download</span> <span class="kn">import</span> <span class="n">download</span>
+file_sizes: 100%|███████████████████████████| 10.8M/10.8M [00:00&lt;00:00, 136MB/s]
+Extracting zip file...
+Successfully downloaded / unzipped to ./
+</code></pre>
+<pre><code class="language-python">print(MnistDataset.__doc__)
+# mnist数据集包含以下内容
+# mnist_dataset_dir
+ # ├── t10k-images-idx3-ubyte (10000个测试图片)
+ # ├── t10k-labels-idx1-ubyte (10000个测试标签)
+ # ├── train-images-idx3-ubyte (60000个训练图片)
+ # └── train-labels-idx1-ubyte (60000个训练标签)
+</code></pre>
+<pre><code>    MNIST dataset.
 
-<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/&quot;</span> \
-      <span class="s2">&quot;notebook/datasets/MNIST_Data.zip&quot;</span>
-<span class="n">path</span> <span class="o">=</span> <span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;./&quot;</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;zip&quot;</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</code></pre></div>
+    The generated dataset has two columns :py:obj:`[image, label]` .
+    The tensor of column :py:obj:`image` is of the uint8 type.
+    The tensor of column :py:obj:`label` is a scalar of the uint32 type.
 
-<div class="highlight"><pre><span></span><code><span class="n">Downloading</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">mindspore</span><span class="o">-</span><span class="n">website</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">cn</span><span class="o">-</span><span class="n">north</span><span class="o">-</span><span class="mf">4.</span><span class="n">myhuaweicloud</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">notebook</span><span class="o">/</span><span class="n">datasets</span><span class="o">/</span><span class="n">MNIST_Data</span><span class="o">.</span><span class="n">zip</span><span class="w"> </span><span class="p">(</span><span class="mf">10.3</span><span class="w"> </span><span class="n">MB</span><span class="p">)</span>
+    Args:
+        dataset_dir (str): Path to the root directory that contains the dataset.
+        usage (str, optional): Usage of this dataset, can be ``'train'`` , ``'test'`` or ``'all'`` .
+            ``'train'`` will read from 60,000 train samples, ``'test'`` will read from 10,000 test samples,
+            ``'all'`` will read from all 70,000 samples. Default: ``None`` , will read all samples.
+        num_samples (int, optional): The number of images to be included in the dataset.
+            Default: ``None`` , will read all images.
+        num_parallel_workers (int, optional): Number of worker threads to read the data.
+            Default: ``None`` , will use global default workers(8), it can be set
+            by :func:`mindspore.dataset.config.set_num_parallel_workers` .
+        shuffle (bool, optional): Whether or not to perform shuffle on the dataset.
+            Default: ``None`` , expected order behavior shown in the table below.
+        sampler (Sampler, optional): Object used to choose samples from the
+            dataset. Default: ``None`` , expected order behavior shown in the table below.
+        num_shards (int, optional): Number of shards that the dataset will be divided into. Default: ``None`` .
+            When this argument is specified, `num_samples` reflects the maximum sample number of per shard.
+        shard_id (int, optional): The shard ID within `num_shards` . Default: ``None`` . This
+            argument can only be specified when `num_shards` is also specified.
+        cache (DatasetCache, optional): Use tensor caching service to speed up dataset processing. More details:
+            `Single-Node Data Cache &lt;https://www.mindspore.cn/tutorials/experts/en/r2.2/dataset/cache.html&gt;`_ .
+            Default: ``None`` , which means no cache is used.
 
-<span class="n">file_sizes</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="o">%|</span><span class="err">███████████████████████████</span><span class="o">|</span><span class="w"> </span><span class="mf">10.8</span><span class="n">M</span><span class="o">/</span><span class="mf">10.8</span><span class="n">M</span><span class="w"> </span><span class="p">[</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="o">&lt;</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mi">136</span><span class="n">MB</span><span class="o">/</span><span class="n">s</span><span class="p">]</span>
-<span class="n">Extracting</span><span class="w"> </span><span class="n">zip</span><span class="w"> </span><span class="n">file</span><span class="o">...</span>
-<span class="n">Successfully</span><span class="w"> </span><span class="n">downloaded</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">unzipped</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="o">./</span>
-</code></pre></div>
+    Raises:
+        RuntimeError: If `dataset_dir` does not contain data files.
+        ValueError: If `num_parallel_workers` exceeds the max thread numbers.
+        ValueError: If `usage` is not ``'train'``、``'test'`` or ``'all'``.
+        RuntimeError: If `sampler` and `shuffle` are specified at the same time.
+        RuntimeError: If `sampler` and `num_shards`/`shard_id` are specified at the same time.
+        RuntimeError: If `num_shards` is specified but shard_id is None.
+        RuntimeError: If `shard_id` is specified but `num_shards` is None.
+        ValueError: If `shard_id` is not in range of [0, `num_shards` ).
 
-<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">MnistDataset</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
-<span class="c1"># mnist数据集包含以下内容</span>
-<span class="c1"># mnist_dataset_dir</span>
- <span class="c1"># ├── t10k-images-idx3-ubyte (10000个测试图片)</span>
- <span class="c1"># ├── t10k-labels-idx1-ubyte (10000个测试标签)</span>
- <span class="c1"># ├── train-images-idx3-ubyte (60000个训练图片)</span>
- <span class="c1"># └── train-labels-idx1-ubyte (60000个训练标签)</span>
-</code></pre></div>
+    Tutorial Examples:
+        - `Load &amp; Process Data With Dataset Pipeline
+          &lt;https://www.mindspore.cn/docs/en/r2.2/api_python/samples/dataset/dataset_gallery.html&gt;`_
 
-<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="n">MNIST</span><span class="w"> </span><span class="n">dataset</span><span class="p">.</span>
+    Note:
+        - The parameters `num_samples` , `shuffle` , `num_shards` , `shard_id` can be used to control the sampler
+          used in the dataset, and their effects when combined with parameter `sampler` are as follows.
 
-<span class="w">    </span><span class="n">The</span><span class="w"> </span><span class="k">generated</span><span class="w"> </span><span class="n">dataset</span><span class="w"> </span><span class="n">has</span><span class="w"> </span><span class="n">two</span><span class="w"> </span><span class="k">columns</span><span class="w"> </span><span class="o">:</span><span class="n">py</span><span class="o">:</span><span class="n">obj</span><span class="o">:</span><span class="n n-Quoted">`[image, label]`</span><span class="w"> </span><span class="p">.</span>
-<span class="w">    </span><span class="n">The</span><span class="w"> </span><span class="n">tensor</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="k">column</span><span class="w"> </span><span class="o">:</span><span class="n">py</span><span class="o">:</span><span class="n">obj</span><span class="o">:</span><span class="n n-Quoted">`image`</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="k">type</span><span class="p">.</span>
-<span class="w">    </span><span class="n">The</span><span class="w"> </span><span class="n">tensor</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="k">column</span><span class="w"> </span><span class="o">:</span><span class="n">py</span><span class="o">:</span><span class="n">obj</span><span class="o">:</span><span class="n n-Quoted">`label`</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">scalar</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">uint32</span><span class="w"> </span><span class="k">type</span><span class="p">.</span>
+    .. include:: mindspore.dataset.sampler.txt
 
-<span class="w">    </span><span class="n">Args</span><span class="o">:</span>
-<span class="w">        </span><span class="n">dataset_dir</span><span class="w"> </span><span class="p">(</span><span class="n">str</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="k">Path</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="k">directory</span><span class="w"> </span><span class="n">that</span><span class="w"> </span><span class="k">contains</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">dataset</span><span class="p">.</span>
-<span class="w">        </span><span class="k">usage</span><span class="w"> </span><span class="p">(</span><span class="n">str</span><span class="p">,</span><span class="w"> </span><span class="k">optional</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="k">Usage</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">this</span><span class="w"> </span><span class="n">dataset</span><span class="p">,</span><span class="w"> </span><span class="n">can</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n n-Quoted">``</span><span class="s1">&#39;train&#39;</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n n-Quoted">``</span><span class="s1">&#39;test&#39;</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="n n-Quoted">``</span><span class="s1">&#39;all&#39;</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="p">.</span>
-<span class="w">            </span><span class="n n-Quoted">``</span><span class="s1">&#39;train&#39;</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="k">read</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="mi">000</span><span class="w"> </span><span class="n">train</span><span class="w"> </span><span class="n">samples</span><span class="p">,</span><span class="w"> </span><span class="n n-Quoted">``</span><span class="s1">&#39;test&#39;</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="k">read</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="mi">000</span><span class="w"> </span><span class="n">test</span><span class="w"> </span><span class="n">samples</span><span class="p">,</span>
-<span class="w">            </span><span class="n n-Quoted">``</span><span class="s1">&#39;all&#39;</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="k">read</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="k">all</span><span class="w"> </span><span class="mi">70</span><span class="p">,</span><span class="mi">000</span><span class="w"> </span><span class="n">samples</span><span class="p">.</span><span class="w"> </span><span class="k">Default</span><span class="o">:</span><span class="w"> </span><span class="n n-Quoted">``</span><span class="k">None</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="k">read</span><span class="w"> </span><span class="k">all</span><span class="w"> </span><span class="n">samples</span><span class="p">.</span>
-<span class="w">        </span><span class="n">num_samples</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="k">optional</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="k">number</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">images</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">included</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">dataset</span><span class="p">.</span>
-<span class="w">            </span><span class="k">Default</span><span class="o">:</span><span class="w"> </span><span class="n n-Quoted">``</span><span class="k">None</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="k">read</span><span class="w"> </span><span class="k">all</span><span class="w"> </span><span class="n">images</span><span class="p">.</span>
-<span class="w">        </span><span class="n">num_parallel_workers</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="k">optional</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="k">Number</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">worker</span><span class="w"> </span><span class="n">threads</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="k">read</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">data</span><span class="p">.</span>
-<span class="w">            </span><span class="k">Default</span><span class="o">:</span><span class="w"> </span><span class="n n-Quoted">``</span><span class="k">None</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="k">use</span><span class="w"> </span><span class="k">global</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="n">workers</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="n">can</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="k">set</span>
-<span class="w">            </span><span class="k">by</span><span class="w"> </span><span class="o">:</span><span class="n">func</span><span class="o">:</span><span class="n n-Quoted">`mindspore.dataset.config.set_num_parallel_workers`</span><span class="w"> </span><span class="p">.</span>
-<span class="w">        </span><span class="n">shuffle</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">,</span><span class="w"> </span><span class="k">optional</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="n">Whether</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">perform</span><span class="w"> </span><span class="n">shuffle</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">dataset</span><span class="p">.</span>
-<span class="w">            </span><span class="k">Default</span><span class="o">:</span><span class="w"> </span><span class="n n-Quoted">``</span><span class="k">None</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">expected</span><span class="w"> </span><span class="k">order</span><span class="w"> </span><span class="n">behavior</span><span class="w"> </span><span class="n">shown</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">below</span><span class="p">.</span>
-<span class="w">        </span><span class="n">sampler</span><span class="w"> </span><span class="p">(</span><span class="n">Sampler</span><span class="p">,</span><span class="w"> </span><span class="k">optional</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="n">used</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">choose</span><span class="w"> </span><span class="n">samples</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">the</span>
-<span class="w">            </span><span class="n">dataset</span><span class="p">.</span><span class="w"> </span><span class="k">Default</span><span class="o">:</span><span class="w"> </span><span class="n n-Quoted">``</span><span class="k">None</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">expected</span><span class="w"> </span><span class="k">order</span><span class="w"> </span><span class="n">behavior</span><span class="w"> </span><span class="n">shown</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">below</span><span class="p">.</span>
-<span class="w">        </span><span class="n">num_shards</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="k">optional</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="k">Number</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">shards</span><span class="w"> </span><span class="n">that</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">dataset</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">divided</span><span class="w"> </span><span class="k">into</span><span class="p">.</span><span class="w"> </span><span class="k">Default</span><span class="o">:</span><span class="w"> </span><span class="n n-Quoted">``</span><span class="k">None</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="p">.</span>
-<span class="w">            </span><span class="k">When</span><span class="w"> </span><span class="n">this</span><span class="w"> </span><span class="n">argument</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">specified</span><span class="p">,</span><span class="w"> </span><span class="n n-Quoted">`num_samples`</span><span class="w"> </span><span class="n">reflects</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">maximum</span><span class="w"> </span><span class="n">sample</span><span class="w"> </span><span class="k">number</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">per</span><span class="w"> </span><span class="n">shard</span><span class="p">.</span>
-<span class="w">        </span><span class="n">shard_id</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="k">optional</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="n">shard</span><span class="w"> </span><span class="n">ID</span><span class="w"> </span><span class="n">within</span><span class="w"> </span><span class="n n-Quoted">`num_shards`</span><span class="w"> </span><span class="p">.</span><span class="w"> </span><span class="k">Default</span><span class="o">:</span><span class="w"> </span><span class="n n-Quoted">``</span><span class="k">None</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="p">.</span><span class="w"> </span><span class="n">This</span>
-<span class="w">            </span><span class="n">argument</span><span class="w"> </span><span class="n">can</span><span class="w"> </span><span class="k">only</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">specified</span><span class="w"> </span><span class="k">when</span><span class="w"> </span><span class="n n-Quoted">`num_shards`</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">also</span><span class="w"> </span><span class="n">specified</span><span class="p">.</span>
-<span class="w">        </span><span class="k">cache</span><span class="w"> </span><span class="p">(</span><span class="n">DatasetCache</span><span class="p">,</span><span class="w"> </span><span class="k">optional</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="k">Use</span><span class="w"> </span><span class="n">tensor</span><span class="w"> </span><span class="n">caching</span><span class="w"> </span><span class="n">service</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">speed</span><span class="w"> </span><span class="n">up</span><span class="w"> </span><span class="n">dataset</span><span class="w"> </span><span class="n">processing</span><span class="p">.</span><span class="w"> </span><span class="n">More</span><span class="w"> </span><span class="n">details</span><span class="o">:</span>
-<span class="w">            </span><span class="n n-Quoted">`Single-Node Data Cache &lt;https://www.mindspore.cn/tutorials/experts/en/r2.2/dataset/cache.html&gt;`</span><span class="n">_</span><span class="w"> </span><span class="p">.</span>
-<span class="w">            </span><span class="k">Default</span><span class="o">:</span><span class="w"> </span><span class="n n-Quoted">``</span><span class="k">None</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">which</span><span class="w"> </span><span class="n">means</span><span class="w"> </span><span class="k">no</span><span class="w"> </span><span class="k">cache</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">used</span><span class="p">.</span>
+    Examples:
+        &gt;&gt;&gt; import mindspore.dataset as ds
+        &gt;&gt;&gt; mnist_dataset_dir = &quot;/path/to/mnist_dataset_directory&quot;
+        &gt;&gt;&gt;
+        &gt;&gt;&gt; # Read 3 samples from MNIST dataset
+        &gt;&gt;&gt; dataset = ds.MnistDataset(dataset_dir=mnist_dataset_dir, num_samples=3)
+        &gt;&gt;&gt;
+        &gt;&gt;&gt; # Note: In mnist_dataset dataset, each dictionary has keys &quot;image&quot; and &quot;label&quot;
 
-<span class="w">    </span><span class="n">Raises</span><span class="o">:</span>
-<span class="w">        </span><span class="n">RuntimeError</span><span class="o">:</span><span class="w"> </span><span class="k">If</span><span class="w"> </span><span class="n n-Quoted">`dataset_dir`</span><span class="w"> </span><span class="n">does</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="n">contain</span><span class="w"> </span><span class="k">data</span><span class="w"> </span><span class="n">files</span><span class="p">.</span>
-<span class="w">        </span><span class="n">ValueError</span><span class="o">:</span><span class="w"> </span><span class="k">If</span><span class="w"> </span><span class="n n-Quoted">`num_parallel_workers`</span><span class="w"> </span><span class="n">exceeds</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">max</span><span class="w"> </span><span class="n">thread</span><span class="w"> </span><span class="n">numbers</span><span class="p">.</span>
-<span class="w">        </span><span class="n">ValueError</span><span class="o">:</span><span class="w"> </span><span class="k">If</span><span class="w"> </span><span class="n n-Quoted">`usage`</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="n n-Quoted">``</span><span class="s1">&#39;train&#39;</span><span class="n n-Quoted">``</span><span class="n">、</span><span class="n n-Quoted">``</span><span class="s1">&#39;test&#39;</span><span class="n n-Quoted">``</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="n n-Quoted">``</span><span class="s1">&#39;all&#39;</span><span class="n n-Quoted">``</span><span class="p">.</span>
-<span class="w">        </span><span class="n">RuntimeError</span><span class="o">:</span><span class="w"> </span><span class="k">If</span><span class="w"> </span><span class="n n-Quoted">`sampler`</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n n-Quoted">`shuffle`</span><span class="w"> </span><span class="n">are</span><span class="w"> </span><span class="n">specified</span><span class="w"> </span><span class="k">at</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">same</span><span class="w"> </span><span class="kt">time</span><span class="p">.</span>
-<span class="w">        </span><span class="n">RuntimeError</span><span class="o">:</span><span class="w"> </span><span class="k">If</span><span class="w"> </span><span class="n n-Quoted">`sampler`</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n n-Quoted">`num_shards`</span><span class="o">/</span><span class="n n-Quoted">`shard_id`</span><span class="w"> </span><span class="n">are</span><span class="w"> </span><span class="n">specified</span><span class="w"> </span><span class="k">at</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">same</span><span class="w"> </span><span class="kt">time</span><span class="p">.</span>
-<span class="w">        </span><span class="n">RuntimeError</span><span class="o">:</span><span class="w"> </span><span class="k">If</span><span class="w"> </span><span class="n n-Quoted">`num_shards`</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">specified</span><span class="w"> </span><span class="n">but</span><span class="w"> </span><span class="n">shard_id</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">None</span><span class="p">.</span>
-<span class="w">        </span><span class="n">RuntimeError</span><span class="o">:</span><span class="w"> </span><span class="k">If</span><span class="w"> </span><span class="n n-Quoted">`shard_id`</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">specified</span><span class="w"> </span><span class="n">but</span><span class="w"> </span><span class="n n-Quoted">`num_shards`</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">None</span><span class="p">.</span>
-<span class="w">        </span><span class="n">ValueError</span><span class="o">:</span><span class="w"> </span><span class="k">If</span><span class="w"> </span><span class="n n-Quoted">`shard_id`</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">range</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="err">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n n-Quoted">`num_shards`</span><span class="w"> </span><span class="p">).</span>
+    About MNIST dataset:
 
-<span class="w">    </span><span class="n">Tutorial</span><span class="w"> </span><span class="n">Examples</span><span class="o">:</span>
-<span class="w">        </span><span class="o">-</span><span class="w"> </span><span class="n n-Quoted">`Load &amp; Process Data With Dataset Pipeline</span>
-<span class="n n-Quoted">          &lt;https://www.mindspore.cn/docs/en/r2.2/api_python/samples/dataset/dataset_gallery.html&gt;`</span><span class="n">_</span>
+    The MNIST database of handwritten digits has a training set of 60,000 examples,
+    and a test set of 10,000 examples. It is a subset of a larger set available from
+    NIST. The digits have been size-normalized and centered in a fixed-size image.
 
-<span class="w">    </span><span class="n">Note</span><span class="o">:</span>
-<span class="w">        </span><span class="o">-</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="n">parameters</span><span class="w"> </span><span class="n n-Quoted">`num_samples`</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n n-Quoted">`shuffle`</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n n-Quoted">`num_shards`</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n n-Quoted">`shard_id`</span><span class="w"> </span><span class="n">can</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">used</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">control</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">sampler</span>
-<span class="w">          </span><span class="n">used</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">dataset</span><span class="p">,</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">their</span><span class="w"> </span><span class="n">effects</span><span class="w"> </span><span class="k">when</span><span class="w"> </span><span class="n">combined</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="n">parameter</span><span class="w"> </span><span class="n n-Quoted">`sampler`</span><span class="w"> </span><span class="n">are</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="k">follows</span><span class="p">.</span>
+    Here is the original MNIST dataset structure.
+    You can unzip the dataset files into this directory structure and read by MindSpore's API.
 
-<span class="w">    </span><span class="p">..</span><span class="w"> </span><span class="n">include</span><span class="o">::</span><span class="w"> </span><span class="n">mindspore</span><span class="p">.</span><span class="n">dataset</span><span class="p">.</span><span class="n">sampler</span><span class="p">.</span><span class="n">txt</span>
+    .. code-block::
 
-<span class="w">    </span><span class="n">Examples</span><span class="o">:</span>
-<span class="w">        </span><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="k">import</span><span class="w"> </span><span class="n">mindspore</span><span class="p">.</span><span class="n">dataset</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">ds</span>
-<span class="w">        </span><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="n">mnist_dataset_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/path/to/mnist_dataset_directory&quot;</span>
-<span class="w">        </span><span class="o">&gt;&gt;&gt;</span>
-<span class="w">        </span><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="c1"># Read 3 samples from MNIST dataset</span>
-<span class="w">        </span><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="n">dataset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ds</span><span class="p">.</span><span class="n">MnistDataset</span><span class="p">(</span><span class="n">dataset_dir</span><span class="o">=</span><span class="n">mnist_dataset_dir</span><span class="p">,</span><span class="w"> </span><span class="n">num_samples</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="w">        </span><span class="o">&gt;&gt;&gt;</span>
-<span class="w">        </span><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="c1"># Note: In mnist_dataset dataset, each dictionary has keys &quot;image&quot; and &quot;label&quot;</span>
+        .
+        └── mnist_dataset_dir
+             ├── t10k-images-idx3-ubyte
+             ├── t10k-labels-idx1-ubyte
+             ├── train-images-idx3-ubyte
+             └── train-labels-idx1-ubyte
 
-<span class="w">    </span><span class="n">About</span><span class="w"> </span><span class="n">MNIST</span><span class="w"> </span><span class="n">dataset</span><span class="o">:</span>
+    Citation:
 
-<span class="w">    </span><span class="n">The</span><span class="w"> </span><span class="n">MNIST</span><span class="w"> </span><span class="k">database</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">handwritten</span><span class="w"> </span><span class="n">digits</span><span class="w"> </span><span class="n">has</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">training</span><span class="w"> </span><span class="k">set</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="mi">000</span><span class="w"> </span><span class="n">examples</span><span class="p">,</span>
-<span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">test</span><span class="w"> </span><span class="k">set</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="mi">000</span><span class="w"> </span><span class="n">examples</span><span class="p">.</span><span class="w"> </span><span class="n">It</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">subset</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">larger</span><span class="w"> </span><span class="k">set</span><span class="w"> </span><span class="n">available</span><span class="w"> </span><span class="k">from</span>
-<span class="w">    </span><span class="n">NIST</span><span class="p">.</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="n">digits</span><span class="w"> </span><span class="n">have</span><span class="w"> </span><span class="n">been</span><span class="w"> </span><span class="n">size</span><span class="o">-</span><span class="n">normalized</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">centered</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="kt">fixed</span><span class="o">-</span><span class="n">size</span><span class="w"> </span><span class="n">image</span><span class="p">.</span>
+    .. code-block::
 
-<span class="w">    </span><span class="n">Here</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">original</span><span class="w"> </span><span class="n">MNIST</span><span class="w"> </span><span class="n">dataset</span><span class="w"> </span><span class="n">structure</span><span class="p">.</span>
-<span class="w">    </span><span class="n">You</span><span class="w"> </span><span class="n">can</span><span class="w"> </span><span class="n">unzip</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">dataset</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">this</span><span class="w"> </span><span class="k">directory</span><span class="w"> </span><span class="n">structure</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="k">read</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">MindSpore</span><span class="s1">&#39;s API.</span>
+        @article{lecun2010mnist,
+        title        = {MNIST handwritten digit database},
+        author       = {LeCun, Yann and Cortes, Corinna and Burges, CJ},
+        journal      = {ATT Labs [Online]},
+        volume       = {2},
+        year         = {2010},
+        howpublished = {http://yann.lecun.com/exdb/mnist}
+        }
+</code></pre>
+<pre><code class="language-python"># 查看MNIST_Data数据集内容
 
-<span class="s1">    .. code-block::</span>
+import numpy as np
+import matplotlib.pyplot as plt
+# 加载数据集，包含图像和标签两部分
+train_dataset = MnistDataset(&quot;MNIST_Data/train&quot;, shuffle=False)
+print('dataset:', type(train_dataset))
+print('dataset`s cloumns is: ', train_dataset.get_col_names())
 
-<span class="s1">        .</span>
-<span class="s1">        └── mnist_dataset_dir</span>
-<span class="s1">             ├── t10k-images-idx3-ubyte</span>
-<span class="s1">             ├── t10k-labels-idx1-ubyte</span>
-<span class="s1">             ├── train-images-idx3-ubyte</span>
-<span class="s1">             └── train-labels-idx1-ubyte</span>
+def visualize(dataset):
+    &quot;&quot;&quot;
+    查看数据集中部分内容，这里是图片
+    Args:
+        dataset (_type_): 数据集
+    &quot;&quot;&quot;
+    figure = plt.figure(figsize=(4, 4))
+    cols, rows = 3, 3
 
-<span class="s1">    Citation:</span>
+    plt.subplots_adjust(wspace=0.5, hspace=0.5)
 
-<span class="s1">    .. code-block::</span>
+    for idx, (image, label) in enumerate(dataset.create_tuple_iterator()):
+        figure.add_subplot(rows, cols, idx + 1)
+        plt.title(int(label))
+        plt.axis(&quot;off&quot;)
+        plt.imshow(image.asnumpy().squeeze(), cmap=&quot;gray&quot;)
+        if idx == cols * rows - 1:
+            break
+    plt.show()
+visualize(train_dataset)
 
-<span class="s1">        @article{lecun2010mnist,</span>
-<span class="s1">        title        = {MNIST handwritten digit database},</span>
-<span class="s1">        author       = {LeCun, Yann and Cortes, Corinna and Burges, CJ},</span>
-<span class="s1">        journal      = {ATT Labs [Online]},</span>
-<span class="s1">        volume       = {2},</span>
-<span class="s1">        year         = {2010},</span>
-<span class="s1">        howpublished = {http://yann.lecun.com/exdb/mnist}</span>
-<span class="s1">        }</span>
-</code></pre></div>
+</code></pre>
+<pre><code>dataset: &lt;class 'mindspore.dataset.engine.datasets_vision.MnistDataset'&gt;
+dataset`s cloumns is:  ['image', 'label']
+</code></pre>
+<p><img src="/static/mindspore/blog-doc_quikStarting_files/blog-doc_quikStarting_5_1.png" alt="png" /></p>
+<pre><code class="language-python">img, label = next(train_dataset.create_tuple_iterator())
+print('the img chw is : ', img.shape) # mnist数据中每张图像是一个25*25的灰度图
+print('the label is : ', label)
 
-<div class="highlight"><pre><span></span><code><span class="c1"># 查看MNIST_Data数据集内容</span>
+def datapipe(dataset: MnistDataset, batch_size: int):
+    image_transforms = [
+        vision.Rescale(1.0 / 255.0, 0), # 将图像进行缩放处理
+        vision.Normalize(mean=(0.1307,), std=(0.3081,)), # 将图像进行归一化处理
+        vision.HWC2CHW() 
+    ]
+    label_transform = transforms.TypeCast(mindspore.int32)
+    
+    dataset = dataset.map(image_transforms, input_columns='image')
+    dataset = dataset.map(label_transform, input_columns='label')
+    dataset = dataset.batch(batch_size)
+    return dataset
+</code></pre>
+<pre><code>the img chw is :  (28, 28, 1)
+the label is :  5
+</code></pre>
+<pre><code class="language-python"># 数据处理
+test_dataset = MnistDataset('MNIST_Data/test')
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="c1"># 加载数据集，包含图像和标签两部分</span>
-<span class="n">train_dataset</span> <span class="o">=</span> <span class="n">MnistDataset</span><span class="p">(</span><span class="s2">&quot;MNIST_Data/train&quot;</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dataset:&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dataset`s cloumns is: &#39;</span><span class="p">,</span> <span class="n">train_dataset</span><span class="o">.</span><span class="n">get_col_names</span><span class="p">())</span>
+train_dataset = datapipe(train_dataset, 64)
+test_dataset = datapipe(test_dataset, 64)
+</code></pre>
+<pre><code>mindspore.dataset.engine.datasets_vision.MnistDataset
+</code></pre>
+<h3>网络构建</h3>
+<p>神经网络模型是由神经网络层和Tensor操作构成的，mindspore.nn 提供了常见神经网络层的实现，在MindSpore中，Cell类是构建所有网络的基类，也是网络的基本单元。一个神经网络模型表示为一个Cell，它由不同的子Cell构成。使用这样的嵌套结构，可以简单地使用面向对象编程的思维，对神经网络结构进行构建和管理。</p>
+<ol>
+<li>定义模型类
+当我们定义神经网络时，可以继承 nn.Cell 类，在__init__方法中进行子Cell的实例化和状态管理，在construct(构造)方法中实现Tensor操作。</li>
+</ol>
+<p><strong>construct意为神经网络（或计算图）构建，相关内容详见使用静态图加速。construct()方法不可直接调用</strong></p>
+<pre><code class="language-python">class Net(nn.Cell):
+    def __init__(self):
+        super().__init__()
+        self.flatten = nn.Flatten()
+        self.dense_relu_sequential = nn.SequentialCell(
+            nn.Dense(28*28, 512),
+            nn.ReLU(),
+            nn.Dense(512, 512),
+            nn.ReLU(),
+            nn.Dense(512, 10)
+        )
+        
+    def construct(self, x):
+        x = self.flatten(x)
+        logits = self.dense_relu_sequential(x)
+        return logits
+model = Net()
+# 查看神经网络结构
+print(model)
+</code></pre>
+<pre><code>Net&lt;
+  (flatten): Flatten&lt;&gt;
+  (dense_relu_sequential): SequentialCell&lt;
+    (0): Dense&lt;input_channels=784, output_channels=512, has_bias=True&gt;
+    (1): ReLU&lt;&gt;
+    (2): Dense&lt;input_channels=512, output_channels=512, has_bias=True&gt;
+    (3): ReLU&lt;&gt;
+    (4): Dense&lt;input_channels=512, output_channels=10, has_bias=True&gt;
+    &gt;
+  &gt;
+</code></pre>
+<pre><code class="language-python">from datetime import datetime
+import pytz
+print(datetime.now(pytz.timezone('Asia/Shanghai')))
+</code></pre>
+<pre><code>2024-06-28 21:12:18.029531+08:00
+</code></pre>
 
-<span class="k">def</span> <span class="nf">visualize</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    查看数据集中部分内容，这里是图片</span>
-<span class="sd">    Args:</span>
-<span class="sd">        dataset (_type_): 数据集</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">figure</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-    <span class="n">cols</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span>
-
-    <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">wspace</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">create_tuple_iterator</span><span class="p">()):</span>
-        <span class="n">figure</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">asnumpy</span><span class="p">()</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="n">cols</span> <span class="o">*</span> <span class="n">rows</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">break</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-<span class="n">visualize</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code>dataset: &lt;class &#39;mindspore.dataset.engine.datasets_vision.MnistDataset&#39;&gt;
-dataset`s cloumns is:  [&#39;image&#39;, &#39;label&#39;]
-</code></pre></div>
-
-<p><img alt="png" src="/static/mindspore/blog-doc_quikStarting_files/blog-doc_quikStarting_5_1.png"
       </div><!-- /.entry-content -->
 
     </article>

@@ -44,33 +44,34 @@
 <p>该博客用于记录学习在qemu中添加自定义开发板的过程</p>
 <p><strong>注意</strong> qemu 官方在 <code>hw/misc/edu.c</code> 中提供了一个教学用的设备样例, 可参考此文件实现模拟设备创建.</p>
 <h2>QEMU Object Model</h2>
-<p>在 qemu 中使用一套叫做 <code>Qemu Object Model</code> 的东西来实现面向对象式开发模拟设备，主要由这四个组件构成：
-- Type：用来定义一个「类」的基本属性，例如类的名字、大小、构造函数等
-- Class：用来定义一个「类」的静态内容，例如类中存储的静态数据、方法函数指针等
-- Object：动态分配的一个「类」的具体的实例（instance），储存类的动态数据
-- Property：动态对象数据的访问器（accessor），可以通过监视器接口进行检查</p>
+<p>在 qemu 中使用一套叫做 <code>Qemu Object Model</code> 的东西来实现面向对象式开发模拟设备，主要由这四个组件构成：</p>
+<ul>
+<li>Type：用来定义一个「类」的基本属性，例如类的名字、大小、构造函数等</li>
+<li>Class：用来定义一个「类」的静态内容，例如类中存储的静态数据、方法函数指针等</li>
+<li>Object：动态分配的一个「类」的具体的实例（instance），储存类的动态数据</li>
+<li>Property：动态对象数据的访问器（accessor），可以通过监视器接口进行检查</li>
+</ul>
 <blockquote>
 <p>一个定义设备obj的示例</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">pci_edu_register_types</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="n">InterfaceInfo</span><span class="w"> </span><span class="n">interfaces</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="n">INTERFACE_CONVENTIONAL_PCI_DEVICE</span><span class="w"> </span><span class="p">},</span>
-<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="p">},</span>
-<span class="w">    </span><span class="p">};</span>
-<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">TypeInfo</span><span class="w"> </span><span class="n">edu_info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_PCI_EDU_DEVICE</span><span class="p">,</span>
-<span class="w">        </span><span class="p">.</span><span class="n">parent</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">TYPE_PCI_DEVICE</span><span class="p">,</span>
-<span class="w">        </span><span class="p">.</span><span class="n">instance_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">EduState</span><span class="p">),</span>
-<span class="w">        </span><span class="p">.</span><span class="n">instance_init</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">edu_instance_init</span><span class="p">,</span>
-<span class="w">        </span><span class="p">.</span><span class="n">class_init</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">edu_class_init</span><span class="p">,</span>
-<span class="w">        </span><span class="p">.</span><span class="n">interfaces</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">interfaces</span><span class="p">,</span>
-<span class="w">    </span><span class="p">};</span>
-<span class="w">    </span><span class="n">type_register_static</span><span class="p">(</span><span class="o">&amp;</span><span class="n">edu_info</span><span class="p">);</span>
-<span class="p">}</span>
-<span class="n">type_init</span><span class="p">(</span><span class="n">pci_edu_register_types</span><span class="p">)</span>
-</code></pre></div>
-
+<pre><code class="language-c">static void pci_edu_register_types(void)
+{
+    static InterfaceInfo interfaces[] = {
+        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+        { },
+    };
+    static const TypeInfo edu_info = {
+        .name          = TYPE_PCI_EDU_DEVICE,
+        .parent        = TYPE_PCI_DEVICE,
+        .instance_size = sizeof(EduState),
+        .instance_init = edu_instance_init,
+        .class_init    = edu_class_init,
+        .interfaces = interfaces,
+    };
+    type_register_static(&amp;edu_info);
+}
+type_init(pci_edu_register_types)
+</code></pre>
 <h2>QEMU添加设备流程</h2>
 <ol>
 <li>在 <code>hw/{target_architecture}/</code> 下, 创建新设备定义文件</li>
@@ -81,6 +82,7 @@
 <ul>
 <li><code>type_init</code> 宏, 会被扩展为<code>gcc attribute constructor</code>修饰的函数<code>do_qemu_init_##</code>函数, 此属性修饰的函数会在程序的<code>main()</code>函数之前自动调用, 其最终的作用是将一个 <code>TypeInfo</code> 结构体实例通过  <code>type_register_static</code> 函数注册到 <code>GHashTable</code> 中</li>
 </ul>
+
       </div><!-- /.entry-content -->
 
     </article>

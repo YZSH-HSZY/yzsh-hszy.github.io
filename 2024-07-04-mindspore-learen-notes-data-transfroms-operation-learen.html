@@ -43,56 +43,51 @@
 </footer><!-- /.post-info -->        <h1>数据变换 Transforms</h1>
 <p>通常情况下，直接加载的原始数据并不能直接送入神经网络进行训练，我们需要对其进行数据预处理。MindSpore提供不同种类的数据变换（Transforms），配合数据处理Pipeline来实现数据预处理。所有的Transforms均可通过<code>map</code>方法传入，实现对指定数据列的处理。</p>
 <p><code>mindspore.dataset</code>提供了面向图像、文本、音频等不同数据类型的Transforms，同时也支持使用Lambda函数。</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">from</span> <span class="nn">download</span> <span class="kn">import</span> <span class="n">download</span>
-<span class="kn">from</span> <span class="nn">mindspore.dataset</span> <span class="kn">import</span> <span class="n">transforms</span><span class="p">,</span> <span class="n">vision</span><span class="p">,</span> <span class="n">text</span>
-<span class="kn">from</span> <span class="nn">mindspore.dataset</span> <span class="kn">import</span> <span class="n">GeneratorDataset</span><span class="p">,</span> <span class="n">MnistDataset</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;base moudel import&#39;</span><span class="p">)</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code>base moudel import
-</code></pre></div>
-
+<pre><code class="language-python">import numpy as np
+from PIL import Image
+from download import download
+from mindspore.dataset import transforms, vision, text
+from mindspore.dataset import GeneratorDataset, MnistDataset
+print('base moudel import')
+</code></pre>
+<pre><code>base moudel import
+</code></pre>
 <h2>Common Transforms(常用变换)</h2>
 <p><code>mindspore.dataset.transforms</code>模块支持一系列通用Transforms。这里我们以<code>Compose</code>为例，介绍其使用方式。</p>
 <h3>Compose(组合)</h3>
 <p><code>Compose</code> 接收一个序列，序列内存放各种数据增强操作，然后将这几个数据操作合并为单个数据操作。</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># 以MNIST数据集演示</span>
-<span class="c1"># MNIST数据集下载</span>
-<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/&quot;</span> \
-      <span class="s2">&quot;notebook/datasets/MNIST_Data.zip&quot;</span>
-<span class="n">path</span> <span class="o">=</span> <span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;./&quot;</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;zip&quot;</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">train_dataset</span> <span class="o">=</span> <span class="n">MnistDataset</span><span class="p">(</span><span class="s1">&#39;MNIST_Data/train&#39;</span><span class="p">)</span>
-</code></pre></div>
+<pre><code class="language-python"># 以MNIST数据集演示
+# MNIST数据集下载
+url = &quot;https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/&quot; \
+      &quot;notebook/datasets/MNIST_Data.zip&quot;
+path = download(url, &quot;./&quot;, kind=&quot;zip&quot;, replace=True)
+train_dataset = MnistDataset('MNIST_Data/train')
+</code></pre>
+<pre><code>Downloading data from https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/MNIST_Data.zip (10.3 MB)
 
-<div class="highlight"><pre><span></span><code><span class="n">Downloading</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">mindspore</span><span class="o">-</span><span class="n">website</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">cn</span><span class="o">-</span><span class="n">north</span><span class="o">-</span><span class="mf">4.</span><span class="n">myhuaweicloud</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">notebook</span><span class="o">/</span><span class="n">datasets</span><span class="o">/</span><span class="n">MNIST_Data</span><span class="o">.</span><span class="n">zip</span><span class="w"> </span><span class="p">(</span><span class="mf">10.3</span><span class="w"> </span><span class="n">MB</span><span class="p">)</span>
+file_sizes: 100%|██████████████████████████| 10.8M/10.8M [00:00&lt;00:00, 58.3MB/s]
+Extracting zip file...
+Successfully downloaded / unzipped to ./
+</code></pre>
+<pre><code class="language-python"># 合并图像缩放和形状变换为一个操作
+composed = transforms.Compose(
+    [
+        vision.Rescale(1.0 / 255.0, 0),
+        vision.HWC2CHW()
+    ]
+)
+# 原image的数据类型和shape
+image, label = next(train_dataset.create_tuple_iterator())
+print('before image shape and type is:', image.shape, image.dtype)
+# 应用合并变换操作
+train_dataset = train_dataset.map(composed, 'image')
+image, label = next(train_dataset.create_tuple_iterator())
+print('compose transforms image shape and type is:', image.shape, image.dtype)
 
-<span class="n">file_sizes</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="o">%|</span><span class="err">██████████████████████████</span><span class="o">|</span><span class="w"> </span><span class="mf">10.8</span><span class="n">M</span><span class="o">/</span><span class="mf">10.8</span><span class="n">M</span><span class="w"> </span><span class="p">[</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="o">&lt;</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mf">58.3</span><span class="n">MB</span><span class="o">/</span><span class="n">s</span><span class="p">]</span>
-<span class="n">Extracting</span><span class="w"> </span><span class="n">zip</span><span class="w"> </span><span class="n">file</span><span class="o">...</span>
-<span class="n">Successfully</span><span class="w"> </span><span class="n">downloaded</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">unzipped</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="o">./</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="c1"># 合并图像缩放和形状变换为一个操作</span>
-<span class="n">composed</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
-    <span class="p">[</span>
-        <span class="n">vision</span><span class="o">.</span><span class="n">Rescale</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">255.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-        <span class="n">vision</span><span class="o">.</span><span class="n">HWC2CHW</span><span class="p">()</span>
-    <span class="p">]</span>
-<span class="p">)</span>
-<span class="c1"># 原image的数据类型和shape</span>
-<span class="n">image</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">train_dataset</span><span class="o">.</span><span class="n">create_tuple_iterator</span><span class="p">())</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;before image shape and type is:&#39;</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-<span class="c1"># 应用合并变换操作</span>
-<span class="n">train_dataset</span> <span class="o">=</span> <span class="n">train_dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">composed</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">)</span>
-<span class="n">image</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">train_dataset</span><span class="o">.</span><span class="n">create_tuple_iterator</span><span class="p">())</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;compose transforms image shape and type is:&#39;</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="nx">before</span><span class="w"> </span><span class="nx">image</span><span class="w"> </span><span class="nx">shape</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="k">is</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="w"> </span><span class="mi">28</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="nx">UInt8</span>
-<span class="nx">compose</span><span class="w"> </span><span class="nx">transforms</span><span class="w"> </span><span class="nx">image</span><span class="w"> </span><span class="nx">shape</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="k">is</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">28</span><span class="p">,</span><span class="w"> </span><span class="mi">28</span><span class="p">)</span><span class="w"> </span><span class="nx">Float32</span>
-</code></pre></div>
-
+</code></pre>
+<pre><code>before image shape and type is: (28, 28, 1) UInt8
+compose transforms image shape and type is: (1, 28, 28) Float32
+</code></pre>
 <p>从上述输出中可以看到，image数据的shape、dtype均发生变化</p>
 <h2>Vision Transforms(视觉变换)</h2>
 <p><code>mindspore.dataset.vision</code> 模块提供一系列针对图像数据的Transforms。</p>
@@ -103,17 +98,16 @@
 <li>shift：平移因子。</li>
 </ul>
 <p>图像的每个像素将根据这两个参数进行调整，输出的像素值为$output_{i} = input_{i} * rescale + shift$。</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># 这里我们先使用numpy随机生成一个像素值在[0, 255]的图像</span>
-<span class="n">random_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
-<span class="n">random_image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">random_np</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;src img data is:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">random_np</span><span class="p">)</span>
+<pre><code class="language-python"># 这里我们先使用numpy随机生成一个像素值在[0, 255]的图像
+random_np = np.random.randint(0, 255, (4, 4), np.uint8)
+random_image = Image.fromarray(random_np)
+print('src img data is:\n', random_np)
 
-<span class="c1"># 将其像素值进行缩放</span>
-<span class="n">rescale_image</span> <span class="o">=</span> <span class="n">vision</span><span class="o">.</span><span class="n">Rescale</span><span class="p">(</span><span class="n">rescale</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">255.0</span><span class="p">,</span> <span class="n">shift</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)(</span><span class="n">random_image</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;rescale img data is:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rescale_image</span><span class="p">))</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code>src img data is:
+# 将其像素值进行缩放
+rescale_image = vision.Rescale(rescale = 1.0 / 255.0, shift = 1)(random_image)
+print('rescale img data is:\n', np.asarray(rescale_image))
+</code></pre>
+<pre><code>src img data is:
  [[205 201 102 194]
  [ 80 124 234 241]
  [ 27  62 151 131]
@@ -123,8 +117,7 @@ rescale img data is:
  [1.3137255 1.4862745 1.9176471 1.945098 ]
  [1.1058824 1.2431372 1.5921569 1.5137255]
  [1.1254902 1.882353  1.1450981 1.9568628]]
-</code></pre></div>
-
+</code></pre>
 <h3>Normalize(归一化)</h3>
 <p>变换用于对输入图像的归一化，包括三个参数：</p>
 <ul>
@@ -134,263 +127,217 @@ rescale img data is:
 </ul>
 <p>图像的每个通道将根据<code>mean</code>和<code>std</code>进行调整，计算公式为$output_{c} = \frac{input_{c} - mean_{c}}{std_{c}}$，其中 $c$代表通道索引。</p>
 <p><strong>注意</strong> 以(0.2)作为序列，会自动卸包，而(0.2,)，[0.2]不会</p>
-<div class="highlight"><pre><span></span><code><span class="n">normalize</span> <span class="o">=</span> <span class="n">vision</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,),</span> <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.3</span><span class="p">])</span>
-<span class="n">random_image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>  <span class="c1"># hwc格式的rgba图像</span>
-<span class="n">normalized_image</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">random_image</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">normalized_image</span><span class="p">)</span>
-</code></pre></div>
+<pre><code class="language-python">normalize = vision.Normalize(mean=(0.1,), std=[0.3])
+random_image = Image.fromarray(np.random.randint(0, 255, (2,3,4), np.uint8))  # hwc格式的rgba图像
+normalized_image = normalize(random_image)
+print(normalized_image)
+</code></pre>
+<pre><code>[[[616.3333   186.33333  562.99994  699.6666  ]
+  [802.99994  726.3333   123.        16.333332]
+  [339.66666  582.99994    9.666667 406.3333  ]]
 
-<div class="highlight"><pre><span></span><code><span class="k">[[[616.3333   186.33333  562.99994  699.6666  ]</span>
-<span class="w">  </span><span class="k">[802.99994  726.3333   123.        16.333332]</span>
-<span class="w">  </span><span class="k">[339.66666  582.99994    9.666667 406.3333  ]]</span>
-
-<span class="w"> </span><span class="k">[[ 29.666664 173.       739.6666   386.3333  ]</span>
-<span class="w">  </span><span class="k">[626.3333   109.666664 496.33328   46.333332]</span>
-<span class="w">  </span><span class="k">[652.99994  146.33333  809.6666   159.66667 ]]]</span>
-</code></pre></div>
-
+ [[ 29.666664 173.       739.6666   386.3333  ]
+  [626.3333   109.666664 496.33328   46.333332]
+  [652.99994  146.33333  809.6666   159.66667 ]]]
+</code></pre>
 <h3>HWC2CHW</h3>
 <p><code>HWC2CHW</code>变换用于转换图像格式。在不同的硬件设备中可能会对(height, width, channel)或(channel, height, width)两种不同格式有针对性优化。MindSpore设置HWC为默认图像格式，在有CHW格式需求时，可使用该变换进行处理。</p>
 <p>图像进行转换，只转换shape。</p>
-<div class="highlight"><pre><span></span><code><span class="n">hwc_image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>  <span class="c1"># hwc格式的rgba图像</span>
-<span class="n">chw_image</span> <span class="o">=</span> <span class="n">vision</span><span class="o">.</span><span class="n">HWC2CHW</span><span class="p">()(</span><span class="n">hwc_image</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">hwc_image</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">chw_image</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code>(2, 3, 4) (4, 2, 3)
-</code></pre></div>
-
+<pre><code class="language-python">hwc_image = Image.fromarray(np.random.randint(0, 255, (2,3,4), np.uint8))  # hwc格式的rgba图像
+chw_image = vision.HWC2CHW()(hwc_image)
+print(np.array(hwc_image).shape, chw_image.shape)
+</code></pre>
+<pre><code>(2, 3, 4) (4, 2, 3)
+</code></pre>
 <h2>Text Transforms(文本变换)</h2>
 <p><code>mindspore.dataset.text</code>模块提供一系列针对文本数据的Transforms。与图像数据不同，文本数据需要有分词（Tokenize）、构建词表、Token转Index等操作。</p>
 <p>首先我们定义三段文本，作为待处理的数据，并使用<code>GeneratorDataset</code>进行加载。</p>
-<div class="highlight"><pre><span></span><code><span class="n">texts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Welcome to Beijing&#39;</span><span class="p">]</span>
-<span class="n">test_dataset</span> <span class="o">=</span> <span class="n">GeneratorDataset</span><span class="p">(</span><span class="n">texts</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">)</span>
-<span class="c1"># 查看test_dataset中数据格式</span>
-<span class="n">text_tensor</span><span class="p">,</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">test_dataset</span><span class="o">.</span><span class="n">create_tuple_iterator</span><span class="p">())</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">text_tensor</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">text_tensor</span><span class="p">))</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code>Welcome to Beijing &lt;class &#39;mindspore.common.tensor.Tensor&#39;&gt;
-</code></pre></div>
-
+<pre><code class="language-python">texts = ['Welcome to Beijing']
+test_dataset = GeneratorDataset(texts, 'text')
+# 查看test_dataset中数据格式
+text_tensor, = next(test_dataset.create_tuple_iterator())
+print(text_tensor, type(text_tensor))
+</code></pre>
+<pre><code>Welcome to Beijing &lt;class 'mindspore.common.tensor.Tensor'&gt;
+</code></pre>
 <h3>PythonTokenizer(分词器)</h3>
 <p>分词（Tokenize）操作是文本数据的基础处理方法，MindSpore提供多种不同的Tokenizer。这里我们选择基础的<code>PythonTokenizer</code>举例，它允许用户自由实现分词策略。</p>
-<div class="highlight"><pre><span></span><code><span class="n">test_dataset</span> <span class="o">=</span> <span class="n">test_dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">PythonTokenizer</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">test_dataset</span><span class="o">.</span><span class="n">create_tuple_iterator</span><span class="p">()))</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="nx">Tensor</span><span class="p">(</span><span class="nx">shape</span><span class="p">=[</span><span class="mi">3</span><span class="p">],</span><span class="w"> </span><span class="nx">dtype</span><span class="p">=</span><span class="nx">String</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="err">&#39;</span><span class="nx">Welcome</span><span class="err">&#39;</span><span class="p">,</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">to</span><span class="err">&#39;</span><span class="p">,</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">Beijing</span><span class="err">&#39;</span><span class="p">])]</span>
-</code></pre></div>
-
+<pre><code class="language-python">test_dataset = test_dataset.map(text.PythonTokenizer(lambda v: v.split()))
+print(next(test_dataset.create_tuple_iterator()))
+</code></pre>
+<pre><code>[Tensor(shape=[3], dtype=String, value= ['Welcome', 'to', 'Beijing'])]
+</code></pre>
 <h3>Lookup</h3>
 <p><code>Lookup</code>为词表映射变换，用来将Token转换为Index。在使用<code>Lookup</code>前，需要构造词表，一般可以加载已有的词表，或使用<code>Vocab</code>生成词表。这里我们选择使用<code>Vocab.from_dataset</code>方法从数据集中生成词表。</p>
-<div class="highlight"><pre><span></span><code><span class="n">vocab</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">Vocab</span><span class="o">.</span><span class="n">from_dataset</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span>
-<span class="c1"># 使用`vocab`方法查看词表</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">vocab</span><span class="o">.</span><span class="n">vocab</span><span class="p">())</span>
-<span class="c1"># 生成词表后，即可通过Lookup操作进行词表映射变换，将Token转为Index</span>
-<span class="n">test_dataset</span> <span class="o">=</span> <span class="n">test_dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">Lookup</span><span class="p">(</span><span class="n">vocab</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">test_dataset</span><span class="o">.</span><span class="n">create_tuple_iterator</span><span class="p">()))</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="err">&#39;</span><span class="nx">to</span><span class="err">&#39;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">Welcome</span><span class="err">&#39;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">&#39;</span><span class="nx">Beijing</span><span class="err">&#39;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">}</span>
-<span class="p">[</span><span class="nx">Tensor</span><span class="p">(</span><span class="nx">shape</span><span class="p">=[</span><span class="mi">3</span><span class="p">],</span><span class="w"> </span><span class="nx">dtype</span><span class="p">=</span><span class="nx">Int32</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">])]</span>
-</code></pre></div>
-
+<pre><code class="language-python">vocab = text.Vocab.from_dataset(test_dataset)
+# 使用`vocab`方法查看词表
+print(vocab.vocab())
+# 生成词表后，即可通过Lookup操作进行词表映射变换，将Token转为Index
+test_dataset = test_dataset.map(text.Lookup(vocab))
+print(next(test_dataset.create_tuple_iterator()))
+</code></pre>
+<pre><code>{'to': 2, 'Welcome': 1, 'Beijing': 0}
+[Tensor(shape=[3], dtype=Int32, value= [1, 2, 0])]
+</code></pre>
 <h2>Lambda Transforms</h2>
 <p>通过Lambda Transforms，用户对简单的变换操作可以自定义lambda函数实现，更灵活。</p>
-<div class="highlight"><pre><span></span><code><span class="n">test_dataset</span> <span class="o">=</span> <span class="n">GeneratorDataset</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">test_dataset</span> <span class="o">=</span> <span class="n">test_dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">test_dataset</span><span class="o">.</span><span class="n">create_tuple_iterator</span><span class="p">()))</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="p">[[</span><span class="nx">Tensor</span><span class="p">(</span><span class="nx">shape</span><span class="p">=[],</span><span class="w"> </span><span class="nx">dtype</span><span class="p">=</span><span class="nx">Int64</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">=</span><span class="w"> </span><span class="mi">2</span><span class="p">)],</span><span class="w"> </span><span class="p">[</span><span class="nx">Tensor</span><span class="p">(</span><span class="nx">shape</span><span class="p">=[],</span><span class="w"> </span><span class="nx">dtype</span><span class="p">=</span><span class="nx">Int64</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">=</span><span class="w"> </span><span class="mi">4</span><span class="p">)],</span><span class="w"> </span><span class="p">[</span><span class="nx">Tensor</span><span class="p">(</span><span class="nx">shape</span><span class="p">=[],</span><span class="w"> </span><span class="nx">dtype</span><span class="p">=</span><span class="nx">Int64</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">=</span><span class="w"> </span><span class="mi">6</span><span class="p">)]]</span>
-</code></pre></div>
-
+<pre><code class="language-python">test_dataset = GeneratorDataset([1, 2, 3], 'data', shuffle=False)
+test_dataset = test_dataset.map(lambda x: x * 2)
+print(list(test_dataset.create_tuple_iterator()))
+</code></pre>
+<pre><code>[[Tensor(shape=[], dtype=Int64, value= 2)], [Tensor(shape=[], dtype=Int64, value= 4)], [Tensor(shape=[], dtype=Int64, value= 6)]]
+</code></pre>
 <h2>Audio Transforms(音频变换)</h2>
 <p><code>mindspore.dataset.audio</code>模块提供一系列针对音频数据的Transforms。<a href="https://www.mindspore.cn/docs/zh-CN/r2.3.0/api_python/samples/dataset/audio_gallery.html">参audio文档</a></p>
-<div class="highlight"><pre><span></span><code><span class="c1"># 安装librosa库</span>
-<span class="kn">import</span> <span class="nn">pip</span>
-<span class="n">pip</span><span class="o">.</span><span class="n">main</span><span class="p">([</span><span class="s1">&#39;install&#39;</span><span class="p">,</span> <span class="s1">&#39;librosa&#39;</span><span class="p">])</span>
+<pre><code class="language-python"># 安装librosa库
+import pip
+pip.main(['install', 'librosa'])
 
-<span class="kn">import</span> <span class="nn">librosa</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">scipy.io.wavfile</span> <span class="k">as</span> <span class="nn">wavfile</span>
-<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Audio</span>
-<span class="kn">from</span> <span class="nn">download</span> <span class="kn">import</span> <span class="n">download</span>
+import librosa
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.io.wavfile as wavfile
+from IPython.display import Audio
+from download import download
 
-<span class="kn">import</span> <span class="nn">mindspore.dataset</span> <span class="k">as</span> <span class="nn">ds</span>
-<span class="kn">import</span> <span class="nn">mindspore.dataset.audio</span> <span class="k">as</span> <span class="nn">audio</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Audio环境准备&#39;</span><span class="p">)</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="n">WARNING</span><span class="o">:</span><span class="w"> </span><span class="n">pip</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">being</span><span class="w"> </span><span class="n">invoked</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="n">an</span><span class="w"> </span><span class="n">old</span><span class="w"> </span><span class="n">script</span><span class="w"> </span><span class="n">wrapper</span><span class="o">.</span><span class="w"> </span><span class="n">This</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="n">fail</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">future</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">pip</span><span class="o">.</span>
-<span class="n">Please</span><span class="w"> </span><span class="n">see</span><span class="w"> </span><span class="n">https</span><span class="o">://</span><span class="n">github</span><span class="o">.</span><span class="na">com</span><span class="sr">/pypa/pip/issues/</span><span class="mi">5599</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">advice</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">fixing</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">underlying</span><span class="w"> </span><span class="n">issue</span><span class="o">.</span>
-<span class="n">To</span><span class="w"> </span><span class="n">avoid</span><span class="w"> </span><span class="k">this</span><span class="w"> </span><span class="n">problem</span><span class="w"> </span><span class="n">you</span><span class="w"> </span><span class="n">can</span><span class="w"> </span><span class="n">invoke</span><span class="w"> </span><span class="n">Python</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="s1">&#39;-m pip&#39;</span><span class="w"> </span><span class="n">instead</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">running</span><span class="w"> </span><span class="n">pip</span><span class="w"> </span><span class="n">directly</span><span class="o">.</span>
-</code></pre></div>
-
+import mindspore.dataset as ds
+import mindspore.dataset.audio as audio
+print('Audio环境准备')
+</code></pre>
+<pre><code>WARNING: pip is being invoked by an old script wrapper. This will fail in a future version of pip.
+Please see https://github.com/pypa/pip/issues/5599 for advice on fixing the underlying issue.
+To avoid this problem you can invoke Python with '-m pip' instead of running pip directly.
+</code></pre>
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Looking in indexes: https://pypi.tuna.tsinghua.edu.cn/simple
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: librosa in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (0.10.2.post1)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: audioread&gt;=2.1.9 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from librosa) (3.0.1)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: numpy!=1.22.0,!=1.22.1,!=1.22.2,&gt;=1.20.3 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from librosa) (1.26.4)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: scipy&gt;=1.2.0 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from librosa) (1.13.1)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: scikit-learn&gt;=0.20.0 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from librosa) (1.5.0)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: joblib&gt;=0.14 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from librosa) (1.4.2)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: decorator&gt;=4.3.0 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from librosa) (5.1.1)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: numba&gt;=0.51.0 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from librosa) (0.60.0)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: soundfile&gt;=0.12.1 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from librosa) (0.12.1)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: pooch&gt;=1.1 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from librosa) (1.8.2)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: soxr&gt;=0.3.2 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from librosa) (0.3.7)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: typing-extensions&gt;=4.1.1 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from librosa) (4.11.0)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: lazy-loader&gt;=0.1 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from librosa) (0.4)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: msgpack&gt;=1.0 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from librosa) (1.0.8)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: packaging in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from lazy-loader&gt;=0.1-&gt;librosa) (23.2)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: llvmlite&lt;0.44,&gt;=0.43.0dev0 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from numba&gt;=0.51.0-&gt;librosa) (0.43.0)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: platformdirs&gt;=2.5.0 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from pooch&gt;=1.1-&gt;librosa) (4.2.2)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: requests&gt;=2.19.0 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from pooch&gt;=1.1-&gt;librosa) (2.32.3)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: threadpoolctl&gt;=3.1.0 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from scikit-learn&gt;=0.20.0-&gt;librosa) (3.5.0)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: cffi&gt;=1.0 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from soundfile&gt;=0.12.1-&gt;librosa) (1.16.0)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: pycparser in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from cffi&gt;=1.0-&gt;soundfile&gt;=0.12.1-&gt;librosa) (2.22)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: charset-normalizer&lt;4,&gt;=2 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from requests&gt;=2.19.0-&gt;pooch&gt;=1.1-&gt;librosa) (3.3.2)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: idna&lt;4,&gt;=2.5 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from requests&gt;=2.19.0-&gt;pooch&gt;=1.1-&gt;librosa) (3.7)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: urllib3&lt;3,&gt;=1.21.1 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from requests&gt;=2.19.0-&gt;pooch&gt;=1.1-&gt;librosa) (2.2.2)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Requirement already satisfied: certifi&gt;=2017.4.17 in /home/nginx/miniconda/envs/jupyter/lib/python3.9/site-packages (from requests&gt;=2.19.0-&gt;pooch&gt;=1.1-&gt;librosa) (2024.6.2)
 </pre>
-
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 <span style="font-weight: bold">[</span><span style="color: #000080; text-decoration-color: #000080; background-color: #ffffff">notice</span><span style="color: #000000; text-decoration-color: #000000; background-color: #ffffff; font-weight: bold">]</span><span style="color: #000000; text-decoration-color: #000000; background-color: #ffffff"> A new release of pip is available: </span><span style="color: #800000; text-decoration-color: #800000; background-color: #ffffff">24.1</span><span style="color: #000000; text-decoration-color: #000000; background-color: #ffffff"> -&gt; </span><span style="color: #008000; text-decoration-color: #008000; background-color: #ffffff">24.1.2</span>
 <span style="font-weight: bold">[</span><span style="color: #000080; text-decoration-color: #000080; background-color: #ffffff">notice</span><span style="color: #000000; text-decoration-color: #000000; background-color: #ffffff; font-weight: bold">]</span><span style="color: #000000; text-decoration-color: #000000; background-color: #ffffff"> To update, run: </span><span style="color: #008000; text-decoration-color: #008000; background-color: #ffffff">python -m pip install --upgrade pip</span>
 </pre>
+<pre><code>Audio环境准备
+</code></pre>
+<pre><code class="language-python"># 下载音频wav文件
+url = &quot;https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/84-121123-0000.wav&quot;
+download(url, './84-121123-0000.wav', replace=True)
+wav_file = &quot;84-121123-0000.wav&quot;
+</code></pre>
+<pre><code>Downloading data from https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/84-121123-0000.wav (65 kB)
 
-<div class="highlight"><pre><span></span><code>Audio环境准备
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="c1"># 下载音频wav文件</span>
-<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/84-121123-0000.wav&quot;</span>
-<span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;./84-121123-0000.wav&#39;</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">wav_file</span> <span class="o">=</span> <span class="s2">&quot;84-121123-0000.wav&quot;</span>
-</code></pre></div>
-
-<div class="highlight"><pre><span></span><code><span class="n">Downloading</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">mindspore</span><span class="o">-</span><span class="n">website</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">cn</span><span class="o">-</span><span class="n">north</span><span class="o">-</span><span class="mf">4.</span><span class="n">myhuaweicloud</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">notebook</span><span class="o">/</span><span class="n">datasets</span><span class="o">/</span><span class="mi">84</span><span class="o">-</span><span class="mi">121123</span><span class="o">-</span><span class="mf">0000.</span><span class="n">wav</span><span class="w"> </span><span class="p">(</span><span class="mi">65</span><span class="w"> </span><span class="n">kB</span><span class="p">)</span>
-
-<span class="n">file_sizes</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="o">%|</span><span class="err">██████████████████████████</span><span class="o">|</span><span class="w"> </span><span class="mf">67.0</span><span class="n">k</span><span class="o">/</span><span class="mf">67.0</span><span class="n">k</span><span class="w"> </span><span class="p">[</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="o">&lt;</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">,</span><span class="w"> </span><span class="mf">25.9</span><span class="n">MB</span><span class="o">/</span><span class="n">s</span><span class="p">]</span>
-<span class="n">Successfully</span><span class="w"> </span><span class="n">downloaded</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="o">./</span><span class="mi">84</span><span class="o">-</span><span class="mi">121123</span><span class="o">-</span><span class="mf">0000.</span><span class="n">wav</span>
-</code></pre></div>
-
+file_sizes: 100%|██████████████████████████| 67.0k/67.0k [00:00&lt;00:00, 25.9MB/s]
+Successfully downloaded file to ./84-121123-0000.wav
+</code></pre>
 <h3>Spectrogram</h3>
 <p><code>Spectrogram</code> 用于从音频信号创建其频谱</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># 读取音频文件</span>
-<span class="n">sample_rate</span><span class="p">,</span> <span class="n">waveform</span> <span class="o">=</span> <span class="n">wavfile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">wav_file</span><span class="p">)</span>
+<pre><code class="language-python"># 读取音频文件
+sample_rate, waveform = wavfile.read(wav_file)
 
-<span class="k">def</span> <span class="nf">plot_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sr</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Waveform&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; 绘制音频波形图 &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
-    <span class="n">num_channels</span><span class="p">,</span> <span class="n">num_frames</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">time_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">)</span> <span class="o">/</span> <span class="n">sr</span>
+def plot_waveform(waveform, sr, title=&quot;Waveform&quot;):
+    &quot;&quot;&quot; 绘制音频波形图 &quot;&quot;&quot;
+    if waveform.ndim == 1:
+        waveform = waveform[np.newaxis, :]
+    num_channels, num_frames = waveform.shape
+    time_axis = np.arange(0, num_frames) / sr
 
-    <span class="n">figure</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">num_channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">axes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time_axis</span><span class="p">,</span> <span class="n">waveform</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">axes</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">figure</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    figure, axes = plt.subplots(num_channels, 1)
+    axes.plot(time_axis, waveform[0], linewidth=1)
+    axes.grid(True)
+    figure.suptitle(title)
+    plt.show(block=False)
+    
+def plot_spectrogram(specgram, title=None, ylabel=&quot;freq_bin&quot;):
+    &quot;&quot;&quot; 绘制音频光谱图 &quot;&quot;&quot;
+    fig, axs = plt.subplots(1, 1)
+    axs.set_title(title or &quot;Spectrogram (db)&quot;)
+    axs.set_ylabel(ylabel)
+    axs.set_xlabel(&quot;frame&quot;)
+    im = axs.imshow(librosa.power_to_db(specgram), origin=&quot;lower&quot;, aspect=&quot;auto&quot;)
+    fig.colorbar(im, ax=axs)
+    plt.show(block=False)
 
-<span class="k">def</span> <span class="nf">plot_spectrogram</span><span class="p">(</span><span class="n">specgram</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;freq_bin&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; 绘制音频光谱图 &quot;&quot;&quot;</span>
-    <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">axs</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span> <span class="ow">or</span> <span class="s2">&quot;Spectrogram (db)&quot;</span><span class="p">)</span>
-    <span class="n">axs</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
-    <span class="n">axs</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;frame&quot;</span><span class="p">)</span>
-    <span class="n">im</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">librosa</span><span class="o">.</span><span class="n">power_to_db</span><span class="p">(</span><span class="n">specgram</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+plot_waveform(waveform, sample_rate, title=&quot;Original waveform&quot;)
+</code></pre>
+<p><img src="/static/mindspore/fourth-blog_files/fourth-blog_25_0.png" alt="png" /></p>
+<pre><code class="language-python"># 进行Spectrogram变换
+n_fft = 1024
+win_length = None
+hop_length = 512
 
-<span class="n">plot_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original waveform&quot;</span><span class="p">)</span>
-</code></pre></div>
+# Define transform
+spectrogram = audio.Spectrogram(
+    n_fft=n_fft,
+    win_length=win_length,
+    hop_length=hop_length,
+    center=True,
+    pad_mode=audio.BorderType.REFLECT,
+    power=2.0,
+)
 
-<p><img alt="png" src="/static/mindspore/fourth-blog_files/fourth-blog_25_0.png"></p>
-<div class="highlight"><pre><span></span><code><span class="c1"># 进行Spectrogram变换</span>
-<span class="n">n_fft</span> <span class="o">=</span> <span class="mi">1024</span>
-<span class="n">win_length</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="n">hop_length</span> <span class="o">=</span> <span class="mi">512</span>
-
-<span class="c1"># Define transform</span>
-<span class="n">spectrogram</span> <span class="o">=</span> <span class="n">audio</span><span class="o">.</span><span class="n">Spectrogram</span><span class="p">(</span>
-    <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
-    <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
-    <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
-    <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">pad_mode</span><span class="o">=</span><span class="n">audio</span><span class="o">.</span><span class="n">BorderType</span><span class="o">.</span><span class="n">REFLECT</span><span class="p">,</span>
-    <span class="n">power</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">spec</span> <span class="o">=</span> <span class="n">spectrogram</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
-<span class="n">plot_spectrogram</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;audio&quot;</span><span class="p">)</span>
-</code></pre></div>
-
-<p><img alt="png" src="/static/mindspore/fourth-blog_files/fourth-blog_26_0.png"></p>
+spec = spectrogram(waveform)
+plot_spectrogram(spec, title=&quot;audio&quot;)
+</code></pre>
+<p><img src="/static/mindspore/fourth-blog_files/fourth-blog_26_0.png" alt="png" /></p>
 <h3>GriffinLim</h3>
 <p>从线性幅度频谱图恢复信号波形</p>
 <h3>Mel Filter Bank</h3>
 <p>mindspore.dataset.audio.melscale_fbanks 可以创建频率变换矩阵。</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">import</span> <span class="nn">pytz</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="s1">&#39;Asia/Shanghai&#39;</span><span class="p">)),</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">user:YZSH-HSZY&#39;</span><span class="p">)</span>
-</code></pre></div>
+<pre><code class="language-python">from datetime import datetime
+import pytz
+print(datetime.now(pytz.timezone('Asia/Shanghai')), '\nuser:YZSH-HSZY')
+</code></pre>
+<pre><code>2024-07-19 18:33:26.985327+08:00 
+user:YZSH-HSZY
+</code></pre>
 
-<div class="highlight"><pre><span></span><code><span class="mf">2024</span><span class="o">-</span><span class="mf">07</span><span class="o">-</span><span class="mf">19</span><span class="w"> </span><span class="mf">18</span><span class="p">:</span><span class="mf">33</span><span class="p">:</span><span class="mf">26.985327</span><span class="o">+</span><span class="mf">08</span><span class="p">:</span><span class="mf">00</span><span class="w"> </span>
-<span class="n">user</span><span class="p">:</span><span class="n">YZSH</span><span class="o">-</span><span class="n">HSZY</span>
-</code></pre></div>
       </div><!-- /.entry-content -->
 
     </article>

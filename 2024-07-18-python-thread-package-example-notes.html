@@ -40,41 +40,44 @@
                 </address>
         <p>In <a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a>.</p>
         
-</footer><!-- /.post-info -->        <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">atexit</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
-<span class="k">def</span> <span class="nf">test_p</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;this is test&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y, %H:%M:%S&quot;</span><span class="p">)))</span>
-    <span class="k">assert</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">1</span>
-<span class="c1"># atexit.register(test_p)</span>
+</footer><!-- /.post-info -->        <pre><code class="language-python">import atexit
+from datetime import datetime
+import threading
+from time import sleep
+def test_p():
+    print('this is test', str(datetime.now().strftime(&quot;%d/%m/%Y, %H:%M:%S&quot;)))
+    assert 1 == 1
+# atexit.register(test_p)
+    
+def thread_print():
+    i = 0
+    while i &lt; 1e3:
+        sleep(.001)
+        i += 1
+    print('threading end print')
+def end_print(*args):
+    print('atexiting print')
+    print(args)
+    if isinstance(args[0], threading.Thread):
+        p = args[0]
+        print(p, p.is_alive(), p.name)
+        p.join()
+p = threading.Thread(
+    target=thread_print,
+    args=[]
+)
+# 1. 对应主进程来说，并不是主线程退出了，主进程就会退出
+#   &gt; 而是主进程会等待所有在前景的线程结束才会退出
+# 2. 如果线程设置了守护标志，是一个背景线程daemon,那么主进程不会等待其执行完成才退出
+#   &gt; 一般无限循环检测标志或为其他线程提供服务的线程被设置为守护线程
+# 
+p.setDaemon(True)
+p.start()
+atexit.register(end_print, p)
 
-<span class="k">def</span> <span class="nf">thread_print</span><span class="p">():</span>
-    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mf">1e3</span><span class="p">:</span>
-        <span class="n">sleep</span><span class="p">(</span><span class="mf">.001</span><span class="p">)</span>
-        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;threading end print&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">end_print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;atexiting print&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">is_alive</span><span class="p">(),</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-<span class="n">p</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
-    <span class="n">target</span><span class="o">=</span><span class="n">thread_print</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="p">[]</span>
-<span class="p">)</span>
-<span class="c1"># 1. 对应主进程来说，并不是主线程退出了，主进程就会退出</span>
-<span class="c1">#   &gt; 而是主进程会等待所有在前景的线程结束才会退出</span>
-<span class="c1"># 2. 如果线程设置了守护标志，是一个背景线程daemon,那么主进程不会等待其执行完成才退出</span>
-<span class="c1">#   &gt; 一般无限循环检测标志或为其他线程提供服务的线程被设置为守护线程</span>
-<span class="c1"># </span>
-<span class="n">p</span><span class="o">.</span><span class="n">setDaemon</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-<span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">end_print</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-</code></pre></div>
+
+</code></pre>
+
       </div><!-- /.entry-content -->
 
     </article>

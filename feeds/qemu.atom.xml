@@ -1,37 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Welcome to YZSH-HSZY blog. - Qemu</title><link href="https://yzsh-hszy.github.io/" rel="alternate"></link><link href="https://yzsh-hszy.github.io/feeds/qemu.atom.xml" rel="self"></link><id>https://yzsh-hszy.github.io/</id><updated>2025-03-10T12:00:00+08:00</updated><entry><title>Customize Virtual Device Using Qemu.</title><link href="https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html" rel="alternate"></link><published>2025-03-10T12:00:00+08:00</published><updated>2025-03-10T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-03-10:/2025-03-10-customize-virtual-device-using-qemu.html</id><summary type="html">&lt;h1&gt;笔记介绍&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Welcome to YZSH-HSZY blog. - Qemu</title><link href="https://yzsh-hszy.github.io/" rel="alternate"/><link href="https://yzsh-hszy.github.io/feeds/qemu.atom.xml" rel="self"/><id>https://yzsh-hszy.github.io/</id><updated>2025-03-10T12:00:00+08:00</updated><entry><title>Customize Virtual Device Using Qemu.</title><link href="https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html" rel="alternate"/><published>2025-03-10T12:00:00+08:00</published><updated>2025-03-10T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-03-10:/2025-03-10-customize-virtual-device-using-qemu.html</id><summary type="html">&lt;h1&gt;笔记介绍&lt;/h1&gt;
 &lt;p&gt;该博客用于记录学习在qemu中添加自定义开发板的过程&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; qemu 官方在 &lt;code&gt;hw/misc/edu.c&lt;/code&gt; 中提供了一个教学用的设备样例, 可参考此文件实现模拟设 …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;笔记介绍&lt;/h1&gt;
 &lt;p&gt;该博客用于记录学习在qemu中添加自定义开发板的过程&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; qemu 官方在 &lt;code&gt;hw/misc/edu.c&lt;/code&gt; 中提供了一个教学用的设备样例, 可参考此文件实现模拟设备创建.&lt;/p&gt;
 &lt;h2&gt;QEMU Object Model&lt;/h2&gt;
-&lt;p&gt;在 qemu 中使用一套叫做 &lt;code&gt;Qemu Object Model&lt;/code&gt; 的东西来实现面向对象式开发模拟设备，主要由这四个组件构成：
-- Type：用来定义一个「类」的基本属性，例如类的名字、大小、构造函数等
-- Class：用来定义一个「类」的静态内容，例如类中存储的静态数据、方法函数指针等
-- Object：动态分配的一个「类」的具体的实例（instance），储存类的动态数据
-- Property：动态对象数据的访问器（accessor），可以通过监视器接口进行检查&lt;/p&gt;
+&lt;p&gt;在 qemu 中使用一套叫做 &lt;code&gt;Qemu Object Model&lt;/code&gt; 的东西来实现面向对象式开发模拟设备，主要由这四个组件构成：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Type：用来定义一个「类」的基本属性，例如类的名字、大小、构造函数等&lt;/li&gt;
+&lt;li&gt;Class：用来定义一个「类」的静态内容，例如类中存储的静态数据、方法函数指针等&lt;/li&gt;
+&lt;li&gt;Object：动态分配的一个「类」的具体的实例（instance），储存类的动态数据&lt;/li&gt;
+&lt;li&gt;Property：动态对象数据的访问器（accessor），可以通过监视器接口进行检查&lt;/li&gt;
+&lt;/ul&gt;
 &lt;blockquote&gt;
 &lt;p&gt;一个定义设备obj的示例&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;pci_edu_register_types&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;InterfaceInfo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;interfaces&lt;/span&gt;&lt;span class="p"&gt;[]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;INTERFACE_CONVENTIONAL_PCI_DEVICE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;TypeInfo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;edu_info&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;TYPE_PCI_EDU_DEVICE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parent&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;TYPE_PCI_DEVICE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;instance_size&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;sizeof&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;EduState&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;instance_init&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;edu_instance_init&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;class_init&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;edu_class_init&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;interfaces&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;interfaces&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;type_register_static&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;edu_info&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="n"&gt;type_init&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pci_edu_register_types&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
+&lt;pre&gt;&lt;code class="language-c"&gt;static void pci_edu_register_types(void)
+{
+    static InterfaceInfo interfaces[] = {
+        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+        { },
+    };
+    static const TypeInfo edu_info = {
+        .name          = TYPE_PCI_EDU_DEVICE,
+        .parent        = TYPE_PCI_DEVICE,
+        .instance_size = sizeof(EduState),
+        .instance_init = edu_instance_init,
+        .class_init    = edu_class_init,
+        .interfaces = interfaces,
+    };
+    type_register_static(&amp;amp;edu_info);
+}
+type_init(pci_edu_register_types)
+&lt;/code&gt;&lt;/pre&gt;
 &lt;h2&gt;QEMU添加设备流程&lt;/h2&gt;
 &lt;ol&gt;
 &lt;li&gt;在 &lt;code&gt;hw/{target_architecture}/&lt;/code&gt; 下, 创建新设备定义文件&lt;/li&gt;
@@ -41,7 +42,8 @@
 &lt;h2&gt;QEMU API介绍&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;code&gt;type_init&lt;/code&gt; 宏, 会被扩展为&lt;code&gt;gcc attribute constructor&lt;/code&gt;修饰的函数&lt;code&gt;do_qemu_init_##&lt;/code&gt;函数, 此属性修饰的函数会在程序的&lt;code&gt;main()&lt;/code&gt;函数之前自动调用, 其最终的作用是将一个 &lt;code&gt;TypeInfo&lt;/code&gt; 结构体实例通过  &lt;code&gt;type_register_static&lt;/code&gt; 函数注册到 &lt;code&gt;GHashTable&lt;/code&gt; 中&lt;/li&gt;
-&lt;/ul&gt;</content><category term="Qemu"></category></entry><entry><title>Build Mini Linux Distro And Use Qemu Running.</title><link href="https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html" rel="alternate"></link><published>2025-02-10T12:00:00+08:00</published><updated>2025-02-10T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-02-10:/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html</id><summary type="html">&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;/ul&gt;
+</content><category term="Qemu"/></entry><entry><title>Build Mini Linux Distro And Use Qemu Running.</title><link href="https://yzsh-hszy.github.io/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html" rel="alternate"/><published>2025-02-10T12:00:00+08:00</published><updated>2025-02-10T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-02-10:/2025-02-10-build-mini-linux-distro-and-use-qemu-running.html</id><summary type="html">&lt;h1&gt;介绍&lt;/h1&gt;
 &lt;p&gt;这是使用qemu的使用教程, 以构建最小linux发行版为例.
 &lt;a href="https://github.com/nir9/welcome/tree/master"&gt;参nir9博客&lt;/a&gt;&lt;/p&gt;
 &lt;h2&gt;术语参考&lt;/h2&gt;
@@ -66,13 +68,12 @@
 &lt;blockquote&gt;
 &lt;p&gt;使用 &lt;code&gt;make menuconfig&lt;/code&gt; 配置编译make选项, 配置如下:&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;64&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;bit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;kernel&lt;/span&gt;
-&lt;span class="n"&gt;General&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;---&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;Initial&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;RAM&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;filesystem&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ow"&gt;and&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;RAM&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;disk&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;initramfs&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;initrd&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
-&lt;span class="n"&gt;General&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;---&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;Configure&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;standard&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;kernel&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;features&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;exp&lt;/span&gt;&lt;span class="n"&gt;ert&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;users&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;---&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;Enable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kr"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kr"&gt;print&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
-&lt;span class="n"&gt;Executable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;file&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kr"&gt;for&lt;/span&gt;&lt;span class="n"&gt;mats&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;---&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;Kernel&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kr"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ELF&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;binaries&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
-&lt;span class="n"&gt;Device&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Drivers&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;---&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;Character&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;devices&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;---&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;Enable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;TTY&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
+&lt;pre&gt;&lt;code&gt;64-bit kernel
+General setup  ---&amp;gt;Initial RAM filesystem and RAM disk (initramfs/initrd) support 
+General setup  ---&amp;gt;Configure standard kernel features (expert users)  ---&amp;gt;Enable support for printk 
+Executable file formats  ---&amp;gt;Kernel support for ELF binaries 
+Device Drivers  ---&amp;gt;Character devices  ---&amp;gt;Enable TTY
+&lt;/code&gt;&lt;/pre&gt;
 &lt;blockquote&gt;
 &lt;p&gt;以上配置分别代表生成 &lt;code&gt;64位内核&lt;/code&gt;;&lt;code&gt;启用RAM文件系统和初始化根文件系统&lt;/code&gt;;&lt;code&gt;启用文本打印支持&lt;/code&gt;;&lt;code&gt;支持ELF格式执行文件&lt;/code&gt;;&lt;code&gt;启用tty字符设备&lt;/code&gt;
 使用 &lt;code&gt;make -j $(nproc)&lt;/code&gt; 构建, 默认生成的内核镜像在 &lt;code&gt;arch/x86/boot/bzImage&lt;/code&gt;,为压缩的kernel镜像,约780K
@@ -84,36 +85,35 @@
 &lt;ol&gt;
 &lt;li&gt;编写一个简易的调用shell命令程序, 使用POISX接口&lt;code&gt;write/read/execve/waitid&lt;/code&gt;&lt;/li&gt;
 &lt;/ol&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;
-&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;sys/wait.h&amp;gt;&lt;/span&gt;
+&lt;pre&gt;&lt;code class="language-c"&gt;#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;sys/wait.h&amp;gt;
 
-&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(){&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kt"&gt;char&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;255&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="p"&gt;(;;){&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;# &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;count&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;255&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// write(1, &amp;quot;&amp;quot;, );&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;count&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kt"&gt;pid_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;child&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;fork&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;child&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;-1&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
-&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;fork failed!&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;exit!!!&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;21&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;child&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
-&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="n"&gt;execve&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kt"&gt;siginfo_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;infop&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;waitid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;P_ALL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;infop&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;WEXITED&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;ol&gt;
+int main(){
+    char cmd[255];
+    for(;;){
+        write(1, &amp;quot;# &amp;quot;, 2);
+        int count = read(0, cmd, 255);
+        // write(1, &amp;quot;&amp;quot;, );
+        cmd[count - 1] = 0;
+        pid_t child = fork();
+        if (child == -1){
+            write(1, &amp;quot;fork failed!\nexit!!!&amp;quot;, 21);
+            break;
+        }
+        if (child == 0){
+            execve(cmd, 0, NULL);
+            break;
+        }
+        siginfo_t infop;
+        waitid(P_ALL, 0, &amp;amp;infop, WEXITED);
+    }
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start="2"&gt;
 &lt;li&gt;&lt;code&gt;gcc -static shell.c -o init&lt;/code&gt; 编译为静态可执行文件&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;echo init | cpio -H newc -o &amp;gt; init.cpio&lt;/code&gt; 生成一个initrd&lt;/li&gt;
-&lt;li&gt;重新编译为iso内核 &lt;code&gt;make isoimage FDARGS="initrd=/init.cpio" FDINITRD=$(pwd)/init.cpio&lt;/code&gt; 生成的arch/x96/boot/image.iso 镜像大小为2.2M&lt;/li&gt;
+&lt;li&gt;重新编译为iso内核 &lt;code&gt;make isoimage FDARGS=&amp;quot;initrd=/init.cpio&amp;quot; FDINITRD=$(pwd)/init.cpio&lt;/code&gt; 生成的arch/x96/boot/image.iso 镜像大小为2.2M&lt;/li&gt;
 &lt;li&gt;启动iso镜像 &lt;code&gt;qemu-system-x86_64 -cdrom image.iso&lt;/code&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;h3&gt;使用assembly进行系统调用,进一步精简init程序&lt;/h3&gt;
@@ -128,131 +128,129 @@
 &lt;blockquote&gt;
 &lt;p&gt;准备待链接的.c和.s源文件&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// shell.c&lt;/span&gt;
-&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;
-&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;sys/wait.h&amp;gt;&lt;/span&gt;
+&lt;pre&gt;&lt;code class="language-c"&gt;// shell.c
+#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;sys/wait.h&amp;gt;
 
-&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;real_waitid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;idtype_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;idtype&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;id_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;siginfo_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;infop&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;options&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+int real_waitid(idtype_t idtype, id_t id, siginfo_t *infop, int options, void*);
 
-&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kt"&gt;char&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;255&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(;;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;# &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;count&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;255&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// /bin/ls\n -&amp;gt; /bin/ls\0&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;count&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kt"&gt;pid_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;fork_result&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;fork&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fork_result&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="n"&gt;execve&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="c1"&gt;// wait&lt;/span&gt;
-&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="c1"&gt;// &lt;/span&gt;
-&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="kt"&gt;siginfo_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="n"&gt;real_waitid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;P_ALL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;WEXITED&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+int main()
+{
+	char command[255];
+	for (;;) {
+		write(1, &amp;quot;# &amp;quot;, 2);
+		int count = read(0, command, 255);
+		// /bin/ls\n -&amp;gt; /bin/ls\0
+		command[count - 1] = 0;
+		pid_t fork_result = fork();
+		if (fork_result == 0) {
+			execve(command, 0, 0);
+			break;
+		} else {
+			// wait
+			// 
+			siginfo_t info;
+			real_waitid(P_ALL, 0, &amp;amp;info, WEXITED, 0);
+		}
+	}
 
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;_exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+	_exit(0);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class="language-asm"&gt;sys.S
+.intel_syntax noprefix
 
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;sys.S&lt;/span&gt;
-&lt;span class="na"&gt;.intel_syntax&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;noprefix&lt;/span&gt;
+.global write
+.global read
+.global fork
+.global execve
+.global real_waitid
+.global _exit
 
-&lt;span class="na"&gt;.global&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;write&lt;/span&gt;
-&lt;span class="na"&gt;.global&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;read&lt;/span&gt;
-&lt;span class="na"&gt;.global&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;fork&lt;/span&gt;
-&lt;span class="na"&gt;.global&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;execve&lt;/span&gt;
-&lt;span class="na"&gt;.global&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;real_waitid&lt;/span&gt;
-&lt;span class="na"&gt;.global&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;_exit&lt;/span&gt;
+write:
+mov rax, 1
+syscall
+ret
 
-&lt;span class="nl"&gt;write:&lt;/span&gt;
-&lt;span class="nf"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;
-&lt;span class="nf"&gt;syscall&lt;/span&gt;
-&lt;span class="nf"&gt;ret&lt;/span&gt;
+read:
+mov rax, 0
+syscall
+ret
 
-&lt;span class="nl"&gt;read:&lt;/span&gt;
-&lt;span class="nf"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;
-&lt;span class="nf"&gt;syscall&lt;/span&gt;
-&lt;span class="nf"&gt;ret&lt;/span&gt;
-
-&lt;span class="nl"&gt;execve:&lt;/span&gt;
-&lt;span class="nf"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;59&lt;/span&gt;
-&lt;span class="nf"&gt;syscall&lt;/span&gt;
-&lt;span class="nf"&gt;ret&lt;/span&gt;
+execve:
+mov rax, 59
+syscall
+ret
 
 
-&lt;span class="nl"&gt;fork:&lt;/span&gt;
-&lt;span class="nf"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;57&lt;/span&gt;
-&lt;span class="nf"&gt;syscall&lt;/span&gt;
-&lt;span class="nf"&gt;ret&lt;/span&gt;
+fork:
+mov rax, 57
+syscall
+ret
 
-&lt;span class="nl"&gt;real_waitid:&lt;/span&gt;
-&lt;span class="nf"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;247&lt;/span&gt;
-&lt;span class="nf"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;r10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;rcx&lt;/span&gt;
-&lt;span class="nf"&gt;syscall&lt;/span&gt;
-&lt;span class="nf"&gt;ret&lt;/span&gt;
+real_waitid:
+mov rax, 247
+mov r10, rcx
+syscall
+ret
 
-&lt;span class="nl"&gt;_exit:&lt;/span&gt;
-&lt;span class="nf"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;60&lt;/span&gt;
-&lt;span class="nf"&gt;syscall&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
+_exit:
+mov rax, 60
+syscall
+&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;strong&gt;为什么 &lt;code&gt;real_waitid&lt;/code&gt; 函数多了一条 &lt;code&gt;mov r10, rcx&lt;/code&gt;指令?&lt;/strong&gt;&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;参考&lt;a href="https://en.wikipedia.org/wiki/X86_calling_conventions"&gt;wiki x86 体系结构的调用约定&lt;/a&gt;
-AMD64架构下gcc编译器使用的参数寄存器依次是 &lt;code&gt;Integer/pointer arguments(RDI, RSI, RDX, RCX, R8, R9), Floating point arguments([XYZ]MM0–7)&lt;/code&gt;. 
+AMD64架构下gcc编译器使用的参数寄存器依次是 &lt;code&gt;Integer/pointer arguments(RDI, RSI, RDX, RCX, R8, R9), Floating point arguments([XYZ]MM0–7)&lt;/code&gt;.
 而内核接口使用的参数寄存器是 &lt;code&gt;RDI, RSI, RDX, R10, R8 and R9&lt;/code&gt;
 因此在汇编实现的syscall function需要将第四个参数从寄存器RCX移动到R10&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;&lt;strong&gt;依次执行编译链接命令&lt;/strong&gt;
-- &lt;code&gt;gcc -c shell.c -o shell.o&lt;/code&gt;
-- &lt;code&gt;as sys.S -o sys.o&lt;/code&gt;
-- &lt;code&gt;ld -o init shell.o sys.o --entry main -z noexecstack&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;依次执行编译链接命令&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;gcc -c shell.c -o shell.o&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;as sys.S -o sys.o&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ld -o init shell.o sys.o --entry main -z noexecstack&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h4&gt;&lt;code&gt;Segmentation fault&lt;/code&gt; 问题排查&lt;/h4&gt;
 &lt;p&gt;上述步骤中生成的最小init,在我调用时报错 &lt;code&gt;Segmentation fault (core dumped)&lt;/code&gt;, 在我进一步排查积累了以下经验&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;首先, 我想验证通过gcc和as链接obj生成程序是否可行, 而不是其他版本或库等的问题. 为此我编写了一个仅包含&lt;code&gt;write&lt;/code&gt;的系统调用和对应的asm实现syscall id寄存器(此处是eax/rax)的装载
 示例代码如下:&lt;/li&gt;
 &lt;/ol&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// shell.c&lt;/span&gt;
-&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;
+&lt;pre&gt;&lt;code&gt;// shell.c
+#include &amp;lt;unistd.h&amp;gt;
 
-&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(){&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;# &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="c1"&gt;// sys.S&lt;/span&gt;
-&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;intel_syntax&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;noprefix&lt;/span&gt;
+int main(){
+    write(1, &amp;quot;# &amp;quot;, 2);
+}
+// sys.S
+.intel_syntax noprefix
 
-&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;global&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;
+.global write
 
-&lt;span class="nl"&gt;write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-&lt;span class="n"&gt;mov&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;rax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;
-&lt;span class="n"&gt;syscall&lt;/span&gt;
-&lt;span class="n"&gt;ret&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;ol&gt;
-&lt;li&gt;但是我仍得到了 &lt;code&gt;Segmentation fault&lt;/code&gt;,不同的是在此之前程序有期望的输出&lt;code&gt;#&lt;/code&gt;, 此时想要继续探究下去, 我就需要探索汇编了, 但这方面我不太熟悉, 因此消耗了一些时间. 首先因为具有期望输出, 使用判断此时asm系统调用应该可用, 了解到 &lt;code&gt;objdump&lt;/code&gt; 这一反汇编工具, 因此将生成的程序反汇编 &lt;code&gt;objdump -D minit &amp;gt; mm.S&lt;/code&gt; , 主要关注syscall之后的部分&lt;/li&gt;
+write:
+mov rax, 1
+syscall
+ret
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start="2"&gt;
+&lt;li&gt;但是我仍得到了 &lt;code&gt;Segmentation fault&lt;/code&gt;,不同的是在此之前程序有期望的输出&lt;code&gt;# &lt;/code&gt;, 此时想要继续探究下去, 我就需要探索汇编了, 但这方面我不太熟悉, 因此消耗了一些时间. 首先因为具有期望输出, 使用判断此时asm系统调用应该可用, 了解到 &lt;code&gt;objdump&lt;/code&gt; 这一反汇编工具, 因此将生成的程序反汇编 &lt;code&gt;objdump -D minit &amp;gt; mm.S&lt;/code&gt; , 主要关注syscall之后的部分&lt;/li&gt;
 &lt;/ol&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;0000000000401000&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mf"&gt;401019&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="n"&gt;e8&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;07&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;00&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;00&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;00&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="n"&gt;callq&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mf"&gt;401025&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mf"&gt;40101&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="n"&gt;b8&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;00&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;00&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;00&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;00&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="n"&gt;mov&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="mf"&gt;0&lt;/span&gt;&lt;span class="n"&gt;x0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="err"&gt;%&lt;/span&gt;&lt;span class="n"&gt;eax&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mf"&gt;401023&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="mf"&gt;5&lt;/span&gt;&lt;span class="n"&gt;d&lt;/span&gt;&lt;span class="w"&gt;                      &lt;/span&gt;&lt;span class="n"&gt;pop&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="err"&gt;%&lt;/span&gt;&lt;span class="n"&gt;rbp&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mf"&gt;401024&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="n"&gt;c3&lt;/span&gt;&lt;span class="w"&gt;                      &lt;/span&gt;&lt;span class="n"&gt;retq&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;
+&lt;pre&gt;&lt;code&gt;0000000000401000 &amp;lt;main&amp;gt;:
+  401019:	e8 07 00 00 00       	callq  401025 &amp;lt;write&amp;gt;
+  40101e:	b8 00 00 00 00       	mov    $0x0,%eax
+  401023:	5d                   	pop    %rbp
+  401024:	c3                   	retq   
 
-&lt;span class="mf"&gt;0000000000401025&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mf"&gt;401025&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="mf"&gt;48&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;c7&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;c0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;01&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;00&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;00&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;00&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;mov&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="mf"&gt;0&lt;/span&gt;&lt;span class="n"&gt;x1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="err"&gt;%&lt;/span&gt;&lt;span class="n"&gt;rax&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mf"&gt;40102&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="mf"&gt;0&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;05&lt;/span&gt;&lt;span class="w"&gt;                   &lt;/span&gt;&lt;span class="kr"&gt;sys&lt;/span&gt;&lt;span class="n"&gt;call&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="mf"&gt;40102&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="n"&gt;c3&lt;/span&gt;&lt;span class="w"&gt;                      &lt;/span&gt;&lt;span class="n"&gt;retq&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
+0000000000401025 &amp;lt;write&amp;gt;:
+  401025:	48 c7 c0 01 00 00 00 	mov    $0x1,%rax
+  40102c:	0f 05                	syscall 
+  40102e:	c3                   	retq   
+&lt;/code&gt;&lt;/pre&gt;
 &lt;blockquote&gt;
 &lt;p&gt;可以看到在 &lt;code&gt;call write&lt;/code&gt; 之后仅有指令:常量mov和pop栈恢复, 判断应该是此处有问题, 让我们通过gdb调试一下  &lt;code&gt;gdb minit&lt;/code&gt;; 在gdb命令界面中输入 &lt;code&gt;set disassemble-next-line on&lt;/code&gt; 开启自动反汇编; &lt;code&gt;layout regs -tui&lt;/code&gt; 以tui形式显示寄存器; &lt;code&gt;si&lt;/code&gt;逐步汇编指令调试, 发现在执行 &lt;code&gt;retq&lt;/code&gt; 时报 &lt;code&gt;cannot access memory at address 0x1&lt;/code&gt;, 因此我们需要避免gcc为我们自动处理的退出, 这也是为什么需要使用&lt;code&gt;_exit&lt;/code&gt; syscall来退出程序, 在&lt;code&gt;sys.S&lt;/code&gt;中添加_exit定义后,此部分工作正常&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;ol&gt;
+&lt;ol start="3"&gt;
 &lt;li&gt;
 &lt;p&gt;现在，让我们用上述步骤调试 &lt;code&gt;init&lt;/code&gt; 程序中的 &lt;code&gt;Segmentation fault&lt;/code&gt;, 问题发生在 &lt;code&gt;mov %fs:0x28, %rax&lt;/code&gt;, 查阅资料得知, 此部分用于栈溢出保护,一般和指令 &lt;code&gt;mov %rax, -0x8(%rsp)&lt;/code&gt; 配套出现, 其作用为:从线程局部空间随机读取一个值, 在函数返回时, 检查此值是否被修改, 以防止栈溢出攻击. 在64bit模式下 %fs 的实际基址由 %fs_base 决定, 此值为0, 因此出现了非法地址范围&lt;/p&gt;
 &lt;/li&gt;
@@ -261,11 +259,12 @@ AMD64架构下gcc编译器使用的参数寄存器依次是 &lt;code&gt;Integer/
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;定位到问题, 那么就不能使用带 &lt;code&gt;siginfo_t&lt;/code&gt; 参数的 &lt;code&gt;waitid&lt;/code&gt; syscall了, 我尝试使用 &lt;code&gt;waitpid&lt;/code&gt; 找到其syscall为&lt;code&gt;syscall_wait4(61)&lt;/code&gt;, 工作正常&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
 &lt;blockquote&gt;
 &lt;p&gt;这里, 我犯了个低级问题, 在asm中实现的waitpid忘记加ret返回, 程序在执行一次子进程后自动退出, 因为PC在执行waitpid后, 自动+1执行到_exit指令位置致循环失效, 主进程退出, 因为涉及到多个进程和无限循环, 导致我又绕了一大圈.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;最后让我们查看一下 &lt;code&gt;init&lt;/code&gt; 的大小并重新生成iso镜像, &lt;code&gt;du -sh init image.iso // 12K, 1.9M&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;</content><category term="Qemu"></category></entry></feed>
+&lt;ol start="6"&gt;
+&lt;li&gt;最后让我们查看一下 &lt;code&gt;init&lt;/code&gt; 的大小并重新生成iso镜像, &lt;code&gt;du -sh init image.iso // 12K, 1.9M&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</content><category term="Qemu"/></entry></feed>
