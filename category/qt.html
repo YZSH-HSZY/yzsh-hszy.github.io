@@ -4,10 +4,9 @@
                         <meta charset="utf-8" />
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                         <meta name="generator" content="Pelican" />
-                        <title>Customize Virtual Device Using Qemu.</title>
+                        <title>Welcome to YZSH-HSZY blog. - Qt</title>
                         <link rel="stylesheet" href="https://yzsh-hszy.github.io/theme/css/main.css" />
                                 <link href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Welcome to YZSH-HSZY blog. Atom Feed" />
-    <meta name="description" content="笔记介绍 该博客用于记录学习在qemu中添加自定义开发板的过程 注意 qemu 官方在 hw/misc/edu.c 中提供了一个教学用的设备样例, 可参考此文件实现模拟设 …" />
         </head>
 
         <body id="index" class="home">
@@ -17,77 +16,90 @@
                                                 <li><a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/linux.html">Linux</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/mindspore.html">Mindspore</a></li>
-                                                <li class="active"><a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a></li>
-                                                <li><a href="https://yzsh-hszy.github.io/category/qt.html">Qt</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a></li>
+                                                <li class="active"><a href="https://yzsh-hszy.github.io/category/qt.html">Qt</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/test.html">Test</a></li>
                         </ul></nav>
                 </header><!-- /#banner -->
-  <section id="content" class="body">
-    <article>
-      <header>
-        <h1 class="entry-title">
-          <a href="https://yzsh-hszy.github.io/2025-03-10-customize-virtual-device-using-qemu.html" rel="bookmark"
-             title="Permalink to Customize Virtual Device Using Qemu.">Customize Virtual Device Using Qemu.</a></h1>
-      </header>
 
-      <div class="entry-content">
+                <aside id="featured" class="body">
+                    <article>
+                        <h1 class="entry-title"><a href="https://yzsh-hszy.github.io/2025-09-01-qtableview-multi-key-sort.html">QTableView Multi-Key Sort</a></h1>
 <footer class="post-info">
-        <abbr class="published" title="2025-03-10T12:00:00+08:00">
-                Published: Mon 10 March 2025
+        <abbr class="published" title="2025-09-01T12:00:00+08:00">
+                Published: Mon 01 September 2025
         </abbr>
 
                 <address class="vcard author">
                         By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
                 </address>
-        <p>In <a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a>.</p>
+        <p>In <a href="https://yzsh-hszy.github.io/category/qt.html">Qt</a>.</p>
         
-</footer><!-- /.post-info -->        <h1>笔记介绍</h1>
-<p>该博客用于记录学习在qemu中添加自定义开发板的过程</p>
-<p><strong>注意</strong> qemu 官方在 <code>hw/misc/edu.c</code> 中提供了一个教学用的设备样例, 可参考此文件实现模拟设备创建.</p>
-<h2>QEMU Object Model</h2>
-<p>在 qemu 中使用一套叫做 <code>Qemu Object Model</code> 的东西来实现面向对象式开发模拟设备，主要由这四个组件构成：</p>
-<ul>
-<li>Type：用来定义一个「类」的基本属性，例如类的名字、大小、构造函数等</li>
-<li>Class：用来定义一个「类」的静态内容，例如类中存储的静态数据、方法函数指针等</li>
-<li>Object：动态分配的一个「类」的具体的实例（instance），储存类的动态数据</li>
-<li>Property：动态对象数据的访问器（accessor），可以通过监视器接口进行检查</li>
-</ul>
+</footer><!-- /.post-info --><h1>介绍</h1>
+<p>在Qt的Tableview中让数据按多个指定项有序, 类似基数排序</p>
+<h2>key固定, 不会动态更改排序key</h2>
+<h3>使用自定义model实现静态多key有序</h3>
 <blockquote>
-<p>一个定义设备obj的示例</p>
+<p>继承 <code>QAbstractTableModel</code> 实现自定义<code>TableModel</code>
+重写以下方法:</p>
 </blockquote>
-<pre><code class="language-c">static void pci_edu_register_types(void)
-{
-    static InterfaceInfo interfaces[] = {
-        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-        { },
-    };
-    static const TypeInfo edu_info = {
-        .name          = TYPE_PCI_EDU_DEVICE,
-        .parent        = TYPE_PCI_DEVICE,
-        .instance_size = sizeof(EduState),
-        .instance_init = edu_instance_init,
-        .class_init    = edu_class_init,
-        .interfaces = interfaces,
-    };
-    type_register_static(&amp;edu_info);
-}
-type_init(pci_edu_register_types)
+<pre><code class="language-cpp">QVariant data(const QModelIndex&amp; index, int role = Qt::DisplayRole) const override;
+int rowCount(const QModelIndex &amp;parent = QModelIndex()) const override;
+int columnCount(const QModelIndex &amp;parent = QModelIndex()) const override;
+QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 </code></pre>
-<h2>QEMU添加设备流程</h2>
-<ol>
-<li>在 <code>hw/{target_architecture}/</code> 下, 创建新设备定义文件</li>
-<li>实例化虚拟设备的 <code>TypeInfo</code>, 并提供 <code>type_register_static</code> 注册, <code>type_init</code> 调用</li>
-<li>设置 <code>TypeInfo</code> 设备obj的 <code>class_init</code> class初始函数指针, 对于模拟开发板, 在<code>class_init</code>指定的方法中需要实例化<code>MACHINE_CLASS</code>并配置</li>
-</ol>
-<h2>QEMU API介绍</h2>
-<ul>
-<li><code>type_init</code> 宏, 会被扩展为<code>gcc attribute constructor</code>修饰的函数<code>do_qemu_init_##</code>函数, 此属性修饰的函数会在程序的<code>main()</code>函数之前自动调用, 其最终的作用是将一个 <code>TypeInfo</code> 结构体实例通过  <code>type_register_static</code> 函数注册到 <code>GHashTable</code> 中</li>
-</ul>
+<blockquote>
+<p>使用 <code>QMap</code> 存储实际数据
+使用自定义 <code>POD</code> 类型作为 <code>QMap</code> 的key, 并重载 <code>openator&lt;</code> 函数</p>
+</blockquote>
+<pre><code class="language-python">%%writefile main.cpp
 
-      </div><!-- /.entry-content -->
+struct TableModelMapKey {
+    int first;
+    int sencond;
+    int trhird;
+    bool operator&lt;(const TableModelMapKey&amp; o) const {
+        if (first != o.first) return first &lt; o.first;
+        else if (sencond != o.sencond) return sencond &lt; o.sencond;
+        else if (trhird != o.trhird) return trhird &lt; o.trhird;
+        return false;
+    }
+};
+QMap&lt;TableModelMapKey, QString&gt; _m_datas;
+</code></pre>
+<pre><code>Overwriting main.cpp
+</code></pre>
+<blockquote>
+<p>QMap定义为Template, 其中key</p>
+</blockquote>
+<pre><code class="language-cpp">template &lt;class Key, class T&gt;
+class QMap
+{
+    typedef QMapNode&lt;Key, T&gt; Node;
 
-    </article>
-  </section>
+    QMapData&lt;Key, T&gt; *d;
+    ...
+}
+</code></pre>
+<pre><code class="language-python">!g++ main.cpp `PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/home/smartwork/work/qtbase-69ce741c186c9a1dd4ea9eecb7a51725c4e62342/install/lib/pkgconfig pkg-config --libs --cflags Qt6Core` -o main.exe
+</code></pre>
+<pre><code class="language-python">!LD_LIBRARY_PATH=/home/smartwork/work/qtbase-69ce741c186c9a1dd4ea9eecb7a51725c4e62342/install/lib/ ./main.exe
+</code></pre>
+<pre><code>Hello World!
+</code></pre>
+<pre><code class="language-python">%%time
+import os
+
+print(os.getcwd())
+</code></pre>
+<pre><code>/home/smartwork/work/mblog/qt
+CPU times: user 0 ns, sys: 450 μs, total: 450 μs
+Wall time: 463 μs
+</code></pre>
+<pre><code class="language-python">
+</code></pre>
+                    </article>
+                </aside><!-- /#featured -->
                 <section id="extras" class="body">
                                 <div class="blogroll">
                                         <h2>links</h2>

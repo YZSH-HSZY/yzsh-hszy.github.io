@@ -1,5 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Welcome to YZSH-HSZY blog. - YZSH-HSZY</title><link href="https://yzsh-hszy.github.io/" rel="alternate"/><link href="https://yzsh-hszy.github.io/feeds/yzsh-hszy.atom.xml" rel="self"/><id>https://yzsh-hszy.github.io/</id><updated>2025-03-20T12:00:00+08:00</updated><entry><title>Linux SSH Port Forward Example.</title><link href="https://yzsh-hszy.github.io/2025-03-20-linux-ssh-port-forward-example.html" rel="alternate"/><published>2025-03-20T12:00:00+08:00</published><updated>2025-03-20T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-03-20:/2025-03-20-linux-ssh-port-forward-example.html</id><summary type="html">&lt;h1&gt;介绍&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Welcome to YZSH-HSZY blog. - YZSH-HSZY</title><link href="https://yzsh-hszy.github.io/" rel="alternate"/><link href="https://yzsh-hszy.github.io/feeds/yzsh-hszy.atom.xml" rel="self"/><id>https://yzsh-hszy.github.io/</id><updated>2025-09-01T12:00:00+08:00</updated><entry><title>QTableView Multi-Key Sort</title><link href="https://yzsh-hszy.github.io/2025-09-01-qtableview-multi-key-sort.html" rel="alternate"/><published>2025-09-01T12:00:00+08:00</published><updated>2025-09-01T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-09-01:/2025-09-01-qtableview-multi-key-sort.html</id><summary type="html">&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;在Qt的Tableview中让数据按多个指定项有序, 类似基数排序&lt;/p&gt;
+&lt;h2&gt;key固定, 不会动态更改排序key&lt;/h2&gt;
+&lt;h3&gt;使用自定义model实现静态多key有序&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;继承 &lt;code&gt;QAbstractTableModel&lt;/code&gt; 实现自定义&lt;code&gt;TableModel&lt;/code&gt;
+重写以下方法:&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class="language-cpp"&gt;QVariant data(const QModelIndex&amp;amp; index, int role = Qt::DisplayRole …&lt;/code&gt;&lt;/pre&gt;</summary><content type="html">&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;在Qt的Tableview中让数据按多个指定项有序, 类似基数排序&lt;/p&gt;
+&lt;h2&gt;key固定, 不会动态更改排序key&lt;/h2&gt;
+&lt;h3&gt;使用自定义model实现静态多key有序&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;继承 &lt;code&gt;QAbstractTableModel&lt;/code&gt; 实现自定义&lt;code&gt;TableModel&lt;/code&gt;
+重写以下方法:&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class="language-cpp"&gt;QVariant data(const QModelIndex&amp;amp; index, int role = Qt::DisplayRole) const override;
+int rowCount(const QModelIndex &amp;amp;parent = QModelIndex()) const override;
+int columnCount(const QModelIndex &amp;amp;parent = QModelIndex()) const override;
+QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;使用 &lt;code&gt;QMap&lt;/code&gt; 存储实际数据
+使用自定义 &lt;code&gt;POD&lt;/code&gt; 类型作为 &lt;code&gt;QMap&lt;/code&gt; 的key, 并重载 &lt;code&gt;openator&amp;lt;&lt;/code&gt; 函数&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class="language-python"&gt;%%writefile main.cpp
+
+struct TableModelMapKey {
+    int first;
+    int sencond;
+    int trhird;
+    bool operator&amp;lt;(const TableModelMapKey&amp;amp; o) const {
+        if (first != o.first) return first &amp;lt; o.first;
+        else if (sencond != o.sencond) return sencond &amp;lt; o.sencond;
+        else if (trhird != o.trhird) return trhird &amp;lt; o.trhird;
+        return false;
+    }
+};
+QMap&amp;lt;TableModelMapKey, QString&amp;gt; _m_datas;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Overwriting main.cpp
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;QMap定义为Template, 其中key&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class="language-cpp"&gt;template &amp;lt;class Key, class T&amp;gt;
+class QMap
+{
+    typedef QMapNode&amp;lt;Key, T&amp;gt; Node;
+
+    QMapData&amp;lt;Key, T&amp;gt; *d;
+    ...
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class="language-python"&gt;!g++ main.cpp `PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/home/smartwork/work/qtbase-69ce741c186c9a1dd4ea9eecb7a51725c4e62342/install/lib/pkgconfig pkg-config --libs --cflags Qt6Core` -o main.exe
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class="language-python"&gt;!LD_LIBRARY_PATH=/home/smartwork/work/qtbase-69ce741c186c9a1dd4ea9eecb7a51725c4e62342/install/lib/ ./main.exe
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Hello World!
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class="language-python"&gt;%%time
+import os
+
+print(os.getcwd())
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;/home/smartwork/work/mblog/qt
+CPU times: user 0 ns, sys: 450 μs, total: 450 μs
+Wall time: 463 μs
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class="language-python"&gt;
+&lt;/code&gt;&lt;/pre&gt;
+</content><category term="Qt"/></entry><entry><title>Linux SSH Port Forward Example.</title><link href="https://yzsh-hszy.github.io/2025-03-20-linux-ssh-port-forward-example.html" rel="alternate"/><published>2025-03-20T12:00:00+08:00</published><updated>2025-03-20T12:00:00+08:00</updated><author><name>YZSH-HSZY</name></author><id>tag:yzsh-hszy.github.io,2025-03-20:/2025-03-20-linux-ssh-port-forward-example.html</id><summary type="html">&lt;h1&gt;介绍&lt;/h1&gt;
 &lt;p&gt;此文章记录使用ssh进行端口转发的示例。&lt;/p&gt;
 &lt;p&gt;ssh能够将其他tcp端口的网络数据通ssh连接来转发, 并且提供自动加密及解密服务, 也叫做tunnel(隧道). 如&lt;code&gt;Telnet&lt;/code&gt;/&lt;code&gt;SMTP&lt;/code&gt;/&lt;code&gt;LDAP&lt;/code&gt;等应用.&lt;/p&gt;
 &lt;blockquote&gt;

@@ -17,12 +17,48 @@
                                                 <li><a href="https://yzsh-hszy.github.io/category/linux.html">Linux</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/mindspore.html">Mindspore</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/qt.html">Qt</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/test.html">Test</a></li>
                         </ul></nav>
                 </header><!-- /#banner -->
 
                     <section id="content" class="body">
                         <ol id="posts-list" class="hfeed" start="9">
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="https://yzsh-hszy.github.io/2024-07-18-python-unicode-and-utf-8-different-notes.html" rel="bookmark"
+                               title="Permalink to Python Unicode And Utf-8 Different Notes.">Python Unicode And Utf-8 Different Notes.</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-07-18T12:00:00+08:00">
+                Published: Thu 18 July 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
+                </address>
+        <p>In <a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a>.</p>
+        
+</footer><!-- /.post-info -->                        <pre><code class="language-python">with open('all_unicode_char.txt', 'wb') as f:
+    err_nums = 0
+    true_nums = 0
+    for i in range(1, pow(2, 19)):
+        try:
+            s = chr(i).encode('utf8')
+        except UnicodeEncodeError:
+            err_nums += 1
+            s = None
+        if s:
+            f.write(s)
+            true_nums += 1
+    print(
+        'the true add error nums equals range(1, pow(2,19 …</code></pre>
+                        <a class="readmore" href="https://yzsh-hszy.github.io/2024-07-18-python-unicode-and-utf-8-different-notes.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
                 <li><article class="hentry">
                     <header>
                         <h1><a href="https://yzsh-hszy.github.io/2024-07-04-mindspore-learen-notes-data-transfroms-operation-learen.html" rel="bookmark"
