@@ -4,10 +4,10 @@
                         <meta charset="utf-8" />
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                         <meta name="generator" content="Pelican" />
-                        <title>Linux Root File System Make.</title>
+                        <title>Compile SQLCipher Using MSVC</title>
                         <link rel="stylesheet" href="https://yzsh-hszy.github.io/theme/css/main.css" />
                                 <link href="https://yzsh-hszy.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Welcome to YZSH-HSZY blog. Atom Feed" />
-    <meta name="description" content="笔记介绍 此文件记载我学习定制linux系统中关于 root file system 的部分 参考文档 博客园-制作ubuntu-base rootfs博客" />
+    <meta name="description" content="介绍 记录使用 MSVC 编译器编译 SQLCipher 这个加密SQLite扩展项目的笔记 准备 ActiveTcl: 一个Tcl/Tk 发行版, 开箱即用(SQLCipher需要tclsh用于生产源代码和测试) OpenSSL: SQLCipher使用的加密后端 参考文档:..." />
         </head>
 
         <body id="index" class="home">
@@ -15,11 +15,11 @@
                         <h1><a href="https://yzsh-hszy.github.io/">Welcome to YZSH-HSZY blog.</a></h1>
                         <nav><ul>
                                                 <li><a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a></li>
-                                                <li class="active"><a href="https://yzsh-hszy.github.io/category/linux.html">Linux</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/linux.html">Linux</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/mindspore.html">Mindspore</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/qt.html">Qt</a></li>
-                                                <li><a href="https://yzsh-hszy.github.io/category/sqlcipher.html">SQLCipher</a></li>
+                                                <li class="active"><a href="https://yzsh-hszy.github.io/category/sqlcipher.html">SQLCipher</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/test.html">Test</a></li>
                         </ul></nav>
                 </header><!-- /#banner -->
@@ -27,27 +27,63 @@
     <article>
       <header>
         <h1 class="entry-title">
-          <a href="https://yzsh-hszy.github.io/2025-03-15-linux-root-file-system-make.html" rel="bookmark"
-             title="Permalink to Linux Root File System Make.">Linux Root File System Make.</a></h1>
+          <a href="https://yzsh-hszy.github.io/2025-09-10-compile-sqlcipher-using-msvc.html" rel="bookmark"
+             title="Permalink to Compile SQLCipher Using MSVC">Compile SQLCipher Using MSVC</a></h1>
       </header>
 
       <div class="entry-content">
 <footer class="post-info">
-        <abbr class="published" title="2025-03-15T12:00:00+08:00">
-                Published: Sat 15 March 2025
+        <abbr class="published" title="2025-09-10T12:00:00+08:00">
+                Published: Wed 10 September 2025
         </abbr>
 
                 <address class="vcard author">
                         By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
                 </address>
-        <p>In <a href="https://yzsh-hszy.github.io/category/linux.html">Linux</a>.</p>
+        <p>In <a href="https://yzsh-hszy.github.io/category/sqlcipher.html">SQLCipher</a>.</p>
         
-</footer><!-- /.post-info -->        <h1>笔记介绍</h1>
-<p>此文件记载我学习定制linux系统中关于 <code>root file system</code> 的部分</p>
-<h2>参考文档</h2>
+</footer><!-- /.post-info -->        <h1>介绍</h1>
+<p>记录使用 <code>MSVC</code> 编译器编译 <code>SQLCipher</code> 这个加密<code>SQLite</code>扩展项目的笔记</p>
+<h2>准备</h2>
 <ul>
-<li><a href="https://www.cnblogs.com/wsg1100/p/13127636.html">博客园-制作ubuntu-base rootfs博客</a></li>
+<li><code>ActiveTcl</code>: 一个Tcl/Tk 发行版, 开箱即用(SQLCipher需要tclsh用于生产源代码和测试)</li>
+<li><code>OpenSSL</code>: SQLCipher使用的加密后端</li>
 </ul>
+<blockquote>
+<p>参考文档:</p>
+</blockquote>
+<ul>
+<li><a href="https://github.com/sqlcipher/sqlcipher">sqlcipher官方仓库</a></li>
+<li><a href="https://discuss.zetetic.net/c/sqlcipher/5?page=3">sqlcipher社区</a></li>
+<li><a href="https://platform.activestate.com/ActiveState/ActiveTcl-8.6">ActiveTcl下载</a></li>
+</ul>
+<h2>编译</h2>
+<p>以<code>4.1.0</code>版本<code>SQLCipher</code>为例</p>
+<ul>
+<li>准备 <code>openssl 1.1.x</code> 库, <code>ActiveTcl</code>包(<code>sqlcipher</code>使用<code>tcl</code>生成部分源码和测试)</li>
+<li>拉取 <code>sqlcipher</code> 源码并切换到4.1.0</li>
+<li>修改 <code>Makefile.msc</code> 添加<code>TCC</code>/<code>RCC</code>/<code>LTLINKOPTS</code>的额外选项, 如下所示</li>
+</ul>
+<pre><code class="language-makefile">TCC = $(TCC) -DSQLITE_HAS_CODEC -DSQLITE_TEMP_STORE=2 -IC:\opt\openssl-1.1.1d-x64\include
+RCC = $(RCC) -DSQLITE_HAS_CODEC -DSQLITE_TEMP_STORE=2 -IC:\opt\openssl-1.1.1d-x64\include
+LTLINKOPTS = $(LTLINKOPTS) /LIBPATH:C:\opt\openssl-1.1.1d-x64\lib libcrypto.lib
+</code></pre>
+<blockquote>
+<p><code>nmake -f Makefile.msc</code> 编译所有目标</p>
+</blockquote>
+<p><strong>注意</strong></p>
+<ul>
+<li>不同sqlcipher版本支持的openssl-api不一致, 可根据changelog查看对应支持</li>
+<li><code>4.1.0</code> 版本只需要开启 <code>SQLITE_HAS_CODEC</code> 宏即可</li>
+</ul>
+<h2>示例</h2>
+<ul>
+<li><code>sqlite3 :memory: &quot;PRAGMA cipher_version;&quot;</code> 查看sqlcipher版本</li>
+<li><code>sqlite3 :memory: &quot;SELECT sqlite_version();&quot;</code> 查看对应的sqlite版本</li>
+<li><code>sqlite3 :memory: &quot;PRAGMA compile_options;&quot;</code> 查看编译选项</li>
+</ul>
+<p><strong>注意</strong> 加解密的<code>key</code>(密码)/<code>cipher_compatibility</code>(加密版本)/<code>kdf_iter</code>(密钥迭代次数)/<code>cipher</code>(加密方法) 都必须一致, 才能正确解密</p>
+<h3>使用C-API操作db</h3>
 
       </div><!-- /.entry-content -->
 

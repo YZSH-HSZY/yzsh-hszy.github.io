@@ -18,13 +18,80 @@
                                                 <li><a href="https://yzsh-hszy.github.io/category/mindspore.html">Mindspore</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/qt.html">Qt</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/sqlcipher.html">SQLCipher</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/test.html">Test</a></li>
                         </ul></nav>
                 </header><!-- /#banner -->
 
                 <aside id="featured" class="body">
                     <article>
-                        <h1 class="entry-title"><a href="https://yzsh-hszy.github.io/2025-09-01-qtableview-multi-key-sort.html">QTableView Multi-Key Sort</a></h1>
+                        <h1 class="entry-title"><a href="https://yzsh-hszy.github.io/2025-09-10-compile-sqlcipher-using-msvc.html">Compile SQLCipher Using MSVC</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2025-09-10T12:00:00+08:00">
+                Published: Wed 10 September 2025
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
+                </address>
+        <p>In <a href="https://yzsh-hszy.github.io/category/sqlcipher.html">SQLCipher</a>.</p>
+        
+</footer><!-- /.post-info --><h1>介绍</h1>
+<p>记录使用 <code>MSVC</code> 编译器编译 <code>SQLCipher</code> 这个加密<code>SQLite</code>扩展项目的笔记</p>
+<h2>准备</h2>
+<ul>
+<li><code>ActiveTcl</code>: 一个Tcl/Tk 发行版, 开箱即用(SQLCipher需要tclsh用于生产源代码和测试)</li>
+<li><code>OpenSSL</code>: SQLCipher使用的加密后端</li>
+</ul>
+<blockquote>
+<p>参考文档:</p>
+</blockquote>
+<ul>
+<li><a href="https://github.com/sqlcipher/sqlcipher">sqlcipher官方仓库</a></li>
+<li><a href="https://discuss.zetetic.net/c/sqlcipher/5?page=3">sqlcipher社区</a></li>
+<li><a href="https://platform.activestate.com/ActiveState/ActiveTcl-8.6">ActiveTcl下载</a></li>
+</ul>
+<h2>编译</h2>
+<p>以<code>4.1.0</code>版本<code>SQLCipher</code>为例</p>
+<ul>
+<li>准备 <code>openssl 1.1.x</code> 库, <code>ActiveTcl</code>包(<code>sqlcipher</code>使用<code>tcl</code>生成部分源码和测试)</li>
+<li>拉取 <code>sqlcipher</code> 源码并切换到4.1.0</li>
+<li>修改 <code>Makefile.msc</code> 添加<code>TCC</code>/<code>RCC</code>/<code>LTLINKOPTS</code>的额外选项, 如下所示</li>
+</ul>
+<pre><code class="language-makefile">TCC = $(TCC) -DSQLITE_HAS_CODEC -DSQLITE_TEMP_STORE=2 -IC:\opt\openssl-1.1.1d-x64\include
+RCC = $(RCC) -DSQLITE_HAS_CODEC -DSQLITE_TEMP_STORE=2 -IC:\opt\openssl-1.1.1d-x64\include
+LTLINKOPTS = $(LTLINKOPTS) /LIBPATH:C:\opt\openssl-1.1.1d-x64\lib libcrypto.lib
+</code></pre>
+<blockquote>
+<p><code>nmake -f Makefile.msc</code> 编译所有目标</p>
+</blockquote>
+<p><strong>注意</strong></p>
+<ul>
+<li>不同sqlcipher版本支持的openssl-api不一致, 可根据changelog查看对应支持</li>
+<li><code>4.1.0</code> 版本只需要开启 <code>SQLITE_HAS_CODEC</code> 宏即可</li>
+</ul>
+<h2>示例</h2>
+<ul>
+<li><code>sqlite3 :memory: &quot;PRAGMA cipher_version;&quot;</code> 查看sqlcipher版本</li>
+<li><code>sqlite3 :memory: &quot;SELECT sqlite_version();&quot;</code> 查看对应的sqlite版本</li>
+<li><code>sqlite3 :memory: &quot;PRAGMA compile_options;&quot;</code> 查看编译选项</li>
+</ul>
+<p><strong>注意</strong> 加解密的<code>key</code>(密码)/<code>cipher_compatibility</code>(加密版本)/<code>kdf_iter</code>(密钥迭代次数)/<code>cipher</code>(加密方法) 都必须一致, 才能正确解密</p>
+<h3>使用C-API操作db</h3>
+                    </article>
+                </aside><!-- /#featured -->
+                    <section id="content" class="body">
+                        <h1>Other articles</h1>
+                        <hr />
+                        <ol id="posts-list" class="hfeed">
+
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="https://yzsh-hszy.github.io/2025-09-01-qtableview-multi-key-sort.html" rel="bookmark"
+                               title="Permalink to QTableView Multi-Key Sort">QTableView Multi-Key Sort</a></h1>
+                    </header>
+
+                    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2025-09-01T12:00:00+08:00">
                 Published: Mon 01 September 2025
@@ -35,7 +102,7 @@
                 </address>
         <p>In <a href="https://yzsh-hszy.github.io/category/qt.html">Qt</a>.</p>
         
-</footer><!-- /.post-info --><h1>介绍</h1>
+</footer><!-- /.post-info -->                        <h1>介绍</h1>
 <p>在Qt的Tableview中让数据按多个指定项有序, 类似基数排序</p>
 <h2>key固定, 不会动态更改排序key</h2>
 <h3>使用自定义model实现静态多key有序</h3>
@@ -43,67 +110,10 @@
 <p>继承 <code>QAbstractTableModel</code> 实现自定义<code>TableModel</code>
 重写以下方法:</p>
 </blockquote>
-<pre><code class="language-cpp">QVariant data(const QModelIndex&amp; index, int role = Qt::DisplayRole) const override;
-int rowCount(const QModelIndex &amp;parent = QModelIndex()) const override;
-int columnCount(const QModelIndex &amp;parent = QModelIndex()) const override;
-QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-</code></pre>
-<blockquote>
-<p>使用 <code>QMap</code> 存储实际数据
-使用自定义 <code>POD</code> 类型作为 <code>QMap</code> 的key, 并重载 <code>openator&lt;</code> 函数</p>
-</blockquote>
-<pre><code class="language-python">%%writefile main.cpp
-
-struct TableModelMapKey {
-    int first;
-    int sencond;
-    int trhird;
-    bool operator&lt;(const TableModelMapKey&amp; o) const {
-        if (first != o.first) return first &lt; o.first;
-        else if (sencond != o.sencond) return sencond &lt; o.sencond;
-        else if (trhird != o.trhird) return trhird &lt; o.trhird;
-        return false;
-    }
-};
-QMap&lt;TableModelMapKey, QString&gt; _m_datas;
-</code></pre>
-<pre><code>Overwriting main.cpp
-</code></pre>
-<blockquote>
-<p>QMap定义为Template, 其中key</p>
-</blockquote>
-<pre><code class="language-cpp">template &lt;class Key, class T&gt;
-class QMap
-{
-    typedef QMapNode&lt;Key, T&gt; Node;
-
-    QMapData&lt;Key, T&gt; *d;
-    ...
-}
-</code></pre>
-<pre><code class="language-python">!g++ main.cpp `PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/home/smartwork/work/qtbase-69ce741c186c9a1dd4ea9eecb7a51725c4e62342/install/lib/pkgconfig pkg-config --libs --cflags Qt6Core` -o main.exe
-</code></pre>
-<pre><code class="language-python">!LD_LIBRARY_PATH=/home/smartwork/work/qtbase-69ce741c186c9a1dd4ea9eecb7a51725c4e62342/install/lib/ ./main.exe
-</code></pre>
-<pre><code>Hello World!
-</code></pre>
-<pre><code class="language-python">%%time
-import os
-
-print(os.getcwd())
-</code></pre>
-<pre><code>/home/smartwork/work/mblog/qt
-CPU times: user 0 ns, sys: 450 μs, total: 450 μs
-Wall time: 463 μs
-</code></pre>
-<pre><code class="language-python">
-</code></pre>
-                    </article>
-                </aside><!-- /#featured -->
-                    <section id="content" class="body">
-                        <h1>Other articles</h1>
-                        <hr />
-                        <ol id="posts-list" class="hfeed">
+<pre><code class="language-cpp">QVariant data(const QModelIndex&amp; index, int role = Qt::DisplayRole …</code></pre>
+                        <a class="readmore" href="https://yzsh-hszy.github.io/2025-09-01-qtableview-multi-key-sort.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
 
                 <li><article class="hentry">
                     <header>
@@ -315,43 +325,6 @@ Wall time: 463 μs
 <ol>
 <li>在类定义代码段中，使用无参数的 <code>super …</code></li></ol>
                         <a class="readmore" href="https://yzsh-hszy.github.io/2024-07-18-python-super-class-example-notes.html">read more</a>
-                    </div><!-- /.entry-content -->
-                </article></li>
-
-                <li><article class="hentry">
-                    <header>
-                        <h1><a href="https://yzsh-hszy.github.io/2024-07-18-python-thread-package-example-notes.html" rel="bookmark"
-                               title="Permalink to Python Thread Package Example Notes.">Python Thread Package Example Notes.</a></h1>
-                    </header>
-
-                    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2024-07-18T12:00:00+08:00">
-                Published: Thu 18 July 2024
-        </abbr>
-
-                <address class="vcard author">
-                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
-                </address>
-        <p>In <a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a>.</p>
-        
-</footer><!-- /.post-info -->                        <pre><code class="language-python">import atexit
-from datetime import datetime
-import threading
-from time import sleep
-def test_p():
-    print('this is test', str(datetime.now().strftime(&quot;%d/%m/%Y, %H:%M:%S&quot;)))
-    assert 1 == 1
-# atexit.register(test_p)
-    
-def thread_print():
-    i = 0
-    while i &lt; 1e3:
-        sleep(.001)
-        i += 1
-    print('threading end print')
-def …</code></pre>
-                        <a class="readmore" href="https://yzsh-hszy.github.io/2024-07-18-python-thread-package-example-notes.html">read more</a>
                     </div><!-- /.entry-content -->
                 </article></li>
                     </ol><!-- /#posts-list -->

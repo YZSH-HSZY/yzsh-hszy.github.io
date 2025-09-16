@@ -18,12 +18,50 @@
                                                 <li><a href="https://yzsh-hszy.github.io/category/mindspore.html">Mindspore</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/qemu.html">Qemu</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/qt.html">Qt</a></li>
+                                                <li><a href="https://yzsh-hszy.github.io/category/sqlcipher.html">SQLCipher</a></li>
                                                 <li><a href="https://yzsh-hszy.github.io/category/test.html">Test</a></li>
                         </ul></nav>
                 </header><!-- /#banner -->
 
                     <section id="content" class="body">
                         <ol id="posts-list" class="hfeed" start="9">
+                <li><article class="hentry">
+                    <header>
+                        <h1><a href="https://yzsh-hszy.github.io/2024-07-18-python-thread-package-example-notes.html" rel="bookmark"
+                               title="Permalink to Python Thread Package Example Notes.">Python Thread Package Example Notes.</a></h1>
+                    </header>
+
+                    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-07-18T12:00:00+08:00">
+                Published: Thu 18 July 2024
+        </abbr>
+
+                <address class="vcard author">
+                        By                                 <a class="url fn" href="https://yzsh-hszy.github.io/author/yzsh-hszy.html">YZSH-HSZY</a>
+                </address>
+        <p>In <a href="https://yzsh-hszy.github.io/category/cpython.html">Cpython</a>.</p>
+        
+</footer><!-- /.post-info -->                        <pre><code class="language-python">import atexit
+from datetime import datetime
+import threading
+from time import sleep
+def test_p():
+    print('this is test', str(datetime.now().strftime(&quot;%d/%m/%Y, %H:%M:%S&quot;)))
+    assert 1 == 1
+# atexit.register(test_p)
+    
+def thread_print():
+    i = 0
+    while i &lt; 1e3:
+        sleep(.001)
+        i += 1
+    print('threading end print')
+def …</code></pre>
+                        <a class="readmore" href="https://yzsh-hszy.github.io/2024-07-18-python-thread-package-example-notes.html">read more</a>
+                    </div><!-- /.entry-content -->
+                </article></li>
+
                 <li><article class="hentry">
                     <header>
                         <h1><a href="https://yzsh-hszy.github.io/2024-07-18-python-unicode-and-utf-8-different-notes.html" rel="bookmark"

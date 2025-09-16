@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Welcome to YZSH-HSZY blog. - YZSH-HSZY</title><link>https://yzsh-hszy.github.io/</link><description/><atom:link href="https://yzsh-hszy.github.io/feeds/yzsh-hszy.rss.xml" rel="self"/><lastBuildDate>Mon, 01 Sep 2025 12:00:00 +0800</lastBuildDate><item><title>QTableView Multi-Key Sort</title><link>https://yzsh-hszy.github.io/2025-09-01-qtableview-multi-key-sort.html</link><description>&lt;h1&gt;介绍&lt;/h1&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Welcome to YZSH-HSZY blog. - YZSH-HSZY</title><link>https://yzsh-hszy.github.io/</link><description/><atom:link href="https://yzsh-hszy.github.io/feeds/yzsh-hszy.rss.xml" rel="self"/><lastBuildDate>Wed, 10 Sep 2025 12:00:00 +0800</lastBuildDate><item><title>Compile SQLCipher Using MSVC</title><link>https://yzsh-hszy.github.io/2025-09-10-compile-sqlcipher-using-msvc.html</link><description>&lt;h1&gt;介绍&lt;/h1&gt;
+&lt;p&gt;记录使用 &lt;code&gt;MSVC&lt;/code&gt; 编译器编译 &lt;code&gt;SQLCipher&lt;/code&gt; 这个加密&lt;code&gt;SQLite&lt;/code&gt;扩展项目的笔记&lt;/p&gt;
+&lt;h2&gt;准备&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ActiveTcl&lt;/code&gt;: 一个Tcl/Tk 发行版, 开箱即用(SQLCipher需要tclsh用于生产源代码和测试)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;OpenSSL&lt;/code&gt;: SQLCipher使用的加密后端&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;参考文档:&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/sqlcipher/sqlcipher"&gt;sqlcipher官方仓库&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://discuss.zetetic.net/c/sqlcipher/5?page=3"&gt;sqlcipher社区&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://platform.activestate.com/ActiveState/ActiveTcl-8.6"&gt;ActiveTcl下载&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;编 …&lt;/h2&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">YZSH-HSZY</dc:creator><pubDate>Wed, 10 Sep 2025 12:00:00 +0800</pubDate><guid>tag:yzsh-hszy.github.io,2025-09-10:/2025-09-10-compile-sqlcipher-using-msvc.html</guid><category>SQLCipher</category></item><item><title>QTableView Multi-Key Sort</title><link>https://yzsh-hszy.github.io/2025-09-01-qtableview-multi-key-sort.html</link><description>&lt;h1&gt;介绍&lt;/h1&gt;
 &lt;p&gt;在Qt的Tableview中让数据按多个指定项有序, 类似基数排序&lt;/p&gt;
 &lt;h2&gt;key固定, 不会动态更改排序key&lt;/h2&gt;
 &lt;h3&gt;使用自定义model实现静态多key有序&lt;/h3&gt;
