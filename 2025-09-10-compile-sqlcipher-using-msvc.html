@@ -84,6 +84,46 @@ LTLINKOPTS = $(LTLINKOPTS) /LIBPATH:C:\opt\openssl-1.1.1d-x64\lib libcrypto.lib
 </ul>
 <p><strong>注意</strong> 加解密的<code>key</code>(密码)/<code>cipher_compatibility</code>(加密版本)/<code>kdf_iter</code>(密钥迭代次数)/<code>cipher</code>(加密方法) 都必须一致, 才能正确解密</p>
 <h3>使用C-API操作db</h3>
+<pre><code class="language-c">
+</code></pre>
+<h3>python binding of sqlcipher</h3>
+<p>使用 <code>pysqlcipher3</code> 包完成 <code>sqlcipher</code> 的py绑定</p>
+<blockquote>
+<p>参考:</p>
+</blockquote>
+<ul>
+<li><a href="https://github.com/rigglemania/pysqlcipher3.git">pysqlcipher3仓库</a></li>
+</ul>
+<p><strong>环境</strong></p>
+<p><code>MSVC 19</code>/<code>cl for x64</code>/<code>sqlcipher 4.1.0</code>/<code>openssl 1.1.1d</code></p>
+<p><strong>步骤</strong></p>
+<ul>
+<li>准备 <code>sqlcipher</code> 的源码, 生成加密版本的 <code>sqlite3.c</code> 文件</li>
+<li>拉取 <code>pysqlcipher3</code> 的代码仓库</li>
+<li>复制 <code>sqlite3.c</code>/<code>sqlite3.h</code> 到 <code>pysqlcipher3/amalgamation</code> 下</li>
+<li>修复 <code>pysqlcipher3/setup.py</code> 的高版本兼容问题
+<blockquote>
+<p><code>cl</code> 定义python API模块名宏 <code>MODULE_NAME</code> 的字符串错误, 在 <code>quote_argument</code> 方法修改 <code>quote = '&quot;' if sys.platform != 'win32' else '\\&quot;'</code> 为 <code>quote = '&quot;' if sys.platform != 'win32' else '\&quot;'</code>
+<code>OPENSSL_CONF</code> 在 <code>1.1</code> 以下版本中存在, <code>pysqlcipher3</code> 仅用它来定位库路径, <code>1.1.1d</code> 版本中可以使用<code>libcrypto.lib</code>的绝对路径来代替
+链接库 <code>libeay32.lib</code> 在 <code>1.1.0</code> 版本中被弃用, 更改为 <code>libcrypto.lib</code></p>
+</blockquote>
+</li>
+<li>设置 <code>OPENSSL_CONF</code> 环境变量及激活msvc_x64终端</li>
+<li>使用 <code>python setup.py build_amalgamation</code> 的源码编译版本, 而不是 <code>build_ext</code> 的库链接版本</li>
+</ul>
+<h4>使用pysqlcipher3操作sqlite3</h4>
+<pre><code class="language-py">from pysqlcipher3 import dbapi2 as sqlite
+conn = sqlite.connect('test.db')
+c = conn.cursor()
+c.execute(&quot;PRAGMA key='password'&quot;)
+c.execute(&quot;PRAGMA cipher_compatibility = 3&quot;)
+c.execute('''create table if not exists stocks (date text, trans text, symbol text, qty real, price real)''')
+c.execute(&quot;&quot;&quot;insert into stocks values ('2006-01-05','BUY','RHAT',100,35.14)&quot;&quot;&quot;)
+c.execute(&quot;&quot;&quot;select * from stocks&quot;&quot;&quot;)
+print(c.fetchall())
+conn.commit()
+c.close()
+</code></pre>
 
       </div><!-- /.entry-content -->
 

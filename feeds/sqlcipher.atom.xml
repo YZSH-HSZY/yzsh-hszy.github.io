@@ -56,4 +56,44 @@ LTLINKOPTS = $(LTLINKOPTS) /LIBPATH:C:\opt\openssl-1.1.1d-x64\lib libcrypto.lib
 &lt;/ul&gt;
 &lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt; 加解密的&lt;code&gt;key&lt;/code&gt;(密码)/&lt;code&gt;cipher_compatibility&lt;/code&gt;(加密版本)/&lt;code&gt;kdf_iter&lt;/code&gt;(密钥迭代次数)/&lt;code&gt;cipher&lt;/code&gt;(加密方法) 都必须一致, 才能正确解密&lt;/p&gt;
 &lt;h3&gt;使用C-API操作db&lt;/h3&gt;
+&lt;pre&gt;&lt;code class="language-c"&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;python binding of sqlcipher&lt;/h3&gt;
+&lt;p&gt;使用 &lt;code&gt;pysqlcipher3&lt;/code&gt; 包完成 &lt;code&gt;sqlcipher&lt;/code&gt; 的py绑定&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;参考:&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/rigglemania/pysqlcipher3.git"&gt;pysqlcipher3仓库&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;环境&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;MSVC 19&lt;/code&gt;/&lt;code&gt;cl for x64&lt;/code&gt;/&lt;code&gt;sqlcipher 4.1.0&lt;/code&gt;/&lt;code&gt;openssl 1.1.1d&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;步骤&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;准备 &lt;code&gt;sqlcipher&lt;/code&gt; 的源码, 生成加密版本的 &lt;code&gt;sqlite3.c&lt;/code&gt; 文件&lt;/li&gt;
+&lt;li&gt;拉取 &lt;code&gt;pysqlcipher3&lt;/code&gt; 的代码仓库&lt;/li&gt;
+&lt;li&gt;复制 &lt;code&gt;sqlite3.c&lt;/code&gt;/&lt;code&gt;sqlite3.h&lt;/code&gt; 到 &lt;code&gt;pysqlcipher3/amalgamation&lt;/code&gt; 下&lt;/li&gt;
+&lt;li&gt;修复 &lt;code&gt;pysqlcipher3/setup.py&lt;/code&gt; 的高版本兼容问题
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;cl&lt;/code&gt; 定义python API模块名宏 &lt;code&gt;MODULE_NAME&lt;/code&gt; 的字符串错误, 在 &lt;code&gt;quote_argument&lt;/code&gt; 方法修改 &lt;code&gt;quote = '&amp;quot;' if sys.platform != 'win32' else '\\&amp;quot;'&lt;/code&gt; 为 &lt;code&gt;quote = '&amp;quot;' if sys.platform != 'win32' else '\&amp;quot;'&lt;/code&gt;
+&lt;code&gt;OPENSSL_CONF&lt;/code&gt; 在 &lt;code&gt;1.1&lt;/code&gt; 以下版本中存在, &lt;code&gt;pysqlcipher3&lt;/code&gt; 仅用它来定位库路径, &lt;code&gt;1.1.1d&lt;/code&gt; 版本中可以使用&lt;code&gt;libcrypto.lib&lt;/code&gt;的绝对路径来代替
+链接库 &lt;code&gt;libeay32.lib&lt;/code&gt; 在 &lt;code&gt;1.1.0&lt;/code&gt; 版本中被弃用, 更改为 &lt;code&gt;libcrypto.lib&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;设置 &lt;code&gt;OPENSSL_CONF&lt;/code&gt; 环境变量及激活msvc_x64终端&lt;/li&gt;
+&lt;li&gt;使用 &lt;code&gt;python setup.py build_amalgamation&lt;/code&gt; 的源码编译版本, 而不是 &lt;code&gt;build_ext&lt;/code&gt; 的库链接版本&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;使用pysqlcipher3操作sqlite3&lt;/h4&gt;
+&lt;pre&gt;&lt;code class="language-py"&gt;from pysqlcipher3 import dbapi2 as sqlite
+conn = sqlite.connect('test.db')
+c = conn.cursor()
+c.execute(&amp;quot;PRAGMA key='password'&amp;quot;)
+c.execute(&amp;quot;PRAGMA cipher_compatibility = 3&amp;quot;)
+c.execute('''create table if not exists stocks (date text, trans text, symbol text, qty real, price real)''')
+c.execute(&amp;quot;&amp;quot;&amp;quot;insert into stocks values ('2006-01-05','BUY','RHAT',100,35.14)&amp;quot;&amp;quot;&amp;quot;)
+c.execute(&amp;quot;&amp;quot;&amp;quot;select * from stocks&amp;quot;&amp;quot;&amp;quot;)
+print(c.fetchall())
+conn.commit()
+c.close()
+&lt;/code&gt;&lt;/pre&gt;
 </content><category term="SQLCipher"/></entry></feed>
